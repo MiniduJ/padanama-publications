@@ -78,7 +78,7 @@ export async function getBooks(params: BookFilterParams = {}) {
         include: {
           authors: { include: { author: true } },
           categories: { include: { category: true } },
-          editions: { where: { isDeleted: false } },
+          editions: { where: { isDeleted: false }, orderBy: { isDigital: "asc" } },
           sampleConfig: true,
         },
         orderBy,
@@ -112,7 +112,7 @@ export async function getBookBySlug(slug: string) {
       include: {
         authors: { include: { author: true } },
         categories: { include: { category: true } },
-        editions: { where: { isDeleted: false } },
+        editions: { where: { isDeleted: false }, orderBy: { isDigital: "asc" } },
         sampleConfig: true,
         reviews: {
           where: { isApproved: true },

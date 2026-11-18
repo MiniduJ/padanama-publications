@@ -29,8 +29,8 @@ describe.skipIf(!run)("database integration", () => {
     const { PATCH } = await import("@/app/api/admin/[resource]/[id]/route");
     const list = await (await GET(req("/api/admin/books?q=382"), ctx({ resource: "books" }))).json();
     expect(list.total).toBeGreaterThan(0);
-    const book = list.rows[0];
-    const upd = await PATCH(req(`/api/admin/books/${book.id}`, { method: "PATCH", body: JSON.stringify({ priceCents: 99900, samplePageUrls: ["https://x.test/p1.jpg", "https://x.test/p2.jpg"], maxPages: 10 }) }), ctx({ resource: "books", id: book.id }));
+    const book = list.rows.find((r: any) => r.slug === "382");
+    const upd = await PATCH(req(`/api/admin/books/${book.id}`, { method: "PATCH", body: JSON.stringify({ priceCents: 99900, salePriceCents: null, samplePageUrls: ["https://x.test/p1.jpg", "https://x.test/p2.jpg"], maxPages: 10 }) }), ctx({ resource: "books", id: book.id }));
     const saved = await upd.json();
     expect(upd.status).toBe(200);
     expect(saved.priceCents).toBe(99900);

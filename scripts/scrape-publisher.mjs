@@ -38,9 +38,13 @@ function parseDetail(id, html) {
   const gallery = [...new Set(imgs.map(abs))];
   const stock = field(html, "Availability");
   const desc = html.match(/id="tab-1"[\s\S]*?<article class="review-article">([\s\S]*?)<\/article>/)?.[1] || "";
-  const preview = html.match(/id="tab-2"[\s\S]*?<iframe[^>]+src="([^"]+)"/)?.[1] || null;
-  const material = html.match(/id="tab-3"[\s\S]*?<iframe[^>]+src="([^"]+)"/)?.[1] || null;
-  const yt = material?.match(/(?:list=[\w-]+|youtu\.be\/[\w-]{11}|watch\?v=[\w-]{11}|embed\/[\w-]{11}$)/) ? material.replace("https://www.youtube.com/embed/https://", "https://") : null;
+  // Each tab's iframe must sit inside that tab (otherwise tab-2 would grab tab-3's iframe).
+  const tab = (n) => html.match(new RegExp(`id="tab-${n}"([\s\S]*?)(?:id="tab-${n + 1}"|<!-- <div class="tab-product-details">)`))?.[1] || "";
+  const preview = tab(2).match(/<iframe[^>]+src="([^"]+)"/)?.[1] || null;
+  const material = tab(3).match(/<iframe[^>]+src="([^"]+)"/)?.[1] || null;
+  const ytId = material?.match(/(?:embed\/|youtu\.be\/|v=)([\w-]{11})(?:$|[?&])/)?.[1];
+  const ytList = material?.match(/list=([\w-]+)/)?.[1];
+  const yt = ytId ? `https://www.youtube.com/watch?v=${ytId}` : ytList ? `https://www.youtube.com/playlist?list=${ytList}` : null;
   const priceNew = money(html.match(/class="price-new">([^<]+)</)?.[1]);
   const priceOld = money(html.match(/class="price-old">([^<]+)</)?.[1]);
   const category = field(html, "Category");
@@ -62,7 +66,7 @@ function parseDetail(id, html) {
     description: decode(desc) || null,
     cover: gallery[0] || null,
     gallery: gallery.slice(1),
-    previewUrl: preview && /^https?:\/\//.test(preview) ? preview : null,
+    previewUrl: preview && /^https?:\/\//.test(preview) && !preview.includes("youtube") ? preview : null,
     materialsUrl: yt,
   };
 }
