@@ -4,6 +4,7 @@ import { getBookBySlug } from "@/server/catalog/books";
 import { formatLkr } from "@/lib/money";
 import { Rating } from "@/components/ui/Rating";
 import { Badge } from "@/components/ui/Badge";
+import { AddToCartButton } from "@/components/store/AddToCartButton";
 import { Link } from "@/i18n/routing";
 import {
   BookOpen,
@@ -168,41 +169,31 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
             )}
           </div>
 
-          {/* Edition / Format Selector */}
-          <div className="space-y-2">
-            <span className="text-xs font-bold text-ink uppercase tracking-wider block">
-              පොතෙහි මුද්‍රණ වර්ගය (Select Format):
-            </span>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {book.editions?.map((ed: any) => (
-                <div
-                  key={ed.id}
-                  className="p-3 rounded-xl border-2 border-maroon-500 bg-maroon-50/50 cursor-pointer shadow-sm text-left"
-                >
-                  <span className="text-xs font-bold block text-maroon-900">
-                    {ed.format === "PAPERBACK"
-                      ? "සාමාන්‍ය මුද්‍රණය"
-                      : ed.format === "HARDCOVER"
-                      ? "දෘඩ කවරය"
-                      : "ඊ-පොත (ඩිජිටල්)"}
-                  </span>
-                  <span className="text-xs text-saffron-700 font-bold block">
-                    {formatLkr(ed.salePriceCents || ed.priceCents, "si")}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Interactive Format Selector, Quantity & Add to Cart */}
+          <AddToCartButton
+            book={{
+              id: book.id,
+              slug: book.slug,
+              titleSi: book.titleSi,
+              titleEn: book.titleEn,
+              authorName: authorName,
+              coverImage: book.coverImage || undefined,
+              editions: book.editions?.map((e: any) => ({
+                id: e.id,
+                format: e.format,
+                priceCents: e.priceCents,
+                salePriceCents: e.salePriceCents,
+                weightGrams: e.weightGrams,
+              })) || [],
+            }}
+            defaultFormat={(primaryEdition.format as any) || "PAPERBACK"}
+            locale="si"
+          />
 
-          {/* Action CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 pt-2">
-            <button className="flex-1 py-3.5 px-6 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
-              <ShoppingBag className="w-4 h-4" />
-              <span>බෑගයට එක් කරන්න (Add to Cart)</span>
-            </button>
+          <div className="pt-1">
             <Link
               href="/checkout"
-              className="py-3.5 px-6 rounded-xl bg-maroon-900 hover:bg-maroon-950 text-cream font-bold text-sm shadow-md transition-all text-center"
+              className="w-full py-3.5 px-6 rounded-xl bg-maroon-900 hover:bg-maroon-950 text-cream font-bold text-sm shadow-md transition-all text-center block"
             >
               දැන්ම මිලදී ගන්න (Buy Now)
             </Link>
