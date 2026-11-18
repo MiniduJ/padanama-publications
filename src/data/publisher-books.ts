@@ -28,7 +28,7 @@ export interface PublisherBook {
   subject: string | null;
   isbn: string | null;
   description: string | null;
-  coverUrl: string;
+  coverUrl: string | null;
   gallery: string[];
   previewUrl: string | null;
   materialsUrl: string | null;
@@ -74,6 +74,9 @@ export function productTypeOf(b: ScrapedBook): ProductType {
   return "BOOK";
 }
 
+// Legacy site emits ".../image/books/" (no file name) for items without a picture.
+const realImage = (u: string | null) => (u && !u.endsWith("/") ? u : null);
+
 const LANG: Record<string, PublisherBook["language"]> = { english: "ENGLISH", tamil: "TAMIL" };
 
 export const REAL_PUBLISHER_BOOKS: PublisherBook[] = (raw as ScrapedBook[])
@@ -95,8 +98,8 @@ export const REAL_PUBLISHER_BOOKS: PublisherBook[] = (raw as ScrapedBook[])
     subject: b.subject,
     isbn: b.isbn,
     description: b.description,
-    coverUrl: b.cover || "/favicon.png",
-    gallery: b.gallery,
+    coverUrl: realImage(b.cover),
+    gallery: b.gallery.filter((g) => realImage(g)),
     previewUrl: b.previewUrl,
     materialsUrl: b.materialsUrl,
     stock: b.inStock ? b.stock : 0,

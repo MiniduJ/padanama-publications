@@ -476,6 +476,10 @@ async function main() {
       },
     });
   }
+  // Clean legacy empty image paths (".../image/books/") so pages show the placeholder instead of a 403.
+  await prisma.$executeRaw`UPDATE "Book" SET "coverUrl" = NULL WHERE "coverUrl" LIKE '%/'`;
+  await prisma.$executeRaw`UPDATE "Book" SET "galleryUrls" = array(SELECT g FROM unnest("galleryUrls") g WHERE g NOT LIKE '%/') WHERE EXISTS (SELECT 1 FROM unnest("galleryUrls") g WHERE g LIKE '%/')`;
+
   // Always reconcile product types (cheap; also fixes databases seeded before types existed).
   for (const t of ["STATIONERY", "LEARNING_AID"] as const) {
     const ids = REAL_PUBLISHER_BOOKS.filter((x) => x.productType === t).map((x) => x.id);
