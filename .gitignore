@@ -20,6 +20,11 @@ dist/
 .env
 .env*.local
 !.env.example
+*.json.key
+*key*.json
+firebase-key.json
+.firebase/
+public_html/
 
 # Logs
 logs
