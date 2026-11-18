@@ -9,7 +9,10 @@ export interface ScrapedBook {
   cover: string | null; gallery: string[]; previewUrl: string | null; materialsUrl: string | null;
 }
 
+export type ProductType = "BOOK" | "STATIONERY" | "LEARNING_AID";
+
 export interface PublisherBook {
+  productType: ProductType;
   id: string;
   originalId: string;
   slug: string;
@@ -63,11 +66,20 @@ const CATEGORY_SLUGS: Record<string, string> = {
 export const categorySlugFor = (name: string, fallback: string) =>
   CATEGORY_SLUGS[name.trim().replace(/\s+/g, " ").toLowerCase()] || fallback || "other";
 
+/** Legacy site mixes books with stationery and wall charts / activity tools; classify from its own fields. */
+export function productTypeOf(b: ScrapedBook): ProductType {
+  const type = (b.bookType || "").toLowerCase(), sub = (b.subCategory || "").toLowerCase(), cat = b.category.toLowerCase();
+  if (type === "school stationery" || sub === "other school stationaries" || sub === "bags" || (cat.startsWith("school stationary") && type === "others")) return "STATIONERY";
+  if (type.startsWith("chart list") || sub.startsWith("size ") || (sub === "activity tools" && !/book/i.test(b.title))) return "LEARNING_AID";
+  return "BOOK";
+}
+
 const LANG: Record<string, PublisherBook["language"]> = { english: "ENGLISH", tamil: "TAMIL" };
 
 export const REAL_PUBLISHER_BOOKS: PublisherBook[] = (raw as ScrapedBook[])
   .filter((b) => b.priceCents)
   .map((b, idx) => ({
+    productType: productTypeOf(b),
     id: `pdn-${b.id}`,
     originalId: b.id,
     slug: b.id,

@@ -6,6 +6,7 @@ export interface BookFilterParams {
   category?: string;
   author?: string;
   format?: string;
+  type?: string; // BOOK | STATIONERY | LEARNING_AID | "items" (= any non-book)
   language?: string;
   query?: string;
   sort?: "newest" | "price_asc" | "price_desc" | "rating" | "title";
@@ -14,7 +15,7 @@ export interface BookFilterParams {
 }
 
 export async function getBooks(params: BookFilterParams = {}) {
-  const { category, author, format, language, query, sort = "newest", page = 1, limit = 12 } = params;
+  const { category, author, format, language, query, type, sort = "newest", page = 1, limit = 12 } = params;
   const skip = (page - 1) * limit;
 
   try {
@@ -24,6 +25,9 @@ export async function getBooks(params: BookFilterParams = {}) {
     const where: any = {
       isDeleted: false,
     };
+
+    if (type === "items") where.productType = { not: "BOOK" };
+    else if (type) where.productType = type;
 
     if (category && category !== "all") {
       where.categories = {
@@ -172,8 +176,9 @@ const ALL_CATALOG_BOOKS = REAL_PUBLISHER_BOOKS.map((b) => ({
       },
     },
   ],
-  sampleConfig: { maxPages: 20, percentageLimit: 20 },
-  editions: [
+  productType: b.productType,
+  sampleConfig: b.productType === "BOOK" ? { maxPages: 20, percentageLimit: 20 } : null,
+  editions: ([
     {
       id: `${b.id}-ed-pb`,
       format: "PAPERBACK",
@@ -195,14 +200,15 @@ const ALL_CATALOG_BOOKS = REAL_PUBLISHER_BOOKS.map((b) => ({
       pageCount: null,
       isDigital: true,
     },
-  ],
+  ] as any[]).filter((e) => b.productType === "BOOK" || e.format !== "EBOOK"),
 }));
 
 // Resilient fallback dataset populated with real publisher inventory
 export function getFallbackBooks(params: BookFilterParams = {}) {
-  const { category, query, sort = "newest", page = 1, limit = 12 } = params;
+  const { category, query, type, sort = "newest", page = 1, limit = 12 } = params;
 
   let filtered = [...ALL_CATALOG_BOOKS];
+  if (type) filtered = filtered.filter((b) => (type === "items" ? b.productType !== "BOOK" : b.productType === type));
 
   if (category && category !== "all") {
     filtered = filtered.filter((b) =>
@@ -252,4 +258,23 @@ export function getFallbackBooks(params: BookFilterParams = {}) {
       totalPages: Math.max(1, Math.ceil(total / limit)),
     },
   };
+}
+
+/** Live item counts per category slug (+ "all"), from the DB or the static catalogue. */
+export async function getCategoryCounts(type?: string): Promise<Record<string, number>> {
+  const match = (t: string) => !type || (type === "items" ? t !== "BOOK" : t === type);
+  try {
+    const rows = await db.bookCategory.findMany({
+      where: { book: { isDeleted: false, ...(type ? { productType: type === "items" ? { not: "BOOK" } : (type as any) } : {}) } },
+      select: { category: { select: { slug: true } } },
+    });
+    if (rows.length) {
+      const c: Record<string, number> = { all: 0 };
+      for (const r of rows) { c[r.category.slug] = (c[r.category.slug] || 0) + 1; c.all++; }
+      return c;
+    }
+  } catch { /* fall back */ }
+  const c: Record<string, number> = { all: 0 };
+  for (const b of ALL_CATALOG_BOOKS) if (match(b.productType)) { const s = b.categories[0].category.slug; c[s] = (c[s] || 0) + 1; c.all++; }
+  return c;
 }

@@ -6,6 +6,7 @@ import { signAdminSession, verifyAdminSession, canAccess } from "@/server/auth/a
 import { shippingCents } from "@/lib/shipping";
 import { coerce } from "@/server/admin/handlers";
 import { RESOURCES } from "@/lib/admin-resources";
+import { productTypeOf } from "@/data/publisher-books";
 
 beforeAll(() => { process.env.AUTH_SECRET = "test-secret-that-is-at-least-32-characters"; });
 
@@ -43,5 +44,16 @@ describe("admin field whitelist", () => {
     expect(out).toEqual({ status: "SHIPPED" });
     expect(() => coerce(RESOURCES.orders, { status: "HACKED" }, true)).toThrow();
     expect(() => coerce(RESOURCES.expenses, { description: "x" }, false)).toThrow();
+  });
+});
+
+describe("catalogue product types", () => {
+  const base = { id: "1", title: "x", author: "a", grade: null, medium: "Sinhala", isbn: null, category: "Pre School", categorySlug: "p", subject: null, inStock: true, stock: 1, priceCents: 100, salePriceCents: null, description: null, cover: null, gallery: [], previewUrl: null, materialsUrl: null };
+  it("separates stationery and learning aids from books", () => {
+    expect(productTypeOf({ ...base, bookType: "SCHOOL STATIONERY", subCategory: null })).toBe("STATIONERY");
+    expect(productTypeOf({ ...base, bookType: "Chart List - පත්‍රිකා ලැයිස්තුව", subCategory: "Size 24*36 ප්‍රමාණය" })).toBe("LEARNING_AID");
+    expect(productTypeOf({ ...base, title: "ENGLISH ALPHABET CIRCLE", bookType: "Reading Book", subCategory: "Activity Tools" })).toBe("LEARNING_AID");
+    expect(productTypeOf({ ...base, title: "Nelson English Pupil Book 2", bookType: "Reading Book", subCategory: "Activity Tools" })).toBe("BOOK");
+    expect(productTypeOf({ ...base, bookType: "Work Book (වැඩ පොත්)", subCategory: "Work Book" })).toBe("BOOK");
   });
 });

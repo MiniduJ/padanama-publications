@@ -445,7 +445,7 @@ async function main() {
     if (isbn) isbns.add(isbn);
     const fields = {
       slug: b.slug, titleSi: b.titleSi, titleEn: b.titleEn, transliterated: b.transliterated, language: b.language as BookLanguage,
-      coverUrl: b.coverUrl, synopsisSi: b.description, grade: b.grade, subject: b.subject, bookType: b.type,
+      productType: b.productType, coverUrl: b.coverUrl, synopsisSi: b.description, grade: b.grade, subject: b.subject, bookType: b.type,
       galleryUrls: b.gallery, previewUrl: b.previewUrl, materialsUrl: b.materialsUrl, publisherId: publisher.id,
     };
     const exists = await prisma.book.findUnique({ where: { id: b.id }, select: { id: true } });
@@ -465,16 +465,24 @@ async function main() {
         id: b.id, ...fields,
         categories: { create: { categoryId: cats.get(b.categorySlug)! } },
         authors: { create: { authorId: authors.get(b.author)! } },
-        sampleConfig: { create: { sampleType: SampleType.PAGE_RANGE, maxPages: 20 } },
+        ...(b.productType === "BOOK" ? { sampleConfig: { create: { sampleType: SampleType.PAGE_RANGE, maxPages: 20 } } } : {}),
         editions: {
           create: [
             { id: `${b.id}-ed-pb`, format: BookFormat.PAPERBACK, sku: `PDN-${b.originalId}-PB`, isbn, priceCents: b.priceCents, salePriceCents: b.salePriceCents, stockQuantity: b.stock },
-            { id: `${b.id}-ed-eb`, format: BookFormat.EBOOK, sku: `PDN-${b.originalId}-EB`, isDigital: true, stockQuantity: 99999,
-              priceCents: Math.round(b.priceCents * 0.65), salePriceCents: b.salePriceCents ? Math.round(b.salePriceCents * 0.65) : null },
+            ...(b.productType === "BOOK" ? [{ id: `${b.id}-ed-eb`, format: BookFormat.EBOOK, sku: `PDN-${b.originalId}-EB`, isDigital: true, stockQuantity: 99999,
+              priceCents: Math.round(b.priceCents * 0.65), salePriceCents: b.salePriceCents ? Math.round(b.salePriceCents * 0.65) : null }] : []),
           ],
         },
       },
     });
+  }
+  // Always reconcile product types (cheap; also fixes databases seeded before types existed).
+  for (const t of ["STATIONERY", "LEARNING_AID"] as const) {
+    const ids = REAL_PUBLISHER_BOOKS.filter((x) => x.productType === t).map((x) => x.id);
+    await prisma.book.updateMany({ where: { id: { in: ids }, productType: "BOOK" }, data: { productType: t } });
+    // Stationery and charts are not readable: retire their e-book editions and sample configs.
+    await prisma.bookEdition.updateMany({ where: { bookId: { in: ids }, isDigital: true }, data: { isDeleted: true, isActive: false } });
+    await prisma.sampleConfig.deleteMany({ where: { bookId: { in: ids } } });
   }
   console.log(`📚 Catalogue: ${REAL_PUBLISHER_BOOKS.length} books, ${cats.size} categories, ${authors.size} authors`);
 

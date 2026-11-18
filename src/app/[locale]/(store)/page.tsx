@@ -38,7 +38,7 @@ function BookGrid({ books, locale }: { books: any[]; locale: string }) {
             salePriceCents={ed.salePriceCents}
             rating={book.averageRating || 4.9}
             format={ed.format || "Paperback"}
-            hasFreeSample
+            hasFreeSample={!!book.sampleConfig}
             isBestSeller={book.isBestSeller}
           />
         );

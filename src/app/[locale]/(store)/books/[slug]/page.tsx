@@ -126,6 +126,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
   const { slug, locale } = await params;
   const book = await getBookBySlug(slug);
   const t = TEXT[(locale as keyof typeof TEXT)] || TEXT.si;
+  const isBook = !book.productType || book.productType === "BOOK";
 
   if (!book) {
     notFound();
@@ -140,7 +141,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
   // JSON-LD structured data for Google Search
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Book",
+    "@type": book.productType && book.productType !== "BOOK" ? "Product" : "Book",
     name: book.titleSi,
     alternateName: book.titleEn,
     author: {
@@ -334,9 +335,11 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
                 [t.grade, book.grade],
                 [t.subject, book.subject],
                 [t.bookType, book.bookType],
-                [t.isbn, primaryEdition.isbn],
-                [t.pages, primaryEdition.pageCount && `${primaryEdition.pageCount}${t.pagesUnit}`],
-                [t.language, book.language === "ENGLISH" ? "English" : book.language === "TAMIL" ? "தமிழ்" : t.sinhala],
+                ...(isBook ? [
+                  [t.isbn, primaryEdition.isbn],
+                  [t.pages, primaryEdition.pageCount && `${primaryEdition.pageCount}${t.pagesUnit}`],
+                  [t.language, book.language === "ENGLISH" ? "English" : book.language === "TAMIL" ? "தமிழ்" : t.sinhala],
+                ] : []),
                 [t.stock, primaryEdition.stockQuantity > 0 ? `${primaryEdition.stockQuantity}` : t.outOfStock],
               ] as [string, any][]).filter(([, v]) => v).map(([k, v]) => (
                 <div key={k} className="p-3 bg-white rounded-lg border border-gray-100">

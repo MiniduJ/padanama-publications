@@ -1,5 +1,5 @@
 import React from "react";
-import { getBooks } from "@/server/catalog/books";
+import { getBooks, getCategoryCounts } from "@/server/catalog/books";
 import { BookCard } from "@/components/ui/BookCard";
 import { Link } from "@/i18n/routing";
 import { SlidersHorizontal, BookOpen, Search, ArrowUpDown, Tag, Sparkles } from "lucide-react";
@@ -14,6 +14,7 @@ interface BooksPageProps {
     format?: string;
     sort?: "newest" | "price_asc" | "price_desc" | "rating" | "title";
     query?: string;
+    type?: string;
     page?: string;
   }>;
 }
@@ -25,6 +26,13 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
   const currentCategory = resolvedParams.category || "all";
   const currentSort = resolvedParams.sort || "newest";
   const currentQuery = resolvedParams.query || "";
+  const currentType = ["BOOK", "items"].includes(resolvedParams.type || "") ? resolvedParams.type! : "";
+  // Keeps the other filters when one changes.
+  const qs = (over: Record<string, string | number>) => {
+    const p = new URLSearchParams(Object.entries({ category: currentCategory, sort: currentSort, type: currentType, query: currentQuery, ...over }).filter(([, v]) => v !== "" && v !== "all").map(([k, v]) => [k, String(v)]));
+    const s = p.toString();
+    return s ? `/books?${s}` : "/books";
+  };
 
   const nav = await getTranslations({ locale, namespace: "nav" });
   const cat = await getTranslations({ locale, namespace: "categories" });
@@ -35,25 +43,33 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
     format: resolvedParams.format,
     sort: currentSort,
     query: currentQuery,
+    type: currentType || undefined,
     page,
     limit: 18,
   });
+  const counts = await getCategoryCounts(currentType || undefined);
 
+  const L = (si: string, en: string, ta: string) => (locale === "en" ? en : locale === "ta" ? ta : si);
   const categories = [
-    { slug: "all", name: cat("all"), count: 320 },
-    { slug: "preschool-grade-1-2", name: cat("preschoolGrade12"), count: 30 },
-    { slug: "primary", name: cat("primary"), count: 39 },
-    { slug: "grade-6-7", name: cat("grade67"), count: 30 },
-    { slug: "grade-8-9", name: cat("grade89"), count: 30 },
-    { slug: "gce-ol", name: cat("gceOl"), count: 30 },
-    { slug: "gce-al-science", name: cat("gceAlScience"), count: 30 },
-    { slug: "gce-al-tech", name: cat("gceAlTech"), count: 18 },
-    { slug: "gce-al-commerce", name: cat("gceAlCommerce"), count: 23 },
-    { slug: "gce-al-art", name: cat("gceAlArt"), count: 30 },
-    { slug: "gov-exam-past-papers", name: cat("pastPapers"), count: 29 },
-    { slug: "gov-books", name: cat("govBooks"), count: 10 },
-    { slug: "donations", name: cat("donations"), count: 16 },
-  ];
+    { slug: "all", name: cat("all") },
+    { slug: "preschool-grade-1-2", name: cat("preschoolGrade12") },
+    { slug: "primary", name: cat("primary") },
+    { slug: "grade-6-7", name: cat("grade67") },
+    { slug: "grade-8-9", name: cat("grade89") },
+    { slug: "gce-ol", name: cat("gceOl") },
+    { slug: "gce-al-common", name: L("උසස් පෙළ පොදු විෂය", "A/L Common Subjects", "உயர்தர பொதுப் பாடங்கள்") },
+    { slug: "gce-al-science", name: cat("gceAlScience") },
+    { slug: "gce-al-tech", name: cat("gceAlTech") },
+    { slug: "gce-al-commerce", name: cat("gceAlCommerce") },
+    { slug: "gce-al-art", name: cat("gceAlArt") },
+    { slug: "gov-exam-past-papers", name: cat("pastPapers") },
+    { slug: "gov-books", name: cat("govBooks") },
+    { slug: "donations", name: cat("donations") },
+    { slug: "school-items", name: L("පාසල් උපකරණ සහ කියවීම් පොත්", "School items & reading", "பாடசாலைப் பொருட்கள்") },
+    { slug: "stationery", name: L("පාසල් ලිපි ද්‍රව්‍ය", "School stationery", "பாடசாலை எழுதுபொருட்கள்") },
+    { slug: "primary-extra", name: L("ප්‍රාථමික අමතර", "Primary extras", "ஆரம்ப மேலதிக") },
+  ].map((c) => ({ ...c, count: counts[c.slug] || 0 })).filter((c) => c.slug === "all" || c.count > 0);
+
 
   const currentCategoryObj = categories.find((c) => c.slug === currentCategory) || categories[0];
 
@@ -107,6 +123,20 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
         </div>
       </div>
 
+      {/* Product type: books vs school items / stationery / learning aids */}
+      <div role="tablist" aria-label="Product type" className="flex gap-2 overflow-x-auto pb-1">
+        {[
+          ["", L("සියල්ල", "Everything", "அனைத்தும்")],
+          ["BOOK", L("පොත්", "Books", "நூல்கள்")],
+          ["items", L("පාසල් උපකරණ සහ ලිපි ද්‍රව්‍ය", "School items & stationery", "பாடசாலைப் பொருட்கள்")],
+        ].map(([v, label]) => (
+          <Link key={v} role="tab" aria-selected={currentType === v} href={qs({ type: v, category: "all", page: "" })}
+            className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap border ${currentType === v ? "bg-brandNavy text-white border-brandNavy" : "bg-white text-brandNavy border-maroon-100 hover:border-brandRed"}`}>
+            {label}
+          </Link>
+        ))}
+      </div>
+
       {/* Horizontal Category Slider (Mobile & Tablet) */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none md:hidden">
         {categories.map((c) => {
@@ -114,7 +144,7 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
           return (
             <Link
               key={c.slug}
-              href={c.slug === "all" ? "/books" : `/books?category=${c.slug}`}
+              href={qs({ category: c.slug, page: "" })}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shadow-sm ${
                 isActive
                   ? "bg-brandRed text-white shadow-md scale-105"
@@ -148,7 +178,7 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
               return (
                 <Link
                   key={c.slug}
-                  href={c.slug === "all" ? "/books" : `/books?category=${c.slug}`}
+                  href={qs({ category: c.slug, page: "" })}
                   className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-all ${
                     isActive
                       ? "bg-brandRed text-white font-extrabold shadow-sm"
@@ -236,19 +266,19 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
               <span className="text-ink-muted shrink-0">{locale === "ta" ? "வரிசைப்படுத்துக:" : locale === "en" ? "Sort by:" : "පිළිවෙල:"}</span>
               <div className="flex items-center gap-1 font-bold">
                 <Link
-                  href={`/books?category=${currentCategory}&sort=newest${currentQuery ? `&query=${encodeURIComponent(currentQuery)}` : ""}`}
+                  href={qs({ sort: "newest", page: "" })}
                   className={`px-2 py-1 rounded-lg transition-all ${currentSort === "newest" ? "bg-brandNavy text-white font-black" : "text-ink hover:text-brandRed"}`}
                 >
                   {locale === "ta" ? "புதியவை" : locale === "en" ? "Newest" : "නවතම"}
                 </Link>
                 <Link
-                  href={`/books?category=${currentCategory}&sort=price_asc${currentQuery ? `&query=${encodeURIComponent(currentQuery)}` : ""}`}
+                  href={qs({ sort: "price_asc", page: "" })}
                   className={`px-2 py-1 rounded-lg transition-all ${currentSort === "price_asc" ? "bg-brandNavy text-white font-black" : "text-ink hover:text-brandRed"}`}
                 >
                   {locale === "ta" ? "குறைந்த விலை" : locale === "en" ? "Price Low" : "මිල (අඩු)"}
                 </Link>
                 <Link
-                  href={`/books?category=${currentCategory}&sort=price_desc${currentQuery ? `&query=${encodeURIComponent(currentQuery)}` : ""}`}
+                  href={qs({ sort: "price_desc", page: "" })}
                   className={`px-2 py-1 rounded-lg transition-all ${currentSort === "price_desc" ? "bg-brandNavy text-white font-black" : "text-ink hover:text-brandRed"}`}
                 >
                   {locale === "ta" ? "கூடிய விலை" : locale === "en" ? "Price High" : "මිල (වැඩි)"}
@@ -297,7 +327,7 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
                     salePriceCents={primaryEdition.salePriceCents}
                     rating={book.averageRating || 4.9}
                     format={primaryEdition.format || "Paperback"}
-                    hasFreeSample={true}
+                    hasFreeSample={!!book.sampleConfig}
                     isBestSeller={book.isBestSeller}
                   />
                 );
@@ -310,7 +340,7 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
             <nav aria-label="Pagination" className="pt-8 flex flex-wrap items-center justify-center gap-2">
               {(() => {
                 const { page, totalPages } = pagination;
-                const href = (p: number) => `/books?category=${currentCategory}&sort=${currentSort}&page=${p}`;
+                const href = (p: number) => qs({ page: p });
                 // Window: first, last, current ±2, with ellipses for gaps.
                 const nums = [...new Set([1, totalPages, ...[-2, -1, 0, 1, 2].map((d) => page + d)])]
                   .filter((p) => p >= 1 && p <= totalPages)

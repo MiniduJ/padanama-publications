@@ -74,7 +74,7 @@ const bookInclude = {
 function bookRow(b: any) {
   const ed = b.editions?.find((e: any) => !e.isDigital) || b.editions?.[0] || {};
   return {
-    id: b.id, coverUrl: b.coverUrl, titleSi: b.titleSi, titleEn: b.titleEn, slug: b.slug,
+    id: b.id, productType: b.productType, coverUrl: b.coverUrl, titleSi: b.titleSi, titleEn: b.titleEn, slug: b.slug,
     categorySlug: b.categories?.[0]?.category?.slug ?? null,
     priceCents: ed.priceCents ?? null, salePriceCents: ed.salePriceCents ?? null,
     stockQuantity: ed.stockQuantity ?? null, pageCount: ed.pageCount ?? null, isbn: ed.isbn ?? null,
@@ -86,7 +86,7 @@ function bookRow(b: any) {
 }
 
 async function writeBook(id: string | null, d: Record<string, any>) {
-  const book = { titleSi: d.titleSi, titleEn: d.titleEn, slug: d.slug, coverUrl: d.coverUrl, synopsisSi: d.synopsisSi, synopsisEn: d.synopsisEn, isFeatured: d.isFeatured, isBestSeller: d.isBestSeller, grade: d.grade, subject: d.subject, bookType: d.bookType, galleryUrls: d.galleryUrls, previewUrl: d.previewUrl, materialsUrl: d.materialsUrl };
+  const book = { titleSi: d.titleSi, titleEn: d.titleEn, slug: d.slug, coverUrl: d.coverUrl, synopsisSi: d.synopsisSi, synopsisEn: d.synopsisEn, isFeatured: d.isFeatured, isBestSeller: d.isBestSeller, productType: d.productType, grade: d.grade, subject: d.subject, bookType: d.bookType, galleryUrls: d.galleryUrls, previewUrl: d.previewUrl, materialsUrl: d.materialsUrl };
   Object.keys(book).forEach((k) => (book as any)[k] === undefined && delete (book as any)[k]);
   return db.$transaction(async (tx) => {
     const saved = id ? await tx.book.update({ where: { id }, data: book }) : await tx.book.create({ data: book as any });
@@ -95,6 +95,10 @@ async function writeBook(id: string | null, d: Record<string, any>) {
     const existing = await tx.bookEdition.findFirst({ where: { bookId: saved.id, isDigital: false, isDeleted: false } });
     if (existing) await tx.bookEdition.update({ where: { id: existing.id }, data: ed });
     else await tx.bookEdition.create({ data: { ...ed, priceCents: ed.priceCents ?? 0, bookId: saved.id, format: "PAPERBACK", sku: `PDN-${saved.slug}-PB` } as any });
+    if (d.productType && d.productType !== "BOOK") {
+      await tx.bookEdition.updateMany({ where: { bookId: saved.id, isDigital: true }, data: { isDeleted: true, isActive: false } });
+      await tx.sampleConfig.deleteMany({ where: { bookId: saved.id } });
+    }
     if (d.categorySlug !== undefined) {
       await tx.bookCategory.deleteMany({ where: { bookId: saved.id } });
       const cat = d.categorySlug && (await tx.category.findUnique({ where: { slug: d.categorySlug } }));
@@ -125,7 +129,7 @@ export async function listResource(key: string, q: { q?: string; page?: number; 
   const filters = Object.fromEntries(Object.entries(q.filters || {}).filter(([k, v]) => v && RESOURCES[key]?.filters?.some((f) => f.name === k && f.options.includes(v))));
 
   if (key === "books") {
-    const where: any = { isDeleted: false, ...searchWhere(["titleSi", "titleEn", "slug"], q.q) };
+    const where: any = { isDeleted: false, ...filters, ...searchWhere(["titleSi", "titleEn", "slug"], q.q) };
     const [rows, total] = await Promise.all([db.book.findMany({ where, include: bookInclude, orderBy: { updatedAt: "desc" }, skip, take }), db.book.count({ where })]);
     return { rows: rows.map(bookRow), total, pageSize: take };
   }

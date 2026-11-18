@@ -44,7 +44,7 @@ export function BestsellersSection({ books }: BestsellersSectionProps) {
               salePriceCents={primaryEdition.salePriceCents}
               rating={book.averageRating || 4.9}
               format={primaryEdition.format || "Paperback"}
-              hasFreeSample={true}
+              hasFreeSample={!!book.sampleConfig}
               isBestSeller={book.isBestSeller}
             />
           );

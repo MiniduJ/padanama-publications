@@ -174,6 +174,13 @@ model Publisher {
 // 3. Catalog, Books, Editions & Categories
 // ------------------------------------------
 
+// What a catalogue item is. The catalogue model is still called Book; non-books skip e-book editions and samples.
+enum ProductType {
+  BOOK
+  STATIONERY
+  LEARNING_AID
+}
+
 enum BookFormat {
   PAPERBACK
   HARDCOVER
@@ -256,6 +263,7 @@ model Book {
   releaseDate    DateTime?
   coverUrl       String?
   readCount      Int          @default(0) // Sample reader opens
+  productType    ProductType  @default(BOOK)
   grade          String?
   subject        String?
   bookType       String?
@@ -293,6 +301,7 @@ model Book {
   @@index([transliterated])
   @@index([isFeatured])
   @@index([isBestSeller])
+  @@index([productType])
 }
 
 model BookEdition {
