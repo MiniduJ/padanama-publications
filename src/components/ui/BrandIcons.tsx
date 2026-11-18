@@ -3,13 +3,16 @@ import React from "react";
 /**
  * Official Brand Icons for Padanama Publications
  * Authentic SVG paths for WhatsApp, Facebook, YouTube, and Koko BNPL
+ * With hard-coded fallback dimensions to prevent SVG overflow
  */
 
-export function WhatsAppIcon({ className = "w-6 h-6" }: { className?: string }) {
+export function WhatsAppIcon({ className = "w-6 h-6", size = 24 }: { className?: string; size?: number }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      className={className}
+      width={size}
+      height={size}
+      className={`shrink-0 ${className}`}
       fill="currentColor"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
@@ -19,11 +22,13 @@ export function WhatsAppIcon({ className = "w-6 h-6" }: { className?: string }) 
   );
 }
 
-export function FacebookIcon({ className = "w-6 h-6" }: { className?: string }) {
+export function FacebookIcon({ className = "w-6 h-6", size = 24 }: { className?: string; size?: number }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      className={className}
+      width={size}
+      height={size}
+      className={`shrink-0 ${className}`}
       fill="currentColor"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
@@ -33,11 +38,13 @@ export function FacebookIcon({ className = "w-6 h-6" }: { className?: string }) 
   );
 }
 
-export function YouTubeIcon({ className = "w-6 h-6" }: { className?: string }) {
+export function YouTubeIcon({ className = "w-6 h-6", size = 24 }: { className?: string; size?: number }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      className={className}
+      width={size}
+      height={size}
+      className={`shrink-0 ${className}`}
       fill="currentColor"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
@@ -52,6 +59,8 @@ export function KokoIcon({ className = "h-5 w-auto" }: { className?: string }) {
     <svg
       viewBox="0 0 76 28"
       className={className}
+      width={76}
+      height={28}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"

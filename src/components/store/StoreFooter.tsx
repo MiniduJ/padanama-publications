@@ -33,7 +33,7 @@ export function StoreFooter() {
                 className="w-9 h-9 rounded-full bg-[#1877F2] text-white flex items-center justify-center hover:scale-110 transition-transform shadow"
                 aria-label="Facebook"
               >
-                <FacebookIcon className="w-4.5 h-4.5 fill-current" />
+                <FacebookIcon className="w-5 h-5 fill-current shrink-0" size={18} />
               </a>
               <a
                 href="https://www.youtube.com/@padanamapublication"
@@ -42,7 +42,7 @@ export function StoreFooter() {
                 className="w-9 h-9 rounded-full bg-[#FF0000] text-white flex items-center justify-center hover:scale-110 transition-transform shadow"
                 aria-label="YouTube"
               >
-                <YouTubeIcon className="w-4.5 h-4.5 fill-current" />
+                <YouTubeIcon className="w-5 h-5 fill-current shrink-0" size={18} />
               </a>
               <a
                 href="https://wa.me/94718008533"
@@ -51,7 +51,7 @@ export function StoreFooter() {
                 className="w-9 h-9 rounded-full bg-[#25D366] text-white flex items-center justify-center hover:scale-110 transition-transform shadow"
                 aria-label="WhatsApp"
               >
-                <WhatsAppIcon className="w-5 h-5 fill-current" />
+                <WhatsAppIcon className="w-5 h-5 fill-current shrink-0" size={18} />
               </a>
             </div>
           </div>

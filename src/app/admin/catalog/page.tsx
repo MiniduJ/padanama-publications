@@ -165,9 +165,10 @@ export default function AdminCatalogPage() {
         </div>
       </div>
 
-      {/* Books Table */}
+      {/* Books Table: Desktop Table & Mobile Stacked Cards */}
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs text-gray-700">
             <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[10px] font-bold border-b border-gray-200">
               <tr>
@@ -288,6 +289,91 @@ export default function AdminCatalogPage() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Stacked Card View */}
+        <div className="md:hidden divide-y divide-gray-100">
+          {filteredBooks.map((book) => (
+            <div key={book.id} className="p-4 space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="space-y-0.5">
+                  <h3 className="font-bold text-sm text-gray-900 leading-tight">
+                    {book.titleSi}
+                  </h3>
+                  <p className="text-[11px] text-gray-500">{book.titleEn}</p>
+                  <p className="text-[10px] text-saffron-700 font-semibold">{book.author}</p>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-gray-100 text-[10px] font-bold text-gray-700 shrink-0">
+                  {book.category}
+                </span>
+              </div>
+
+              {/* Formats & Stock Grid */}
+              <div className="p-3 bg-gray-50 rounded-xl space-y-2 border border-gray-100">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
+                  Editions & Warehouse Stock
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  {book.formats.map((f, idx) => {
+                    const isLow = f.format !== "EBOOK" && f.stock <= 5;
+                    return (
+                      <div key={idx} className="p-2 bg-white rounded-lg border border-gray-100 text-xs space-y-1">
+                        <div className="flex items-center justify-between font-bold">
+                          <span className="text-gray-700 text-[11px]">{f.format}</span>
+                          <span className="text-maroon-900">{formatLkr(f.priceCents, "en")}</span>
+                        </div>
+                        {f.format === "EBOOK" ? (
+                          <span className="text-[10px] text-green-700 font-bold block">∞ Digital Unlimited</span>
+                        ) : (
+                          <div className="flex items-center justify-between pt-1 border-t border-gray-50">
+                            <span className={`text-[10px] font-mono font-bold ${isLow ? "text-red-600" : "text-gray-700"}`}>
+                              {f.stock} in stock {isLow && "⚠️"}
+                            </span>
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => handleQuickStockUpdate(book.id, idx, f.stock - 1)}
+                                className="w-5 h-5 bg-gray-100 hover:bg-gray-200 rounded text-center text-xs font-bold"
+                              >
+                                -
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleQuickStockUpdate(book.id, idx, f.stock + 10)}
+                                className="w-5 h-5 bg-gray-100 hover:bg-gray-200 rounded text-center text-xs font-bold"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-2 pt-1">
+                <Link
+                  href={`/books/${book.slug}`}
+                  target="_blank"
+                  className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-700 hover:text-maroon-900 text-xs font-bold flex items-center gap-1"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>Storefront</span>
+                </Link>
+                <Link
+                  href={`/read/${book.slug}`}
+                  target="_blank"
+                  className="px-3 py-1.5 rounded-lg bg-saffron-500 hover:bg-saffron-600 text-white text-xs font-bold flex items-center gap-1"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>Reader</span>
+                </Link>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

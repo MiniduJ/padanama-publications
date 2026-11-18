@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
 import { Logo } from "@/components/ui/Logo";
-import { Search, ShoppingBag, BookMarked, User, Phone, Sparkles, Menu, X, Info, Mail } from "lucide-react";
+import { Search, ShoppingBag, BookMarked, User, Phone, Sparkles, Menu, X, Info, Mail, Home } from "lucide-react";
 import { CartBadge } from "./CartBadge";
 
 export function StoreHeader() {
@@ -40,9 +40,9 @@ export function StoreHeader() {
 
   return (
     <header className="sticky top-0 z-40 bg-cream/95 backdrop-blur border-b border-maroon-100 shadow-sm w-full">
-      {/* Top Bar with Contact Us, About Us, Hotline and Languages (Full Width) */}
-      <div className="bg-brandNavy text-cream text-xs py-1.5 sm:py-2 px-3 sm:px-6 border-b border-brandNavy/40 w-full">
-        <div className="w-full flex items-center justify-between gap-2">
+      {/* Top Bar with Contact Us, About Us, Hotline and Languages */}
+      <div className="bg-brandNavy text-cream text-xs py-2 px-4 sm:px-6 lg:px-8 border-b border-brandNavy/40 w-full">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
           {/* Left: Hotline & Free Delivery Notice */}
           <div className="flex items-center gap-3 text-[11px] sm:text-xs">
             <a
@@ -130,7 +130,7 @@ export function StoreHeader() {
       </div>
 
       {/* Main Navbar */}
-      <div className="w-full px-3 sm:px-6 h-18 sm:h-20 flex items-center justify-between gap-3 sm:gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
         {/* Brand Logo with exact official image */}
         <Link href="/" className="shrink-0 flex items-center py-1">
           <Logo size="md" />
@@ -151,9 +151,17 @@ export function StoreHeader() {
         </form>
 
         {/* Primary Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-6 text-sm font-bold text-brandNavy">
+        <nav className="hidden lg:flex items-center gap-5 xl:gap-6 text-sm font-bold text-brandNavy">
           <Link
-            href="/products"
+            href="/"
+            className="hover:text-brandRed transition-colors flex items-center gap-1.5"
+          >
+            <Home className="w-4 h-4 text-brandRed" />
+            <span>{nav("home")}</span>
+          </Link>
+
+          <Link
+            href="/books"
             className="hover:text-brandRed transition-colors flex items-center gap-1"
           >
             <span>{nav("shop")}</span>
@@ -165,6 +173,14 @@ export function StoreHeader() {
           >
             <BookMarked className="w-4 h-4 text-brandRed" />
             <span>{nav("digitalLibrary")}</span>
+          </Link>
+
+          <Link
+            href="/book-fair"
+            className="hover:text-brandRed transition-colors flex items-center gap-1.5 px-3 py-1 rounded-full bg-brandYellow/30 text-brandNavy font-extrabold border border-brandYellow/60 hover:bg-brandYellow/50 shadow-xs"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-brandRed" />
+            <span>{currentLocale === "ta" ? "புத்தக கண்காட்சி" : currentLocale === "en" ? "Book Fair" : "පොත් ප්‍රදර්ශනය"}</span>
           </Link>
         </nav>
 

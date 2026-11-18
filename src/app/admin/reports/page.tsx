@@ -173,7 +173,8 @@ export default function AdminReportsPage() {
           </select>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs text-gray-700">
             <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[10px] font-bold border-b border-gray-200">
               <tr>
@@ -210,6 +211,42 @@ export default function AdminReportsPage() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Stacked Card View */}
+        <div className="md:hidden divide-y divide-gray-100">
+          {royalties.map((r) => (
+            <div key={r.id} className="p-4 space-y-2.5">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <h4 className="font-bold text-sm text-gray-900">{r.authorName}</h4>
+                  <p className="text-xs text-gray-600 leading-tight">{r.bookTitle}</p>
+                </div>
+                <span className="px-2 py-0.5 rounded bg-gray-100 text-[10px] font-bold text-gray-700 shrink-0">
+                  {r.format}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-xs p-2.5 bg-gray-50 rounded-xl border border-gray-100">
+                <div>
+                  <span className="text-[10px] text-gray-400 block">Units Sold</span>
+                  <span className="font-mono font-bold text-gray-800">{r.unitsSold} copies</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-gray-400 block">Contract Rate</span>
+                  <span className="font-bold text-saffron-700">{r.royaltyRatePercent}%</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-gray-400 block">Gross Sales</span>
+                  <span className="font-semibold text-gray-700">{formatLkr(r.grossSalesCents, "en")}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-gray-400 block">Royalty Payable</span>
+                  <span className="font-extrabold text-maroon-900">{formatLkr(r.royaltyPayableCents, "en")}</span>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

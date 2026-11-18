@@ -149,7 +149,7 @@ export function SocialMediaSection() {
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3.5">
                 <div className="w-14 h-14 rounded-2xl bg-[#1877F2] text-white flex items-center justify-center shrink-0 shadow-md shadow-[#1877F2]/30">
-                  <FacebookIcon className="w-8 h-8 fill-current" />
+                  <FacebookIcon className="w-8 h-8 fill-current shrink-0" size={32} />
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
@@ -287,9 +287,9 @@ export function SocialMediaSection() {
               rel="noreferrer"
               className="w-full py-3.5 px-6 rounded-2xl bg-[#1877F2] hover:bg-[#1565C0] text-white font-extrabold text-sm shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 group-hover:scale-[1.01]"
             >
-              <FacebookIcon className="w-4.5 h-4.5 fill-current" />
+              <FacebookIcon className="w-5 h-5 fill-current shrink-0" size={20} />
               <span>Facebook පිටුවට පිවිසෙන්න (Visit Facebook Page)</span>
-              <ExternalLink className="w-4 h-4" />
+              <ExternalLink className="w-4 h-4 shrink-0" />
             </a>
           </div>
         </div>
@@ -304,7 +304,7 @@ export function SocialMediaSection() {
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3.5">
                 <div className="w-14 h-14 rounded-2xl bg-[#FF0000] text-white flex items-center justify-center shrink-0 shadow-md shadow-[#FF0000]/30">
-                  <YouTubeIcon className="w-8 h-8 fill-current" />
+                  <YouTubeIcon className="w-8 h-8 fill-current shrink-0" size={32} />
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
@@ -435,9 +435,9 @@ export function SocialMediaSection() {
               rel="noreferrer"
               className="w-full py-3.5 px-6 rounded-2xl bg-[#FF0000] hover:bg-[#CC0000] text-white font-extrabold text-sm shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 group-hover:scale-[1.01]"
             >
-              <YouTubeIcon className="w-4.5 h-4.5 fill-current" />
+              <YouTubeIcon className="w-5 h-5 fill-current shrink-0" size={20} />
               <span>YouTube නාලිකාවට පිවිසෙන්න (Visit YouTube Channel)</span>
-              <ExternalLink className="w-4 h-4" />
+              <ExternalLink className="w-4 h-4 shrink-0" />
             </a>
           </div>
         </div>
