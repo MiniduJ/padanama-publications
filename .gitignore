@@ -44,3 +44,9 @@ Thumbs.db
 
 # Agent Handoff & Temporary files
 .agents/
+
+.next-build/
+
+# Local copies of scraped book images (uploaded to Supabase Storage by scripts/upload-book-images.mjs)
+public/images/books/
+scrape.log

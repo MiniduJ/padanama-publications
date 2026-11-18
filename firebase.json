@@ -1,34 +1,16 @@
 {
   "hosting": {
-    "public": "public_html",
+    "source": ".",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
     ],
-    "cleanUrls": true,
-    "trailingSlash": false,
-    "rewrites": [
-      {
-        "source": "/en",
-        "destination": "/en.html"
-      },
-      {
-        "source": "/si",
-        "destination": "/si.html"
-      },
-      {
-        "source": "/ta",
-        "destination": "/ta.html"
-      },
-      {
-        "source": "/admin",
-        "destination": "/admin.html"
-      },
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
+    "frameworksBackend": {
+      "region": "asia-south1",
+      "memory": "1GiB",
+      "maxInstances": 10,
+      "minInstances": 0
+    }
   }
 }

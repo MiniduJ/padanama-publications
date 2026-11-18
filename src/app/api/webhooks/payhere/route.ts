@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { PayHereProvider } from "@/server/payments/payhere";
 import { db } from "@/server/db";
 import { SmsLenzProvider } from "@/server/sms/smslenz";
-import { ordersRepository } from "@/server/orders/orders-repository";
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,18 +29,17 @@ export async function POST(request: NextRequest) {
     console.log(`[PAYHERE_WEBHOOK_SUCCESS] Order: ${orderId}, Status: ${statusCode}, Amount: ${amountCents}`);
 
     if (isSuccess) {
-      // Synchronize in-memory admin orders repository
-      ordersRepository.updateOrderStatus(orderId, "PAID");
-
       try {
         // Find existing order
         const order = await db.order.findUnique({
           where: { orderNumber: orderId },
-          include: { items: true, user: true },
+          include: { items: { include: { edition: true } }, user: true },
         });
 
-        if (order) {
-          // Idempotent order update
+        if (order && amountCents !== order.totalCents) {
+          console.error(`[PAYHERE_WEBHOOK] amount mismatch for ${orderId}: got ${amountCents}, expected ${order.totalCents}`);
+        } else if (order && order.status !== "PAID") {
+          // Idempotent: skipped when already PAID
           await db.order.update({
             where: { id: order.id },
             data: {
@@ -77,13 +75,13 @@ export async function POST(request: NextRequest) {
                 where: {
                   userId_bookId: {
                     userId: order.userId,
-                    bookId: item.editionId, // Or bookId relation
+                    bookId: item.edition.bookId,
                   },
                 },
                 update: { isActive: true },
                 create: {
                   userId: order.userId,
-                  bookId: item.editionId,
+                  bookId: item.edition.bookId,
                   orderId: order.id,
                   isActive: true,
                   grantedBy: "SYSTEM_PAYHERE_WEBHOOK",

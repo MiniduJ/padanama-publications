@@ -23,7 +23,7 @@ import {
   Sliders,
   X,
 } from "lucide-react";
-import { getReaderBookContent, ReaderBookData } from "@/server/reader/sample-data";
+import type { ReaderBookData } from "@/server/reader/sample-data";
 
 interface ReaderPageProps {
   params: Promise<{
@@ -70,7 +70,8 @@ export default function BookReaderPage({ params }: ReaderPageProps) {
   const { slug } = use(params);
 
   const [bookData, setBookData] = useState<ReaderBookData | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [loadError, setLoadError] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
   const [theme, setTheme] = useState<ThemeMode>("cream");
   const [fontSize, setFontSize] = useState<number>(16); // 14, 16, 18, 22
   const [bookmarkedPages, setBookmarkedPages] = useState<number[]>([]);
@@ -78,8 +79,7 @@ export default function BookReaderPage({ params }: ReaderPageProps) {
   const [showPaywall, setShowPaywall] = useState(false);
   const [showToc, setShowToc] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [isTurning, setIsTurning] = useState(false);
-  const [turnDirection, setTurnDirection] = useState<"next" | "prev" | null>(null);
+  const [flip, setFlip] = useState<{ from: number; dir: "next" | "prev"; key: number } | null>(null);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchEndX, setTouchEndX] = useState<number | null>(null);
 
@@ -122,17 +122,17 @@ export default function BookReaderPage({ params }: ReaderPageProps) {
 
   // Load content
   useEffect(() => {
-    const data = getReaderBookContent(slug);
-    setBookData(data);
-
-    // Load saved page
-    const saved = localStorage.getItem(`padanama_reading_${slug}`);
-    if (saved) {
-      const p = parseInt(saved, 10);
-      if (!isNaN(p) && p >= 1 && p <= data.pages.length) {
-        setCurrentPage(p);
-      }
-    }
+    // Cover is page 0; content pages are 1..N. Admin-uploaded scans replace the text sample.
+    const apply = (data: ReaderBookData) => {
+      setBookData(data);
+      const n = data.pageImages?.length || data.pages.length;
+      const saved = parseInt(localStorage.getItem(`padanama_reading_${slug}`) || "", 10);
+      if (saved >= 1 && saved <= n) setCurrentPage(saved);
+    };
+    fetch(`/api/reader/${encodeURIComponent(slug)}/preview`)
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then(apply)
+      .catch(() => setLoadError(true));
   }, [slug]);
 
   // Save progress
@@ -156,6 +156,10 @@ export default function BookReaderPage({ params }: ReaderPageProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [currentPage, bookData, showPaywall, showToc]);
 
+  if (loadError) {
+    return <div className="h-screen flex items-center justify-center text-sm text-maroon-900 p-6 text-center">පොත පූරණය කළ නොහැක. කරුණාකර නැවත උත්සාහ කරන්න. (Could not load this book — please retry.)</div>;
+  }
+
   if (!bookData) {
     return (
       <div className="h-screen w-screen flex items-center justify-center bg-[#FFF9EE]">
@@ -167,34 +171,97 @@ export default function BookReaderPage({ params }: ReaderPageProps) {
     );
   }
 
+  const imagePages = bookData.pageImages?.length ? bookData.pageImages : null;
+  const totalSamplePages = imagePages ? imagePages.length : bookData.pages.length;
   const activePage = bookData.pages.find((p) => p.pageNumber === currentPage) || bookData.pages[0];
-  const totalSamplePages = bookData.pages.length;
   const progressPercent = Math.round((currentPage / totalSamplePages) * 100);
   const themeClass = THEME_STYLES[theme];
+
+  const paperColor = theme === "cream" ? "#FFFDF7" : theme === "sepia" ? "#F5EEDC" : theme === "night" ? "#1E1C1A" : "#FFFFFF";
+
+  const renderPage = (n: number) => {
+    if (n === 0) {
+      return (
+        <div className="relative z-10 flex flex-col items-center justify-center gap-4 text-center h-full min-h-[60vh]">
+          <img src={bookData.coverImage} alt={`${bookData.titleSi} cover`} className="max-h-[62vh] w-auto rounded-r-lg shadow-[8px_10px_30px_rgba(0,0,0,0.35)] border-l-8 border-black/20" />
+          <p className="font-display font-black text-lg">{bookData.titleSi}</p>
+          <p className="text-xs opacity-70">ඊළඟ පිටුවට පෙරළන්න (Turn the page to start reading)</p>
+        </div>
+      );
+    }
+    if (imagePages) {
+      return (
+        <figure className="relative z-10 flex flex-col items-center gap-3">
+          <img src={imagePages[n - 1]} alt={`Sample page ${n}`} className="w-full h-auto max-h-[75vh] object-contain select-none" draggable={false} onContextMenu={(e) => e.preventDefault()} />
+          <figcaption className="text-center font-serif text-xs opacity-60">— {n} —</figcaption>
+        </figure>
+      );
+    }
+    const pg = bookData.pages.find((p) => p.pageNumber === n) || bookData.pages[0];
+    return (
+                    <article className="relative z-10 space-y-6">
+            {/* Running Header */}
+            <div className="text-[11px] font-serif uppercase tracking-widest text-center opacity-60 pb-3 border-b border-black/10 flex items-center justify-between text-ink-muted">
+              <span className="truncate max-w-[200px]">{bookData.titleSi}</span>
+              <span className="text-[9px] opacity-40">•</span>
+              <span className="truncate max-w-[200px]">{pg.chapterTitle}</span>
+            </div>
+
+            <header className="pb-2">
+              {pg.subTitle && (
+                <h1 className="font-display font-black text-xl sm:text-2xl mt-1 leading-snug">
+                  {pg.subTitle}
+                </h1>
+              )}
+            </header>
+
+            <div
+              className="space-y-5 leading-[1.9] font-normal"
+              style={{ fontSize: `${fontSize}px` }}
+            >
+              {pg.content.map((paragraph, idx) => (
+                <p key={idx} className="indent-4 sm:indent-8 text-justify">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+
+            {pg.notes && (
+              <footer className="pt-6 border-t border-black/10 text-xs italic opacity-70">
+                {pg.notes}
+              </footer>
+            )}
+
+            {/* Centered Page Number */}
+            <div className="text-center font-serif text-xs opacity-60 pt-4">
+              — {n} —
+            </div>
+          </article>
+    );
+  };
+
+  // Destination page renders underneath immediately; the old page is a 3D sheet that turns away on top of it.
+  const turnTo = (target: number, dir: "next" | "prev") => {
+    if (flip) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduce) setFlip({ from: currentPage, dir, key: Date.now() });
+    setCurrentPage(target);
+    if (!reduce) setTimeout(() => setFlip(null), 750);
+  };
 
   const handleNextPage = () => {
     if (currentPage < totalSamplePages) {
       playPageTurnSound();
-      setTurnDirection("next");
-      setIsTurning(true);
-      setTimeout(() => {
-        setCurrentPage((prev) => prev + 1);
-        setIsTurning(false);
-      }, 190);
+      turnTo(currentPage + 1, "next");
     } else {
       setShowPaywall(true);
     }
   };
 
   const handlePrevPage = () => {
-    if (currentPage > 1) {
+    if (currentPage > 0) {
       playPageTurnSound();
-      setTurnDirection("prev");
-      setIsTurning(true);
-      setTimeout(() => {
-        setCurrentPage((prev) => prev - 1);
-        setIsTurning(false);
-      }, 190);
+      turnTo(currentPage - 1, "prev");
       setShowPaywall(false);
     }
   };
@@ -211,7 +278,7 @@ export default function BookReaderPage({ params }: ReaderPageProps) {
     const priceCents = format === "EBOOK" ? bookData.ebookPriceCents : bookData.paperbackPriceCents;
     cartActions.addItem({
       id: `${bookData.slug}_${format}`,
-      bookId: bookData.slug,
+      bookId: bookData.bookId,
       slug: bookData.slug,
       title: bookData.titleSi,
       titleSi: bookData.titleSi,
@@ -345,15 +412,11 @@ export default function BookReaderPage({ params }: ReaderPageProps) {
       </header>
 
       {/* Main Page Canvas: Physical Book Simulation with 3D Page Turn */}
-      <main className="flex-1 max-w-4xl w-full mx-auto px-3 sm:px-8 py-6 sm:py-10 flex flex-col justify-between relative perspective-[1400px]">
+      <main className="flex-1 max-w-4xl w-full mx-auto px-3 sm:px-8 py-6 sm:py-10 flex flex-col justify-between relative [perspective:1800px]">
         {/* Physical Book Leaf Container */}
         <div
-          className={`relative w-full flex-1 rounded-2xl p-6 sm:p-12 shadow-[0_15px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.08)] border border-black/10 flex flex-col justify-between transition-all duration-300 ${
-            isTurning
-              ? turnDirection === "next"
-                ? "animate-page-turn-next"
-                : "animate-page-turn-prev"
-              : ""
+          className={`relative [transform-style:preserve-3d] w-full flex-1 rounded-2xl p-6 sm:p-12 shadow-[0_15px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.08)] border border-black/10 flex flex-col justify-between transition-all duration-300 ${
+""
           }`}
           style={{
             backgroundColor: theme === "cream" ? "#FFFDF7" : theme === "sepia" ? "#F5EEDC" : theme === "night" ? "#1E1C1A" : "#FFFFFF",
@@ -372,45 +435,13 @@ export default function BookReaderPage({ params }: ReaderPageProps) {
             </p>
           </div>
 
-          {/* Page Content */}
-          <article className="relative z-10 space-y-6">
-            {/* Running Header */}
-            <div className="text-[11px] font-serif uppercase tracking-widest text-center opacity-60 pb-3 border-b border-black/10 flex items-center justify-between text-ink-muted">
-              <span className="truncate max-w-[200px]">{bookData.titleSi}</span>
-              <span className="text-[9px] opacity-40">•</span>
-              <span className="truncate max-w-[200px]">{activePage.chapterTitle}</span>
+          {renderPage(currentPage)}
+          {flip && (
+            <div key={flip.key} aria-hidden className={`page-sheet page-sheet-${flip.dir} rounded-2xl`} style={{ backgroundColor: paperColor }}>
+              <div className="page-face p-6 sm:p-12">{renderPage(flip.from)}</div>
+              <div className="page-face page-back rounded-2xl" style={{ backgroundColor: paperColor }} />
             </div>
-
-            <header className="pb-2">
-              {activePage.subTitle && (
-                <h1 className="font-display font-black text-xl sm:text-2xl mt-1 leading-snug">
-                  {activePage.subTitle}
-                </h1>
-              )}
-            </header>
-
-            <div
-              className="space-y-5 leading-[1.9] font-normal"
-              style={{ fontSize: `${fontSize}px` }}
-            >
-              {activePage.content.map((paragraph, idx) => (
-                <p key={idx} className="indent-4 sm:indent-8 text-justify">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-
-            {activePage.notes && (
-              <footer className="pt-6 border-t border-black/10 text-xs italic opacity-70">
-                {activePage.notes}
-              </footer>
-            )}
-
-            {/* Centered Page Number */}
-            <div className="text-center font-serif text-xs opacity-60 pt-4">
-              — {currentPage} —
-            </div>
-          </article>
+          )}
 
           {/* Corner Page Curl Button for Next Page */}
           {currentPage < totalSamplePages && (
@@ -428,7 +459,7 @@ export default function BookReaderPage({ params }: ReaderPageProps) {
           <div className="relative z-10 pt-6 flex items-center justify-between border-t border-black/10 mt-8">
             <button
               type="button"
-              disabled={currentPage === 1}
+              disabled={currentPage === 0}
               onClick={handlePrevPage}
               className="py-2 px-4 rounded-xl border border-black/10 hover:bg-black/5 disabled:opacity-30 disabled:pointer-events-none flex items-center gap-1.5 text-xs font-bold transition-colors"
             >

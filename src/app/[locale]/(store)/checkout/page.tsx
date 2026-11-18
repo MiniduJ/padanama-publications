@@ -1,4 +1,7 @@
 "use client";
+import { useTx } from "@/lib/tx";
+import { BankAccounts } from "@/components/store/BankAccounts";
+import { COURIER_OPTIONS, shippingCents as calcShipping, type Courier } from "@/lib/shipping";
 
 import React, { useState } from "react";
 import { Link, useRouter } from "@/i18n/routing";
@@ -51,6 +54,7 @@ const DISTRICTS = [
 ];
 
 export default function CheckoutPage() {
+  const tx = useTx();
   const router = useRouter();
   const {
     items,
@@ -86,6 +90,7 @@ export default function CheckoutPage() {
 
   // Step 2: Delivery Method
   const [deliveryMethod, setDeliveryMethod] = useState<"COURIER" | "EXPRESS" | "PICKUP">("COURIER");
+  const [courier, setCourier] = useState<Courier>("KOOMBIYO");
 
   // Step 3: Payment Method
   const [paymentMethod, setPaymentMethod] = useState<
@@ -99,19 +104,7 @@ export default function CheckoutPage() {
   // Calculate Shipping Cents
   const isDigitalOnly = items.length > 0 && items.every((i) => i.format === "EBOOK");
 
-  let shippingCents = 0;
-  if (!isDigitalOnly && deliveryMethod !== "PICKUP") {
-    if (deliveryMethod === "EXPRESS") {
-      shippingCents = 45000; // Rs. 450
-    } else if (isFreeDelivery) {
-      shippingCents = 0;
-    } else {
-      const dist = address.district.toLowerCase();
-      if (dist === "colombo") shippingCents = 20000;
-      else if (dist === "gampaha" || dist === "kalutara") shippingCents = 25000;
-      else shippingCents = 30000;
-    }
-  }
+  const shippingCents = calcShipping({ district: address.district, method: deliveryMethod, subtotalCents: netSubtotalCents + discountCents, digitalOnly: isDigitalOnly });
 
   // COD Handling Fee
   const codFeeCents = paymentMethod === "CASH_ON_DELIVERY" ? 10000 : 0;
@@ -131,19 +124,19 @@ export default function CheckoutPage() {
 
   const validateStep1 = () => {
     if (!contact.firstName.trim()) {
-      setErrorMessage("කරුණාකර ඔබගේ නම ඇතුළත් කරන්න (Please enter your first name)");
+      setErrorMessage(tx("කරුණාකර ඔබගේ නම ඇතුළත් කරන්න (Please enter your first name)"));
       return false;
     }
     if (!contact.phone.trim() || contact.phone.length < 9) {
-      setErrorMessage("කරුණාකර වලංගු දුරකථන අංකයක් ඇතුළත් කරන්න (Please enter a valid +94 phone number)");
+      setErrorMessage(tx("කරුණාකර වලංගු දුරකථන අංකයක් ඇතුළත් කරන්න (Please enter a valid +94 phone number)"));
       return false;
     }
     if (!isDigitalOnly && !address.street1.trim()) {
-      setErrorMessage("කරුණාකර ලිපිනය ඇතුළත් කරන්න (Please enter your delivery address)");
+      setErrorMessage(tx("කරුණාකර ලිපිනය ඇතුළත් කරන්න (Please enter your delivery address)"));
       return false;
     }
     if (!isDigitalOnly && !address.city.trim()) {
-      setErrorMessage("කරුණාකර නගරය ඇතුළත් කරන්න (Please enter your city)");
+      setErrorMessage(tx("කරුණාකර නගරය ඇතුළත් කරන්න (Please enter your city)"));
       return false;
     }
     setErrorMessage(null);
@@ -159,6 +152,7 @@ export default function CheckoutPage() {
         contact,
         shippingAddress: address,
         deliveryMethod,
+        courier: deliveryMethod === "COURIER" ? courier : undefined,
         paymentMethod,
         items: items.map((i) => ({
           bookId: i.bookId,
@@ -243,7 +237,7 @@ export default function CheckoutPage() {
       clearCart();
       router.push(`/checkout/success?order=${data.orderNumber}&method=${paymentMethod}`);
     } catch (err: any) {
-      setErrorMessage(err.message || "ඇණවුම ඉදිරිපත් කිරීමේදී දෝෂයක් සිදු විය. නැවත උත්සාහ කරන්න.");
+      setErrorMessage(err.message || tx("ඇණවුම ඉදිරිපත් කිරීමේදී දෝෂයක් සිදු විය. නැවත උත්සාහ කරන්න."));
       setSubmitting(false);
     }
   };
@@ -252,16 +246,16 @@ export default function CheckoutPage() {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center space-y-4">
         <h2 className="font-display font-bold text-xl text-maroon-900">
-          ඔබගේ සාප්පු සවාරි බෑගය හිස්ව පවතී
+          {tx("ඔබගේ සාප්පු සවාරි බෑගය හිස්ව පවතී")}
         </h2>
         <p className="text-sm text-ink-muted">
-          මිලදී ගැනීමට පෙර කරුණාකර පොත් එකතුවෙන් ඔබ කැමති පොත් තෝරාගන්න.
+          {tx("මිලදී ගැනීමට පෙර කරුණාකර පොත් එකතුවෙන් ඔබ කැමති පොත් තෝරාගන්න.")}
         </p>
         <Link
           href="/books"
           className="inline-block px-6 py-3 bg-saffron-500 text-white font-bold text-sm rounded-xl"
         >
-          පොත් නාමාවලිය වෙත
+          {tx("පොත් නාමාවලිය වෙත")}
         </Link>
       </div>
     );
@@ -295,7 +289,7 @@ export default function CheckoutPage() {
             >
               1
             </div>
-            <span className="text-xs">ලිපිනය (Address)</span>
+            <span className="text-xs">{tx("ලිපිනය (Address)")}</span>
           </button>
 
           {/* Step 2 */}
@@ -317,7 +311,7 @@ export default function CheckoutPage() {
             >
               2
             </div>
-            <span className="text-xs">බෙදාහැරීම (Delivery)</span>
+            <span className="text-xs">{tx("බෙදාහැරීම (Delivery)")}</span>
           </button>
 
           {/* Step 3 */}
@@ -339,7 +333,7 @@ export default function CheckoutPage() {
             >
               3
             </div>
-            <span className="text-xs">ගෙවීම (Payment)</span>
+            <span className="text-xs">{tx("ගෙවීම (Payment)")}</span>
           </button>
         </div>
       </div>
@@ -359,13 +353,13 @@ export default function CheckoutPage() {
           {step === 1 && (
             <div className="p-6 rounded-2xl bg-white border border-maroon-100 shadow-sm space-y-5 animate-in fade-in duration-200">
               <h2 className="font-display font-black text-xl text-maroon-900 flex items-center gap-2">
-                <span>1. පාරිභෝගික සහ බෙදාහැරීමේ තොරතුරු (Contact & Delivery)</span>
+                <span>{tx("1. පාරිභෝගික සහ බෙදාහැරීමේ තොරතුරු (Contact & Delivery)")}</span>
               </h2>
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-bold text-ink block mb-1">
-                    මුල් නම (First Name) *
+                    {tx("මුල් නම (First Name) *")}
                   </label>
                   <input
                     type="text"
@@ -374,12 +368,12 @@ export default function CheckoutPage() {
                     value={contact.firstName}
                     onChange={(e) => setContact({ ...contact, firstName: e.target.value })}
                     className="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-saffron-500"
-                    placeholder="සුනිල් / Sunil"
+                    placeholder={tx(tx("සුනිල් / Sunil"))}
                   />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-ink block mb-1">
-                    වාසගම (Last Name)
+                    {tx("වාසගම (Last Name)")}
                   </label>
                   <input
                     type="text"
@@ -387,7 +381,7 @@ export default function CheckoutPage() {
                     value={contact.lastName}
                     onChange={(e) => setContact({ ...contact, lastName: e.target.value })}
                     className="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-saffron-500"
-                    placeholder="පෙරේරා / Perera"
+                    placeholder={tx(tx("පෙරේරා / Perera"))}
                   />
                 </div>
               </div>
@@ -395,7 +389,7 @@ export default function CheckoutPage() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-bold text-ink block mb-1">
-                    ජංගම දුරකථන අංකය (Phone Number) *
+                    {tx("ජංගම දුරකථන අංකය (Phone Number) *")}
                   </label>
                   <input
                     type="tel"
@@ -405,12 +399,12 @@ export default function CheckoutPage() {
                     value={contact.phone}
                     onChange={(e) => setContact({ ...contact, phone: e.target.value })}
                     className="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-saffron-500"
-                    placeholder="071 800 8533 (SMS තහවුරු කිරීම් සඳහා)"
+                    placeholder={tx(tx("071 800 8533 (SMS තහවුරු කිරීම් සඳහා)"))}
                   />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-ink block mb-1">
-                    විද්‍යුත් තැපෑල (Email Address)
+                    {tx("විද්‍යුත් තැපෑල (Email Address)")}
                   </label>
                   <input
                     type="email"
@@ -428,7 +422,7 @@ export default function CheckoutPage() {
                   <div className="space-y-4 pt-3 border-t border-gray-100">
                     <div>
                       <label className="text-xs font-bold text-ink block mb-1">
-                        ලිපිනය පේළිය 1 (Street Address) *
+                        {tx("ලිපිනය පේළිය 1 (Street Address) *")}
                       </label>
                       <input
                         type="text"
@@ -437,14 +431,14 @@ export default function CheckoutPage() {
                         value={address.street1}
                         onChange={(e) => setAddress({ ...address, street1: e.target.value })}
                         className="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-saffron-500"
-                        placeholder="අංක 45/2, ගාලු පාර"
+                        placeholder={tx(tx("අංක 45/2, ගාලු පාර"))}
                       />
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label className="text-xs font-bold text-ink block mb-1">
-                          නගරය (City) *
+                          {tx("නගරය (City) *")}
                         </label>
                         <input
                           type="text"
@@ -453,12 +447,12 @@ export default function CheckoutPage() {
                           value={address.city}
                           onChange={(e) => setAddress({ ...address, city: e.target.value })}
                           className="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-saffron-500"
-                          placeholder="කොල්ලුපිටිය / Colombo"
+                          placeholder={tx(tx("කොල්ලුපිටිය / Colombo"))}
                         />
                       </div>
                       <div>
                         <label className="text-xs font-bold text-ink block mb-1">
-                          දිස්ත්‍රික්කය (District) *
+                          {tx("දිස්ත්‍රික්කය (District) *")}
                         </label>
                         <select
                           value={address.district}
@@ -476,14 +470,14 @@ export default function CheckoutPage() {
 
                     <div>
                       <label className="text-xs font-bold text-ink block mb-1">
-                        හඳුනාගැනීමේ සලකුණ (Nearby Landmark - කුරියර් රියදුරු සඳහා)
+                        {tx("හඳුනාගැනීමේ සලකුණ (Nearby Landmark - කුරියර් රියදුරු සඳහා)")}
                       </label>
                       <input
                         type="text"
                         value={address.landmark}
                         onChange={(e) => setAddress({ ...address, landmark: e.target.value })}
                         className="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-saffron-500"
-                        placeholder="උදා: පන්සල අසල / ඔරලෝසු කණුව අසල"
+                        placeholder={tx(tx("උදා: පන්සල අසල / ඔරලෝසු කණුව අසල"))}
                       />
                     </div>
                   </div>
@@ -498,7 +492,7 @@ export default function CheckoutPage() {
                   }}
                   className="py-3 px-6 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-2"
                 >
-                  <span>ඊළඟ පියවර: බෙදාහැරීම තෝරන්න (Next)</span>
+                  <span>{tx("ඊළඟ පියවර: බෙදාහැරීම තෝරන්න (Next)")}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -509,7 +503,7 @@ export default function CheckoutPage() {
           {step === 2 && (
             <div className="p-6 rounded-2xl bg-white border border-maroon-100 shadow-sm space-y-5 animate-in fade-in duration-200">
               <h2 className="font-display font-black text-xl text-maroon-900 flex items-center gap-2">
-                <span>2. බෙදාහැරීමේ ක්‍රමය (Delivery Method)</span>
+                <span>{tx("2. බෙදාහැරීමේ ක්‍රමය (Delivery Method)")}</span>
               </h2>
 
               <div className="space-y-3">
@@ -532,15 +526,28 @@ export default function CheckoutPage() {
                   <div className="flex-1 space-y-1">
                     <div className="flex justify-between items-baseline">
                       <span className="font-bold text-sm text-maroon-900">
-                        දිවයින පුරා කුරියර් සේවාව (Standard Courier — Domex / Koombiyo)
+                        {tx("දිවයින පුරා කුරියර් සේවාව (Standard Courier — Domex / Koombiyo)")}
                       </span>
                       <span className="font-black text-xs text-saffron-700">
-                        {isFreeDelivery ? "නොමිලේ (FREE)" : formatLkr(shippingCents, "si")}
+                        {isFreeDelivery ? tx("නොමිලේ (FREE)") : formatLkr(shippingCents, "si")}
                       </span>
                     </div>
                     <p className="text-xs text-ink-muted">
-                      වැඩකරන දින 2-4 ක් ඇතුළත නිවසටම බෙදාහැරීම. පාර්සලය පිටත් කළ පසු SMS මගින් Tracking ලින්ක් එක ලැබේ.
+                      {tx("වැඩකරන දින 2-4 ක් ඇතුළත නිවසටම බෙදාහැරීම. පාර්සලය පිටත් කළ පසු SMS මගින් Tracking ලින්ක් එක ලැබේ.")}
                     </p>
+                    {deliveryMethod === "COURIER" && (
+                      <fieldset className="pt-2">
+                        <legend className="text-xs font-bold text-maroon-900 mb-1.5">{tx("කුරියර් සේවාව තෝරන්න (Choose courier)")}</legend>
+                        <div className="grid grid-cols-2 gap-2">
+                          {COURIER_OPTIONS.map((c) => (
+                            <label key={c.id} className={`p-3 rounded-lg border-2 cursor-pointer text-xs font-bold flex items-center gap-2 ${courier === c.id ? "border-maroon-700 bg-white" : "border-gray-200 bg-white/60"}`}>
+                              <input type="radio" name="courier" value={c.id} checked={courier === c.id} onChange={() => setCourier(c.id)} />
+                              <span>{c.name}<span className="block font-normal text-ink-muted">{c.days} days</span></span>
+                            </label>
+                          ))}
+                        </div>
+                      </fieldset>
+                    )}
                   </div>
                 </label>
 
@@ -564,14 +571,14 @@ export default function CheckoutPage() {
                     <div className="flex-1 space-y-1">
                       <div className="flex justify-between items-baseline">
                         <span className="font-bold text-sm text-maroon-900">
-                          කොළඹ කඩිනම් බෙදාහැරීම (Express Metro — Same / Next Day)
+                          {tx("කොළඹ කඩිනම් බෙදාහැරීම (Express Metro — Same / Next Day)")}
                         </span>
                         <span className="font-black text-xs text-saffron-700">
                           {formatLkr(45000, "si")}
                         </span>
                       </div>
                       <p className="text-xs text-ink-muted">
-                        කොළඹ 1-15 ප්‍රදේශ සඳහා පැය 24ක් තුළ කඩිනමින් භාරදීම.
+                        {tx("කොළඹ 1-15 ප්‍රදේශ සඳහා පැය 24ක් තුළ කඩිනමින් භාරදීම.")}
                       </p>
                     </div>
                   </label>
@@ -596,12 +603,12 @@ export default function CheckoutPage() {
                   <div className="flex-1 space-y-1">
                     <div className="flex justify-between items-baseline">
                       <span className="font-bold text-sm text-maroon-900">
-                        පදනම ප්‍රධාන කාර්යාලයෙන් ලබාගැනීම (Store Pickup — Colombo 03)
+                        {tx("පදනම ප්‍රධාන කාර්යාලයෙන් ලබාගැනීම (Store Pickup — Colombo 03)")}
                       </span>
-                      <span className="font-black text-xs text-green-700">නොමිලේ (FREE)</span>
+                      <span className="font-black text-xs text-green-700">{tx("නොමිලේ (FREE)")}</span>
                     </div>
                     <p className="text-xs text-ink-muted">
-                      අංක 142, ගාලු පාර, කොළඹ 03. වැඩකරන දිනවල පෙ.ව. 9.00 සිට ප.ව. 5.00 දක්වා.
+                      {tx("අංක 142, ගාලු පාර, කොළඹ 03. වැඩකරන දිනවල පෙ.ව. 9.00 සිට ප.ව. 5.00 දක්වා.")}
                     </p>
                   </div>
                 </label>
@@ -614,14 +621,14 @@ export default function CheckoutPage() {
                   className="py-2.5 px-4 rounded-xl border border-gray-200 text-xs font-semibold text-ink flex items-center gap-1.5"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>ආපසු (Back)</span>
+                  <span>{tx("ආපසු (Back)")}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setStep(3)}
                   className="py-3 px-6 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-2"
                 >
-                  <span>ඊළඟ පියවර: ගෙවීම් ක්‍රමය (Next)</span>
+                  <span>{tx("ඊළඟ පියවර: ගෙවීම් ක්‍රමය (Next)")}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -632,7 +639,7 @@ export default function CheckoutPage() {
           {step === 3 && (
             <div className="p-6 rounded-2xl bg-white border border-maroon-100 shadow-sm space-y-5 animate-in fade-in duration-200">
               <h2 className="font-display font-black text-xl text-maroon-900 flex items-center gap-2">
-                <span>3. ගෙවීම් ක්‍රමය තෝරන්න (Payment Method)</span>
+                <span>{tx("3. ගෙවීම් ක්‍රමය තෝරන්න (Payment Method)")}</span>
               </h2>
 
               <div className="space-y-3">
@@ -656,11 +663,11 @@ export default function CheckoutPage() {
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-sm text-maroon-900 flex items-center gap-2">
                         <CreditCard className="w-4 h-4 text-saffron-500" />
-                        <span>ක්‍රෙඩිට් / ඩෙබිට් කාඩ්පත් සහ ඩිජිටල් පසුම්බි (PayHere)</span>
+                        <span>{tx("ක්‍රෙඩිට් / ඩෙබිට් කාඩ්පත් සහ ඩිජිටල් පසුම්බි (PayHere)")}</span>
                       </span>
                     </div>
                     <p className="text-xs text-ink-muted">
-                      Visa, MasterCard, Amex, eZ Cash, FriMi, Genie හරහා ආරක්ෂිත ක්ෂණික ගෙවීම.
+                      {tx("Visa, MasterCard, Amex, eZ Cash, FriMi, Genie හරහා ආරක්ෂිත ක්ෂණික ගෙවීම.")}
                     </p>
                   </div>
                 </label>
@@ -685,35 +692,25 @@ export default function CheckoutPage() {
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-sm text-maroon-900 flex items-center gap-2">
                         <Building className="w-4 h-4 text-saffron-500" />
-                        <span>බැංකු තැන්පතු හෝ Online Transfer (Bank Transfer)</span>
+                        <span>{tx("බැංකු තැන්පතු හෝ Online Transfer (Bank Transfer)")}</span>
                       </span>
                     </div>
                     <p className="text-xs text-ink-muted">
-                      BOC, සම්පත් හෝ කොමර්ෂල් බැංකු ගිණුම්වලට මුදල් තැන්පත් කර ලදුපත උඩුගත කරන්න.
+                      {tx("BOC, සම්පත් හෝ කොමර්ෂල් බැංකු ගිණුම්වලට මුදල් තැන්පත් කර ලදුපත උඩුගත කරන්න.")}
                     </p>
 
                     {/* Bank Details Box */}
                     {paymentMethod === "BANK_TRANSFER" && (
                       <div className="p-3 bg-white rounded-lg border border-gold-500/30 text-xs space-y-2 mt-2">
                         <span className="font-bold text-maroon-900 block">
-                          පදනම ප්‍රකාශන නිල බැංකු ගිණුම් තොරතුරු:
+                          {tx("පදනම ප්‍රකාශන නිල බැංකු ගිණුම් තොරතුරු:")}
                         </span>
-                        <div className="space-y-1 text-ink text-[11px]">
-                          <p>
-                            • <strong>ලංකා බැංකුව (BOC):</strong> 0001234567 — කොල්ලුපිටිය ශාඛාව (Padanama Publications)
-                          </p>
-                          <p>
-                            • <strong>සම්පත් බැංකුව (Sampath):</strong> 0112345678 — කොළඹ සුපර් ශාඛාව
-                          </p>
-                          <p>
-                            • <strong>කොමර්ෂල් බැංකුව (Commercial):</strong> 8001234567 — කොළඹ 03 ශාඛාව
-                          </p>
-                        </div>
+                        <BankAccounts className="space-y-1 text-ink text-[11px]" />
 
                         {/* Slip Upload Input */}
                         <div className="pt-2 border-t border-gray-100">
                           <label className="block text-[11px] font-bold text-maroon-900 mb-1">
-                            ගෙවීම් ලදුපත (Slip) උඩුගත කරන්න (විකල්ප):
+                            {tx("ගෙවීම් ලදුපත (Slip) උඩුගත කරන්න (විකල්ප):")}
                           </label>
                           <input
                             type="file"
@@ -724,7 +721,7 @@ export default function CheckoutPage() {
                           {bankSlipPreview && (
                             <div className="mt-2 flex items-center gap-2 text-[11px] text-green-700 font-bold">
                               <CheckCircle2 className="w-4 h-4" />
-                              <span>ලදුපත සාර්ථකව තෝරාගන්නා ලදී (Slip attached)</span>
+                              <span>{tx("ලදුපත සාර්ථකව තෝරාගන්නා ලදී (Slip attached)")}</span>
                             </div>
                           )}
                         </div>
@@ -753,12 +750,12 @@ export default function CheckoutPage() {
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-sm text-maroon-900 flex items-center gap-2">
                         <Banknote className="w-4 h-4 text-saffron-500" />
-                        <span>භාණ්ඩ ලැබුණු පසු මුදල් ගෙවීම (Cash on Delivery)</span>
+                        <span>{tx("භාණ්ඩ ලැබුණු පසු මුදල් ගෙවීම (Cash on Delivery)")}</span>
                       </span>
-                      <span className="text-[11px] font-bold text-ink-muted">+රු. 100 ගාස්තුවක්</span>
+                      <span className="text-[11px] font-bold text-ink-muted">{tx("+රු. 100 ගාස්තුවක්")}</span>
                     </div>
                     <p className="text-xs text-ink-muted">
-                      කුරියර් රියදුරු වෙත මුදල් ගෙවා පාර්සලය ලබාගන්න. ආරක්ෂාව සඳහා පිටත් කිරීමට පෙර 4-digit SMS කේතයක් මඟින් තහවුරු කරනු ලැබේ.
+                      {tx("කුරියර් රියදුරු වෙත මුදල් ගෙවා පාර්සලය ලබාගන්න. ආරක්ෂාව සඳහා පිටත් කිරීමට පෙර 4-digit SMS කේතයක් මඟින් තහවුරු කරනු ලැබේ.")}
                     </p>
                   </div>
                 </label>
@@ -783,14 +780,14 @@ export default function CheckoutPage() {
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-sm text-maroon-900 flex items-center gap-2.5">
                         <KokoIcon className="h-6 w-auto" />
-                        <span>Koko — පොලී රහිත වාරික 3කින් (3 Installments)</span>
+                        <span>{tx("Koko — පොලී රහිත වාරික 3කින් (3 Installments)")}</span>
                       </span>
                       <span className="text-xs font-bold text-maroon-800">
                         3 x {formatLkr(Math.round(grandTotalCents / 3), "si")}
                       </span>
                     </div>
                     <p className="text-xs text-ink-muted">
-                      ඩෙබිට් කාඩ්පත මගින් කිසිදු අමතර පොලියක් නොමැතිව මාස 3කින් ගෙවන්න.
+                      {tx("ඩෙබිට් කාඩ්පත මගින් කිසිදු අමතර පොලියක් නොමැතිව මාස 3කින් ගෙවන්න.")}
                     </p>
                   </div>
                 </label>
@@ -799,13 +796,13 @@ export default function CheckoutPage() {
               {/* Customer Note */}
               <div className="pt-2">
                 <label className="text-xs font-bold text-ink block mb-1">
-                  ඇණවුම පිළිබඳ විශේෂ සටහනක් (Special Instructions / Note):
+                  {tx("ඇණවුම පිළිබඳ විශේෂ සටහනක් (Special Instructions / Note):")}
                 </label>
                 <textarea
                   rows={2}
                   value={customerNote}
                   onChange={(e) => setCustomerNote(e.target.value)}
-                  placeholder="උදා: සති අන්තයේ භාරදෙන්න / කාර්යාල ලිපිනයයි..."
+                  placeholder={tx(tx("උදා: සති අන්තයේ භාරදෙන්න / කාර්යාල ලිපිනයයි..."))}
                   className="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-saffron-500"
                 />
               </div>
@@ -817,7 +814,7 @@ export default function CheckoutPage() {
                   className="py-2.5 px-4 rounded-xl border border-gray-200 text-xs font-semibold text-ink flex items-center gap-1.5"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>ආපසු (Back)</span>
+                  <span>{tx("ආපසු (Back)")}</span>
                 </button>
               </div>
             </div>
@@ -828,7 +825,7 @@ export default function CheckoutPage() {
         <div className="lg:col-span-5 space-y-6">
           <div className="p-5 sm:p-6 rounded-2xl bg-white border border-maroon-200 shadow-md space-y-5 sticky top-28">
             <h3 className="font-display font-black text-lg text-maroon-900 border-b border-gray-100 pb-3">
-              ඇණවුම් සාරාංශය (Order Summary)
+              {tx("ඇණවුම් සාරාංශය (Order Summary)")}
             </h3>
 
             {/* Items Mini List */}
@@ -840,7 +837,7 @@ export default function CheckoutPage() {
                       {it.title}
                     </span>
                     <span className="text-[11px] text-ink-muted">
-                      ප්‍රමාණය: {it.quantity} × {it.format === "EBOOK" ? "ඊ-පොත" : "මුද්‍රණය"}
+                      ප්‍රමාණය: {it.quantity} × {it.format === "EBOOK" ? tx("ඊ-පොත") : tx("මුද්‍රණය")}
                     </span>
                   </div>
                   <span className="font-bold text-ink shrink-0">
@@ -853,7 +850,7 @@ export default function CheckoutPage() {
             {/* Calculations Breakdown */}
             <div className="space-y-2 text-xs border-t border-gray-100 pt-3">
               <div className="flex justify-between text-ink">
-                <span>පොත් එකතුව (Subtotal):</span>
+                <span>{tx("පොත් එකතුව (Subtotal):")}</span>
                 <span className="font-semibold">{formatLkr(subtotalCents, "si")}</span>
               </div>
 
@@ -868,7 +865,7 @@ export default function CheckoutPage() {
                 <span>බෙදාහැරීමේ ගාස්තු ({address.district}):</span>
                 <span className="font-semibold">
                   {shippingCents === 0 ? (
-                    <span className="text-green-700 font-bold">නොමිලේ (FREE)</span>
+                    <span className="text-green-700 font-bold">{tx("නොමිලේ (FREE)")}</span>
                   ) : (
                     formatLkr(shippingCents, "si")
                   )}
@@ -877,7 +874,7 @@ export default function CheckoutPage() {
 
               {codFeeCents > 0 && (
                 <div className="flex justify-between text-ink">
-                  <span>COD හැසිරවීමේ ගාස්තුව:</span>
+                  <span>{tx("COD හැසිරවීමේ ගාස්තුව:")}</span>
                   <span className="font-semibold">{formatLkr(codFeeCents, "si")}</span>
                 </div>
               )}
@@ -885,7 +882,7 @@ export default function CheckoutPage() {
               <div className="pt-3 border-t-2 border-dashed border-gray-200 flex justify-between items-baseline">
                 <div>
                   <span className="font-display font-black text-base text-maroon-900 block">
-                    මුළු ගෙවිය යුතු මුදල:
+                    {tx("මුළු ගෙවිය යුතු මුදල:")}
                   </span>
                   <span className="text-[10px] text-ink-muted">Total Amount (LKR)</span>
                 </div>
@@ -909,10 +906,10 @@ export default function CheckoutPage() {
               <Lock className="w-4 h-4" />
               <span>
                 {submitting
-                  ? "ඇණවුම සකස් කරමින්... (Processing)"
+                  ? tx("ඇණවුම සකස් කරමින්... (Processing)")
                   : paymentMethod === "PAYHERE"
-                  ? "PayHere හරහා ගෙවන්න (Pay Now)"
-                  : "ඇණවුම තහවුරු කරන්න (Place Order)"}
+                  ? tx("PayHere හරහා ගෙවන්න (Pay Now)")
+                  : tx("ඇණවුම තහවුරු කරන්න (Place Order)")}
               </span>
             </button>
 
@@ -920,9 +917,9 @@ export default function CheckoutPage() {
             <div className="pt-2 text-center text-[11px] text-ink-muted space-y-1">
               <div className="flex items-center justify-center gap-1.5 text-green-700 font-bold">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>256-Bit SSL ආරක්ෂිත සන්නිවේදනය</span>
+                <span>{tx("256-Bit SSL ආරක්ෂිත සන්නිවේදනය")}</span>
               </div>
-              <p>පදනම ප්‍රකාශන නිල වෙබ් අඩවියෙන් සෘජු මිලදී ගැනීමකි.</p>
+              <p>{tx("පදනම ප්‍රකාශන නිල වෙබ් අඩවියෙන් සෘජු මිලදී ගැනීමකි.")}</p>
             </div>
           </div>
         </div>

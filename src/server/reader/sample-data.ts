@@ -17,6 +17,8 @@ export interface ReaderChapter {
 
 export interface ReaderBookData {
   slug: string;
+  bookId: string; // catalogue id used by the cart/order API
+  pageImages?: string[]; // admin-uploaded sample page scans (shown instead of text pages)
   titleSi: string;
   titleEn: string;
   authorName: string;
@@ -187,6 +189,7 @@ export function getReaderBookContent(
 
   return {
     slug,
+    bookId: matchedBook?.id || slug,
     titleSi: matchedBook ? matchedBook.titleSi : (slug === "ol-mathematics-short-notes" ? "සාමාන්‍ය පෙළ ගණිතය කෙටි සටහන් සහ සූත්‍ර සංග්‍රහය" : "5 ශ්‍රේණිය ශිෂ්‍යත්ව පෙරහුරු ප්‍රශ්න පත්‍ර"),
     titleEn: matchedBook ? matchedBook.titleEn : (slug === "ol-mathematics-short-notes" ? "O/L Mathematics Short Notes" : "Grade 5 Scholarship Model Papers"),
     authorName: "පදනම අධ්‍යාපනික මණ්ඩලය",

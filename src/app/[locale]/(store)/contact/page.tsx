@@ -1,8 +1,7 @@
 import React from "react";
-import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
+import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { WhatsAppIcon } from "@/components/ui/BrandIcons";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { ContactForm } from "@/components/store/ContactForm";
 
 export default function ContactPage() {
   return (
@@ -64,31 +63,7 @@ export default function ContactPage() {
             පණිවිඩයක් යොමු කරන්න (Send an Inquiry)
           </h2>
 
-          <form className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input label="ඔබගේ නම (Full Name)" placeholder="සුනිල් පෙරේරා" required />
-              <Input label="දුරකථන අංකය (Phone Number)" placeholder="071 800 8533" required />
-            </div>
-
-            <Input label="විද්‍යුත් තැපෑල (Email Address)" type="email" placeholder="sunil@example.com" />
-
-            <div className="space-y-1.5 text-left">
-              <label className="block text-xs font-bold text-ink">
-                පණිවිඩය (Message / Book Request)
-              </label>
-              <textarea
-                rows={5}
-                placeholder="ඔබට අවශ්‍ය පොත් පිළිබඳ විස්තර මෙහි සටහන් කරන්න..."
-                className="w-full p-3.5 bg-white border border-maroon-200 rounded-xl text-sm text-ink placeholder:text-ink-muted/60 focus:outline-none focus:ring-2 focus:ring-saffron-500"
-                required
-              />
-            </div>
-
-            <Button variant="saffron" className="w-full sm:w-auto">
-              <Send className="w-4 h-4 mr-2" />
-              <span>පණිවිඩය යවන්න</span>
-            </Button>
-          </form>
+          <ContactForm />
         </div>
       </div>
     </div>

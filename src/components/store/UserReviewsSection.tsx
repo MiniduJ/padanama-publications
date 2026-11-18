@@ -3,108 +3,14 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Star, CheckCircle2, ThumbsUp, Sparkles, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 
-interface Review {
-  id: number;
-  name: string;
-  role: string;
-  location: string;
-  rating: number;
-  date: string;
-  badge: string;
-  title: string;
-  comment: string;
-  helpfulCount: number;
-  bookTitle?: string;
-}
+import { DEFAULT_REVIEWS, type Review } from "@/data/site-defaults";
+export type { Review };
 
-const REVIEWS: Review[] = [
-  {
-    id: 1,
-    name: "කුමුදුනී අබේසිංහ",
-    role: "දෙමව්පියෙකි (මවක්)",
-    location: "මහනුවර",
-    rating: 5,
-    date: "පෙරේදා",
-    badge: "මිලදී ගැනීමක් ✓",
-    title: "ශිෂ්‍යත්ව විභාගය 186කින් විශිෂ්ට ලෙස සමත් වුණා!",
-    comment:
-      "මගේ දුව පසුගිය 5 ශ්‍රේණිය ශිෂ්‍යත්ව විභාගයෙන් ලකුණු 186ක් අරගෙන දිස්ත්‍රික්කයේ ඉහළින්ම සමත් වුණා. පදනම ආදර්ශ ප්‍රශ්න පත්‍ර සහ පෙරහුරු අභ්‍යාස පොත්වල තිබුණු ප්‍රශ්න රටාව සැබෑ විභාග ප්‍රශ්න පත්‍රයට ගොඩක් සමානයි. මුද්‍රණයේ ගුණාත්මක බව සහ පැහැදිලි පිළිතුරු විවරණ ඉතා විශිෂ්ටයි.",
-    helpfulCount: 48,
-    bookTitle: "5 ශ්‍රේණිය ශිෂ්‍යත්ව ආදර්ශ ප්‍රශ්න පත්‍ර එකතුව",
-  },
-  {
-    id: 2,
-    name: "ඩී. එම්. සෙනෙවිරත්න",
-    role: "ගණිත හා විද්‍යා ආචාර්ය",
-    location: "කුරුණෑගල",
-    rating: 5,
-    date: "පසුගිය සතියේ",
-    badge: "පාසල් ආචාර්ය ✓",
-    title: "O/L සිසුන්ට නිර්දේශ කළ හැකි අංක 1 පොත් පෙළ",
-    comment:
-      "සාමාන්‍ය පෙළ ගණිතය සහ විද්‍යාව කෙටි සටහන් සහ පසුගිය විභාග ප්‍රශ්න විවරණ පොත් පෙළ මගේ පන්තිවල ළමයින්ට නිර්දේශ කළා. විෂය කරුණු ඉතාම ක්‍රමානුකූලව සහ සරලව කෙටි සටහන් ලෙස ඉදිරිපත් කර තිබීම දරුවන්ට විභාගය ආසන්නයේ මතක තබා ගැනීමට ඉතා පහසුයි.",
-    helpfulCount: 62,
-    bookTitle: "සාමාන්‍ය පෙළ විද්‍යාව සහ ගණිතය කෙටි සටහන්",
-  },
-  {
-    id: 3,
-    name: "කවීෂා මධුෂානි",
-    role: "A/L ජීව විද්‍යා ශිෂ්‍යාව (2025)",
-    location: "ගාල්ල",
-    rating: 5,
-    date: "දින 3කට පෙර",
-    badge: "A/L විද්‍යා ශිෂ්‍යාව ✓",
-    title: "කොළඹ නොගිහින් දවස් 2න් පොත් ටික ගෙදරටම ආවා!",
-    comment:
-      "A/L Biology Resource Book එකට අනුකූලව හදපු MCQ ප්‍රශ්න සහ විවරණ පොත් ටික නම් උපරිමයි. කොළඹ සාප්පු ගානේ රස්තියාදු නොවී ගෙදර ඉඳලම ඔන්ලයින් ඕඩර් කරලා දවස් 2න් Domex කුරියර් හරහා පොත් ලැබුණා. COD ක්‍රමයට ගෙවන්න ලැබීමත් ලොකු සහනයක්.",
-    helpfulCount: 39,
-    bookTitle: "උසස් පෙළ ජීව විද්‍යාව බහුවරණ ප්‍රශ්න හා විවරණ",
-  },
-  {
-    id: 4,
-    name: "චමින්ද විජේකෝන්",
-    role: "දෙමව්පියෙකි (පියෙක්)",
-    location: "කොළඹ 06",
-    rating: 5,
-    date: "සති 2කට පෙර",
-    badge: "මිලදී ගැනීමක් ✓",
-    title: "පොත් සාම්පල ඔන්ලයින් කියවලා තීරණය කරන්න ලැබුණා",
-    comment:
-      "වෙබ් අඩවියෙන් ඇණවුම් කිරීම ඉතාම පහසුයි. විශේෂයෙන්ම නොමිලේ ඩිජිටල් පුස්තකාලයෙන් පිටු 20ක සාම්පල කලින්ම කියවලා බලන්න ලැබීම විශිෂ්ට අත්දැකීමක්. පොත්වල අන්තර්ගතය ගැන පූර්ණ අවබෝධයකින් මිලදී ගන්න පුළුවන් වුණා.",
-    helpfulCount: 31,
-    bookTitle: "6-9 ශ්‍රේණි විෂයානුබද්ධ වැඩපොත් කට්ටලය",
-  },
-  {
-    id: 5,
-    name: "එන්. එස්. මුදලිගේ",
-    role: "ඉතිහාසය හා සිංහල ආචාරිනී",
-    location: "මාතර",
-    rating: 5,
-    date: "සති 3කට පෙර",
-    badge: "පාසල් ආචාරිනී ✓",
-    title: "ලකුණු ලබාදීමේ පටිපාටිය (Marking Scheme) අතිවිශිෂ්ටයි",
-    comment:
-      "පදනම ප්‍රකාශන මඟින් ඉදිරිපත් කරන O/L ආදර්ශ ප්‍රශ්න පත්‍ර කට්ටල වාර විභාග සඳහා පුහුණු වීමට අතිශය ප්‍රයෝජනවත්. විශේෂයෙන්ම ලකුණු ලබාදීමේ පටිපාටිය (Marking Scheme) විභාග දෙපාර්තමේන්තු මට්ටමටම සකසා තිබීම අගය කළ යුතුයි.",
-    helpfulCount: 54,
-    bookTitle: "සාමාන්‍ය පෙළ ඉතිහාසය සහ සිංහල ආදර්ශ ප්‍රශ්න පත්‍ර",
-  },
-  {
-    id: 6,
-    name: "දිනෙත් ප්‍රනාන්දු",
-    role: "O/L 9A විශිෂ්ට සාමාර්ථ්‍යලාභී ශිෂ්‍යයෙක්",
-    location: "ගම්පහ",
-    rating: 5,
-    date: "මාසයකට පෙර",
-    badge: "O/L 9A විශිෂ්ටයෙක් ✓",
-    title: "විභාගයට මාස 3කට පෙර ගෙන්නා ගත්තා — 9A ප්‍රතිඵලයක් ලැබුණා",
-    comment:
-      "විභාගයට මාස 3කට කලින් පදනම කෙටි සටහන් පොත් සියල්ල ගෙන්නා ගත්තා. විශේෂයෙන් විද්‍යාව හා ඉතිහාසය පාඩම් ඉතා ඉක්මනින් ආවරණය කරගන්න පුළුවන් වුණා. මගේ 9A ජයග්‍රහණයට පදනම පොත් ලොකු ශක්තියක් වුණා. හැම ශිෂ්‍යයෙකුටම මම නිර්දේශ කරනවා.",
-    helpfulCount: 77,
-    bookTitle: "O/L සියලු විෂයයන්හි කෙටි සටහන් පෙළ",
-  },
-];
 
-export function UserReviewsSection() {
+
+export function UserReviewsSection({ reviews }: { reviews?: Review[] } = {}) {
+  // Reviews managed in Admin → Reviews; built-in examples until some are published.
+  const REVIEWS = reviews?.length ? reviews : DEFAULT_REVIEWS;
   const [likes, setLikes] = useState<Record<number, boolean>>({});
   const [likeCounts, setLikeCounts] = useState<Record<number, number>>(() => {
     const initial: Record<number, number> = {};
@@ -143,6 +49,8 @@ export function UserReviewsSection() {
   }, []);
 
   const handleToggleLike = (id: number) => {
+    const dbId = REVIEWS.find((r) => r.id === id)?.dbId;
+    if (dbId) fetch(`/api/reviews/${dbId}/like`, { method: likes[id] ? "DELETE" : "POST" }).catch(() => {});
     setLikes((prev) => {
       const isLiked = !prev[id];
       const updated = { ...prev, [id]: isLiked };

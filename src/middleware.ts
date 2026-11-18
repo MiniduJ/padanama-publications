@@ -2,6 +2,7 @@ import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { ADMIN_COOKIE, verifyAdminSession } from "./server/auth/admin-session";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -63,9 +64,9 @@ export async function middleware(request: NextRequest) {
       return response;
     }
 
-    // Role check via secure httpOnly admin session cookie
-    const adminSessionToken = request.cookies.get("padanama_admin_token")?.value;
-    if (!adminSessionToken) {
+    // Verify signed admin session cookie (HMAC), not mere presence
+    const session = await verifyAdminSession(request.cookies.get(ADMIN_COOKIE)?.value);
+    if (!session) {
       const loginUrl = new URL("/admin/login", request.url);
       loginUrl.searchParams.set("from", pathname);
       return NextResponse.redirect(loginUrl);

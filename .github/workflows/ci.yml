@@ -1,42 +1,83 @@
-name: CI Pipeline
+name: CI / CD
 
 on:
   push:
-    branches: [main, "phase-*"]
+    branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FIREBASE_CLI_EXPERIMENTS: webframeworks
 
 jobs:
   validate:
-    name: Lint, Typecheck, Test & Build
+    name: Typecheck, test & build
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js 22.x
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "npm"
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Verify Prisma Schema & Client Generation
-        run: npx prisma generate
-
-      - name: Run TypeScript Typecheck
-        run: npm run typecheck
-
-      - name: Run Unit Tests
-        run: npm run test
-
-      - name: Build Next.js Application
-        run: npm run build
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
         env:
-          DATABASE_URL: "postgresql://padanama:padanama_dev_password@localhost:5432/padanama_db?schema=public"
-          AUTH_SECRET: "test-auth-secret-for-ci-build-32-chars-long"
-          PAYHERE_MERCHANT_ID: "1211111"
-          PAYHERE_MERCHANT_SECRET: "test-secret"
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+          AUTH_SECRET: ci-only-secret-at-least-32-characters-long
+
+  deploy:
+    name: Deploy to Firebase
+    needs: validate
+    runs-on: ubuntu-latest
+    # Live on main; preview channel for PRs from this repo (forks have no secrets)
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    environment: ${{ github.event_name == 'pull_request' && 'preview' || 'production' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      # Firebase web-frameworks bundles .env.production into the SSR function.
+      - name: Write runtime env
+        run: |
+          cat > .env.production <<'EOF'
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          AUTH_SECRET=${{ secrets.AUTH_SECRET }}
+          ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+          NEXT_PUBLIC_APP_URL=${{ vars.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_SUPABASE_URL=${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${{ vars.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PAYHERE_MODE=${{ vars.PAYHERE_MODE }}
+          PAYHERE_MERCHANT_ID=${{ secrets.PAYHERE_MERCHANT_ID }}
+          PAYHERE_MERCHANT_SECRET=${{ secrets.PAYHERE_MERCHANT_SECRET }}
+          SMSLENZ_API_KEY=${{ secrets.SMSLENZ_API_KEY }}
+          SMSLENZ_SENDER_ID=${{ vars.SMSLENZ_SENDER_ID }}
+          KOOMBIYO_API_KEY=${{ secrets.KOOMBIYO_API_KEY }}
+          DOMEX_API_KEY=${{ secrets.DOMEX_API_KEY }}
+          EOF
+
+      # Non-destructive schema sync (fails instead of dropping data)
+      - name: Sync database schema
+        if: github.event_name != 'pull_request'
+        run: npx prisma db push --skip-generate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: padanama-publications
+          channelId: ${{ github.event_name == 'pull_request' && '' || 'live' }}

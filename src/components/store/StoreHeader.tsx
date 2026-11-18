@@ -2,14 +2,18 @@
 
 import React, { useState, useEffect } from "react";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
-import { useTranslations, useLocale } from "next-intl";
+import { useLocale } from "next-intl";
 import { Logo } from "@/components/ui/Logo";
 import { Search, ShoppingBag, User, Phone, Menu, X, Info, Mail, Sparkles } from "lucide-react";
 import { CartBadge } from "./CartBadge";
 
+// Nav + top bar stay the same in every language (by design); only page content is translated.
+const NAV_LABELS: Record<string, string> = { home: "Home", books: "All Books", shop: "Book Shop", digitalLibrary: "Digital Library", samples: "Free Samples", about: "About Us", contact: "Contact", bookFair: "Book Fair" };
+const TOP_LABELS: Record<string, string> = { freeDeliveryNotice: "රු. 3,500 ට වැඩි ඇණවුම් සඳහා දිවයින පුරා නොමිලේ බෙදාහැරීම", searchPlaceholder: "Search books, authors, ISBN, or type in Singlish..." };
+
 export function StoreHeader() {
-  const t = useTranslations("common");
-  const nav = useTranslations("nav");
+  const t = (k: string) => TOP_LABELS[k];
+  const nav = (k: string) => NAV_LABELS[k];
   const currentLocale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
@@ -19,14 +23,12 @@ export function StoreHeader() {
   const [currentUser, setCurrentUser] = useState<{ name?: string } | null>(null);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("padanama_user");
-      if (stored) {
-        setCurrentUser(JSON.parse(stored));
-      }
-    } catch {
-      // ignore
-    }
+    const load = () => {
+      try { setCurrentUser(JSON.parse(localStorage.getItem("padanama_user") || "null")); } catch { setCurrentUser(null); }
+    };
+    load();
+    window.addEventListener("padanama-user", load);
+    return () => window.removeEventListener("padanama-user", load);
   }, []);
 
   const handleSearchSubmit = (e: React.FormEvent) => {

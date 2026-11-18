@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Link } from "@/i18n/routing";
+import { useLocale } from "next-intl";
 import { BookCard } from "@/components/ui/BookCard";
 import { ChevronDown, ChevronUp, ArrowRight } from "lucide-react";
 
@@ -9,7 +10,14 @@ interface BestsellersSectionProps {
   books: any[];
 }
 
+const LABELS = {
+  si: { more: "තවත් බලන්න", less: "අඩු කරන්න", all: "සියලුම පොත් සාප්පුවට යන්න" },
+  en: { more: "See more", less: "Show less", all: "Shop all books" },
+  ta: { more: "மேலும் காண்க", less: "குறைவாகக் காண்க", all: "அனைத்து நூல்களும்" },
+};
+
 export function BestsellersSection({ books }: BestsellersSectionProps) {
+  const L = LABELS[useLocale() as keyof typeof LABELS] || LABELS.si;
   const [expanded, setExpanded] = useState(false);
 
   // In one row on desktop (lg:grid-cols-4), 4 books are shown.
@@ -50,7 +58,7 @@ export function BestsellersSection({ books }: BestsellersSectionProps) {
             onClick={() => setExpanded(!expanded)}
             className="inline-flex items-center gap-2 px-7 py-3 rounded-2xl bg-white border-2 border-brandRed text-brandRed hover:bg-brandRed hover:text-white font-extrabold text-sm shadow-sm transition-all duration-200 active:scale-95 group cursor-pointer"
           >
-            <span>{expanded ? "අඩු කරන්න (Show Less)" : "තවත් බලන්න (See More)"}</span>
+            <span>{expanded ? L.less : L.more}</span>
             {expanded ? (
               <ChevronUp className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />
             ) : (
@@ -62,7 +70,7 @@ export function BestsellersSection({ books }: BestsellersSectionProps) {
             href="/books"
             className="text-xs font-bold text-ink-muted hover:text-brandRed hover:underline flex items-center gap-1.5 transition-colors py-2 px-3"
           >
-            <span>සියලුම පොත් සාප්පුවට යන්න (Shop All Books)</span>
+            <span>{L.all}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>

@@ -38,7 +38,7 @@ export class NotificationEngine {
     if (params.paymentMethod === "CASH_ON_DELIVERY") {
       message = `Padanama Publications: Order ${params.orderNumber} confirmed. Total: ${totalFormatted} (COD). Delivery to ${params.deliveryCity} via Domex. Tracking will be sent once dispatched.`;
     } else if (params.paymentMethod === "BANK_TRANSFER") {
-      message = `Padanama Publications: Order ${params.orderNumber} placed. Total: ${totalFormatted}. Please transfer to BOC A/C 0001234567 and upload your slip at padanamapublication.lk.`;
+      message = `Padanama Publications: Order ${params.orderNumber} placed. Total: ${totalFormatted}. Please transfer to the bank account shown at checkout and upload your slip at padanamapublication.lk.`;
     } else {
       message = `Padanama Publications: Order ${params.orderNumber} received. Total: ${totalFormatted}. Thank you for choosing Sri Lanka's trusted book publisher.`;
     }

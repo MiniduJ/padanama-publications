@@ -136,19 +136,111 @@
     "terms": "Terms of Service"
   },
   "home": {
-    "heroBadge": "Official Website • padanamapublication.lk",
-    "shortNotes": "Short Notes & Formulas",
-    "termPapers": "Term Test Papers",
-    "modelPapers": "Model Examination Papers",
-    "syllabusExplorer": "School Syllabus by Grade",
-    "viewAllBooks": "View All Books",
-    "bestsellers": "Bestselling Books",
-    "latestAndDiscounts": "Latest Releases & Discounts",
-    "directPublisherCallout": "Contact Us for Orders & Inquiries",
-    "hotlineNotice": "Padanama Instant Customer Support",
-    "shopCatalog": "Go to Book Shop",
-    "allGrades": "All Grades",
-    "scholarshipPrep": "Scholarship Prep",
-    "olAndAl": "O/L & A/L"
+    "heroAlt": [
+      "Padanama Publications – from Grade 1 to A/L",
+      "O/L short notes and question papers",
+      "Grade 5 scholarship practice papers",
+      "A/L stream study guides",
+      "Islandwide doorstep delivery"
+    ],
+    "features": [
+      {
+        "title": "Short Notes & Formulas",
+        "subtitle": "Quick revision, even the night before the exam",
+        "tag": "O/L & A/L"
+      },
+      {
+        "title": "Term Test Papers",
+        "subtitle": "Get your child ready for every term",
+        "tag": "All grades"
+      },
+      {
+        "title": "Model Papers",
+        "subtitle": "Face the scholarship exam with confidence",
+        "tag": "Scholarship"
+      },
+      {
+        "title": "Past Papers",
+        "subtitle": "With answers and explanations",
+        "tag": "Exam practice"
+      }
+    ],
+    "trust": [
+      [
+        "Islandwide delivery",
+        "Koombiyo / Domex – 2-4 days"
+      ],
+      [
+        "Secure payments",
+        "PayHere, Koko & bank transfer"
+      ],
+      [
+        "Cash on delivery",
+        "Pay when the books arrive"
+      ],
+      [
+        "Trusted by teachers",
+        "100% official Padanama prints"
+      ]
+    ],
+    "gradesKicker": "Choose your child's grade",
+    "gradesTitle": "Books by grade",
+    "viewAll": "View all books",
+    "categories": [
+      [
+        "Preschool & Grades 1-2",
+        "Letters, numbers and activities"
+      ],
+      [
+        "Grades 3-5 – Scholarship",
+        "Model papers and practice"
+      ],
+      [
+        "Grades 6 & 7",
+        "Subject workbooks"
+      ],
+      [
+        "Grades 8 & 9",
+        "Short notes and exercises"
+      ],
+      [
+        "G.C.E. O/L",
+        "Grade 10 & 11 exam books"
+      ],
+      [
+        "A/L – Science",
+        "Biology, Chemistry, Physics"
+      ],
+      [
+        "A/L – Technology",
+        "Science for Technology"
+      ],
+      [
+        "A/L – Commerce",
+        "Accounting, Business Studies"
+      ],
+      [
+        "Past papers",
+        "Exam practice handbooks"
+      ]
+    ],
+    "bestKicker": "New releases & offers",
+    "bestTitle": "Most chosen by parents",
+    "shopAll": "Go to the book shop",
+    "primaryTitle": "For children preparing for the scholarship",
+    "primarySub": "Model papers and practice built on the new syllabus",
+    "primaryAll": "All primary books",
+    "olTitle": "O/L – aim for A passes",
+    "olSub": "Science, Maths, Sinhala, History and Commerce notes and papers",
+    "olAll": "All O/L books",
+    "socialTitle": "Latest posts & videos",
+    "socialSub": "Exam tips, new books and book fair news on Facebook and YouTube",
+    "ctaBadge": "Padanama customer care",
+    "ctaTitle": "Not sure which book to buy? We'll help.",
+    "ctaBody": "Just tell us your child's grade and we'll suggest the right books. Special prices for schools and bulk orders.",
+    "ctaPhone": "Phone",
+    "ctaEmail": "Email",
+    "ctaContact": "Contact us",
+    "featuresLabel": "Book types"
   }
 }

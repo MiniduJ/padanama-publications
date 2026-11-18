@@ -1,4 +1,6 @@
 "use client";
+import { useTx } from "@/lib/tx";
+import { BankAccounts } from "@/components/store/BankAccounts";
 
 import React, { useEffect, useState, use } from "react";
 import { Link } from "@/i18n/routing";
@@ -27,6 +29,7 @@ interface SuccessPageProps {
 }
 
 export default function OrderSuccessPage({ searchParams }: SuccessPageProps) {
+  const tx = useTx();
   const params = use(searchParams);
   const orderNumber = params.order || "PDN-2026-100245";
   const method = params.method || (params.payment ? "PAYHERE" : "BANK_TRANSFER");
@@ -75,14 +78,14 @@ export default function OrderSuccessPage({ searchParams }: SuccessPageProps) {
           </div>
 
           <h1 className="font-display font-black text-2xl sm:text-3xl tracking-tight">
-            ඔබගේ ඇණවුම සාර්ථකව භාරගන්නා ලදී!
+            {tx("ඔබගේ ඇණවුම සාර්ථකව භාරගන්නා ලදී!")}
           </h1>
           <p className="text-xs sm:text-sm text-cream/80 max-w-lg mx-auto">
-            ස්තූතියි! පදනම ප්‍රකාශන වෙතින් පොත් ඇණවුම් කිරීම පිළිබඳව අපි ඉතාමත් සතුටු වන්නෙමු.
+            {tx("ස්තූතියි! පදනම ප්‍රකාශන වෙතින් පොත් ඇණවුම් කිරීම පිළිබඳව අපි ඉතාමත් සතුටු වන්නෙමු.")}
           </p>
 
           <div className="pt-2 inline-flex items-center gap-2 bg-black/30 backdrop-blur px-4 py-1.5 rounded-full border border-gold-500/30 text-xs">
-            <span className="text-gold-400 font-bold">ඇණවුම් අංකය (Order #):</span>
+            <span className="text-gold-400 font-bold">{tx("ඇණවුම් අංකය (Order #):")}</span>
             <span className="font-mono font-black text-white">{orderNumber}</span>
           </div>
         </div>
@@ -95,20 +98,20 @@ export default function OrderSuccessPage({ searchParams }: SuccessPageProps) {
               <Clock className="w-5 h-5 text-saffron-500 shrink-0" />
               <div>
                 <span className="text-xs font-bold text-maroon-900 block">
-                  ඇණවුමේ වත්මන් තත්ත්වය:
+                  {tx("ඇණවුමේ වත්මන් තත්ත්වය:")}
                 </span>
                 <span className="text-xs text-ink-muted">
                   {status === "PAID"
-                    ? "ගෙවීම සාර්ථකව තහවුරු වී ඇත. පාර්සලය සකස් කරමින් පවතී."
+                    ? tx("ගෙවීම සාර්ථකව තහවුරු වී ඇත. පාර්සලය සකස් කරමින් පවතී.")
                     : status === "COD_CONFIRMED"
-                    ? "COD ඇණවුම තහවුරු විය. Domex කුරියර් වෙත භාරදීමට නියමිතයි."
-                    : "බැංකු තැන්පතු ලදුපත තහවුරු කිරීම අපේක්ෂාවෙන් පවතී."}
+                    ? tx("COD ඇණවුම තහවුරු විය. Domex කුරියර් වෙත භාරදීමට නියමිතයි.")
+                    : tx("බැංකු තැන්පතු ලදුපත තහවුරු කිරීම අපේක්ෂාවෙන් පවතී.")}
                 </span>
               </div>
             </div>
             <Badge variant={status === "PAID" ? "green" : "gold"}>
               {status === "PAID"
-                ? "PAID (ගෙවා ඇත)"
+                ? tx("PAID (ගෙවා ඇත)")
                 : status === "COD_CONFIRMED"
                 ? "COD CONFIRMED"
                 : "PENDING VERIFICATION"}
@@ -120,33 +123,17 @@ export default function OrderSuccessPage({ searchParams }: SuccessPageProps) {
             <div className="p-5 rounded-2xl bg-white border-2 border-dashed border-maroon-200 space-y-4">
               <div className="flex items-center gap-2 text-sm font-bold text-maroon-900">
                 <Building className="w-5 h-5 text-saffron-500" />
-                <span>බැංකු තැන්පතු තොරතුරු සහ ලදුපත උඩුගත කිරීම:</span>
+                <span>{tx("බැංකු තැන්පතු තොරතුරු සහ ලදුපත උඩුගත කිරීම:")}</span>
               </div>
 
-              <div className="grid sm:grid-cols-3 gap-3 text-xs">
-                <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
-                  <span className="font-bold text-maroon-900 block">ලංකා බැංකුව (BOC)</span>
-                  <span className="text-[11px] text-ink block">ගිණුම: 0001234567</span>
-                  <span className="text-[10px] text-ink-muted">කොල්ලුපිටිය ශාඛාව</span>
-                </div>
-                <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
-                  <span className="font-bold text-maroon-900 block">සම්පත් බැංකුව</span>
-                  <span className="text-[11px] text-ink block">ගිණුම: 0112345678</span>
-                  <span className="text-[10px] text-ink-muted">කොළඹ සුපර් ශාඛාව</span>
-                </div>
-                <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
-                  <span className="font-bold text-maroon-900 block">කොමර්ෂල් බැංකුව</span>
-                  <span className="text-[11px] text-ink block">ගිණුම: 8001234567</span>
-                  <span className="text-[10px] text-ink-muted">කොළඹ 03 ශාඛාව</span>
-                </div>
-              </div>
+              <BankAccounts className="p-3 bg-gray-50 rounded-xl border border-gray-100 text-xs space-y-1" />
 
               {/* Slip Uploader Tray */}
               <div className="p-4 bg-maroon-50/50 rounded-xl border border-maroon-100 space-y-2">
                 <span className="text-xs font-bold text-maroon-900 block">
                   {slipUploaded
-                    ? "✓ ඔබගේ ගෙවීම් ලදුපත අප වෙත ලැබී ඇත. අපගේ ගිණුම් අංශය විසින් එය අනුමත කරනු ඇත."
-                    : "ගෙවීම් කළ ලදුපත (Deposit Slip / Screenshot) මෙතැනින් උඩුගත කරන්න:"}
+                    ? tx("✓ ඔබගේ ගෙවීම් ලදුපත අප වෙත ලැබී ඇත. අපගේ ගිණුම් අංශය විසින් එය අනුමත කරනු ඇත.")
+                    : tx("ගෙවීම් කළ ලදුපත (Deposit Slip / Screenshot) මෙතැනින් උඩුගත කරන්න:")}
                 </span>
 
                 {!slipUploaded ? (
@@ -161,7 +148,7 @@ export default function OrderSuccessPage({ searchParams }: SuccessPageProps) {
                 ) : (
                   <div className="flex items-center gap-2 text-xs text-green-800 font-bold">
                     <CheckCircle2 className="w-4 h-4 text-green-600" />
-                    <span>ලදුපත සාර්ථකව යොමු විය (Slip Verified by Customer)</span>
+                    <span>{tx("ලදුපත සාර්ථකව යොමු විය (Slip Verified by Customer)")}</span>
                   </div>
                 )}
               </div>
@@ -172,10 +159,10 @@ export default function OrderSuccessPage({ searchParams }: SuccessPageProps) {
             <div className="p-5 rounded-2xl bg-amber-50/70 border border-amber-200 text-xs text-amber-900 space-y-2">
               <span className="font-bold block text-sm flex items-center gap-1.5">
                 <Truck className="w-4 h-4 text-amber-700" />
-                භාණ්ඩ ලැබුණු පසු මුදල් ගෙවීමේ උපදෙස් (COD Instructions):
+                {tx("භාණ්ඩ ලැබුණු පසු මුදල් ගෙවීමේ උපදෙස් (COD Instructions):")}
               </span>
               <p className="leading-relaxed">
-                කුරියර් රියදුරු පැමිණි පසු කරුණාකර මුදල් ගෙවා පාර්සලය ලබාගන්න. කුරියර් පිටත් කිරීමට පෙර Domex සේවාව මගින් ඔබගේ දුරකථන අංකයට 4-digit SMS තහවුරු කිරීමේ කේතයක් එවනු ලැබේ.
+                {tx("කුරියර් රියදුරු පැමිණි පසු කරුණාකර මුදල් ගෙවා පාර්සලය ලබාගන්න. කුරියර් පිටත් කිරීමට පෙර Domex සේවාව මගින් ඔබගේ දුරකථන අංකයට 4-digit SMS තහවුරු කිරීමේ කේතයක් එවනු ලැබේ.")}
               </p>
             </div>
           )}
@@ -187,7 +174,7 @@ export default function OrderSuccessPage({ searchParams }: SuccessPageProps) {
               className="py-3 px-4 rounded-xl bg-maroon-900 hover:bg-maroon-950 text-cream font-bold text-xs text-center shadow transition-colors flex items-center justify-center gap-1.5"
             >
               <Truck className="w-4 h-4" />
-              <span>ඇණවුම් තත්ත්වය බලන්න (Track Order)</span>
+              <span>{tx("ඇණවුම් තත්ත්වය බලන්න (Track Order)")}</span>
             </Link>
 
             <Link
@@ -195,14 +182,14 @@ export default function OrderSuccessPage({ searchParams }: SuccessPageProps) {
               className="py-3 px-4 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white font-extrabold text-xs text-center shadow transition-colors flex items-center justify-center gap-1.5"
             >
               <BookMarked className="w-4 h-4" />
-              <span>මගේ පුස්තකාලය (My Library)</span>
+              <span>{tx("මගේ පුස්තකාලය (My Library)")}</span>
             </Link>
 
             <Link
               href="/books"
               className="py-3 px-4 rounded-xl border border-gray-300 hover:bg-gray-50 text-ink font-semibold text-xs text-center transition-colors flex items-center justify-center gap-1.5"
             >
-              <span>තවත් පොත් බලන්න</span>
+              <span>{tx("තවත් පොත් බලන්න")}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>

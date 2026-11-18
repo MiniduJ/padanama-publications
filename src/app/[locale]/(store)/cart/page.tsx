@@ -1,4 +1,5 @@
 "use client";
+import { useTx } from "@/lib/tx";
 
 import React, { useState } from "react";
 import { Link, useRouter } from "@/i18n/routing";
@@ -49,6 +50,7 @@ const SRI_LANKA_DISTRICTS = [
 ];
 
 export default function CartPage() {
+  const tx = useTx();
   const router = useRouter();
   const {
     items,
@@ -109,7 +111,7 @@ export default function CartPage() {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16">
         <EmptyState
-          title="ඔබගේ පොත් බෑගය හිස්ව පවතී (Your Cart is Empty)"
+          title={tx(tx("ඔබගේ පොත් බෑගය හිස්ව පවතී (Your Cart is Empty)"))}
           description="ඔබ මෙතෙක් කිසිදු පොතක් බෑගයට එක් කර නොමැත. පදනම ප්‍රකාශන විශිෂ්ට පොත් එකතුවෙන් ඔබ කැමති පොත් තෝරාගන්න."
           icon={ShoppingBag}
           actionLabel="පොත් නාමාවලිය වෙත (Browse Catalog)"
@@ -127,9 +129,9 @@ export default function CartPage() {
       <div className="space-y-4 mb-8">
         <div className="flex items-center justify-between">
           <h1 className="font-display font-black text-2xl sm:text-3xl text-maroon-900">
-            සාප්පු සවාරි බෑගය (Shopping Cart)
+            {tx("සාප්පු සවාරි බෑගය (Shopping Cart)")}
             <span className="text-sm font-normal text-ink-muted ml-3">
-              ({itemCount} {itemCount === 1 ? "පොතක්" : "පොත්"})
+              ({itemCount} {itemCount === 1 ? tx("පොතක්") : tx("පොත්")})
             </span>
           </h1>
           <button
@@ -137,7 +139,7 @@ export default function CartPage() {
             onClick={clearCart}
             className="text-xs text-red-600 hover:text-red-800 underline font-semibold"
           >
-            බෑගය හිස් කරන්න (Clear All)
+            {tx("බෑගය හිස් කරන්න (Clear All)")}
           </button>
         </div>
 
@@ -148,7 +150,7 @@ export default function CartPage() {
               <Sparkles className="w-4 h-4 text-gold-500" />
               {isFreeDelivery ? (
                 <span className="text-green-700">
-                  🎉 සුබ පැතුම්! ඔබ නොමිලේ දිවයින පුරා බෙදාහැරීම දිනාගත්තා! (Free Delivery Unlocked!)
+                  {tx("🎉 සුබ පැතුම්! ඔබ නොමිලේ දිවයින පුරා බෙදාහැරීම දිනාගත්තා! (Free Delivery Unlocked!)")}
                 </span>
               ) : (
                 <span>
@@ -200,10 +202,10 @@ export default function CartPage() {
                   <div className="flex items-center gap-2">
                     <Badge variant={item.format === "EBOOK" ? "gold" : "maroon"}>
                       {item.format === "PAPERBACK"
-                        ? "සාමාන්‍ය මුද්‍රණය"
+                        ? tx("සාමාන්‍ය මුද්‍රණය")
                         : item.format === "HARDCOVER"
-                        ? "දෘඩ කවරය"
-                        : "ඊ-පොත (ඩිජිටල්)"}
+                        ? tx("දෘඩ කවරය")
+                        : tx("ඊ-පොත (ඩිජිටල්)")}
                     </Badge>
                   </div>
                   <Link
@@ -231,7 +233,7 @@ export default function CartPage() {
               <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-3 pt-3 sm:pt-0 border-t sm:border-t-0 border-gray-100">
                 {item.format === "EBOOK" ? (
                   <span className="text-[11px] font-semibold text-ink-muted bg-gray-100 px-2.5 py-1 rounded-md">
-                    1 ඩිජිටල් පිටපතකි
+                    {tx("1 ඩිජිටල් පිටපතකි")}
                   </span>
                 ) : (
                   <div className="flex items-center border border-gray-300 rounded-xl bg-gray-50 px-1 py-0.5">
@@ -265,7 +267,7 @@ export default function CartPage() {
                     className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 mt-1 justify-end"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
-                    <span>ඉවත් කරන්න</span>
+                    <span>{tx("ඉවත් කරන්න")}</span>
                   </button>
                 </div>
               </div>
@@ -276,7 +278,7 @@ export default function CartPage() {
           <div className="p-4 rounded-2xl bg-cream/70 border border-gold-500/20 text-xs space-y-2">
             <span className="font-bold text-maroon-900 flex items-center gap-1.5">
               <Tag className="w-3.5 h-3.5 text-saffron-500" />
-              ලබාගත හැකි විශේෂ වට්ටම් කේත (Available Promo Coupons):
+              {tx("ලබාගත හැකි විශේෂ වට්ටම් කේත (Available Promo Coupons):")}
             </span>
             <div className="flex flex-wrap gap-2 pt-1">
               {Object.entries(VALID_COUPONS).map(([code, def]) => (
@@ -298,13 +300,13 @@ export default function CartPage() {
         <div className="lg:col-span-4 space-y-6">
           <div className="p-5 sm:p-6 rounded-2xl bg-white border border-maroon-200 shadow-md space-y-5">
             <h2 className="font-display font-black text-lg text-maroon-900 border-b border-gray-100 pb-3">
-              ඇණවුම් සාරාංශය (Order Summary)
+              {tx("ඇණවුම් සාරාංශය (Order Summary)")}
             </h2>
 
             {/* Calculations Breakdown */}
             <div className="space-y-3 text-sm">
               <div className="flex justify-between text-ink">
-                <span>පොත් එකතුව (Subtotal):</span>
+                <span>{tx("පොත් එකතුව (Subtotal):")}</span>
                 <span className="font-bold">{formatLkr(subtotalCents, "si")}</span>
               </div>
 
@@ -318,7 +320,7 @@ export default function CartPage() {
                       onClick={removeCoupon}
                       className="text-[10px] text-red-500 underline ml-1"
                     >
-                      (ඉවත්)
+                      {tx("(ඉවත්)")}
                     </button>
                   </div>
                   <span className="font-bold">-{formatLkr(discountCents, "si")}</span>
@@ -330,11 +332,11 @@ export default function CartPage() {
                 <div className="flex justify-between text-ink text-xs">
                   <span className="font-semibold flex items-center gap-1">
                     <Truck className="w-3.5 h-3.5 text-saffron-500" />
-                    දිස්ත්‍රික්කය (District):
+                    {tx("දිස්ත්‍රික්කය (District):")}
                   </span>
                   <span className="font-bold">
                     {deliveryCents === 0 ? (
-                      <span className="text-green-700 font-black">නොමිලේ (FREE)</span>
+                      <span className="text-green-700 font-black">{tx("නොමිලේ (FREE)")}</span>
                     ) : (
                       formatLkr(deliveryCents, "si")
                     )}
@@ -357,7 +359,7 @@ export default function CartPage() {
               <div className="pt-3 border-t-2 border-dashed border-gray-200 flex justify-between items-baseline">
                 <div>
                   <span className="font-display font-black text-lg text-maroon-900 block">
-                    මුළු එකතුව:
+                    {tx("මුළු එකතුව:")}
                   </span>
                   <span className="text-[11px] text-ink-muted">Estimated Total (LKR)</span>
                 </div>
@@ -369,7 +371,7 @@ export default function CartPage() {
 
             {/* Promo Code Input Form */}
             <form onSubmit={handleApplyCoupon} className="space-y-2 pt-2 border-t border-gray-100">
-              <label className="text-xs font-bold text-ink block">කූපන් කේතය (Promo Code):</label>
+              <label className="text-xs font-bold text-ink block">{tx("කූපන් කේතය (Promo Code):")}</label>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -382,7 +384,7 @@ export default function CartPage() {
                   type="submit"
                   className="px-4 py-2 bg-maroon-900 hover:bg-maroon-950 text-white text-xs font-bold rounded-xl transition-colors"
                 >
-                  ඇතුළත්
+                  {tx("ඇතුළත්")}
                 </button>
               </div>
               {couponFeedback && (
@@ -402,7 +404,7 @@ export default function CartPage() {
                 href="/checkout"
                 className="w-full py-4 px-6 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white font-extrabold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
               >
-                <span>මිලදී ගැනීමට ඉදිරියට (Proceed to Checkout)</span>
+                <span>{tx("මිලදී ගැනීමට ඉදිරියට (Proceed to Checkout)")}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
 
@@ -410,7 +412,7 @@ export default function CartPage() {
                 href="/books"
                 className="w-full py-2.5 px-4 rounded-xl border border-maroon-200 hover:bg-cream text-maroon-900 font-semibold text-xs text-center block transition-colors"
               >
-                තවත් පොත් තෝරන්න (Continue Shopping)
+                {tx("තවත් පොත් තෝරන්න (Continue Shopping)")}
               </Link>
             </div>
 
@@ -418,11 +420,11 @@ export default function CartPage() {
             <div className="pt-4 border-t border-gray-100 space-y-2 text-[11px] text-ink-muted">
               <div className="flex items-center gap-2 text-green-800 font-semibold">
                 <ShieldCheck className="w-4 h-4 text-green-600 shrink-0" />
-                <span>100% ආරක්ෂිත ගෙවීම් (PayHere, Bank Transfer, COD)</span>
+                <span>{tx("100% ආරක්ෂිත ගෙවීම් (PayHere, Bank Transfer, COD)")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-saffron-500 shrink-0" />
-                <span>පදනම ප්‍රකාශන නිල මුද්‍රණ තත්ත්ව සහතිකය</span>
+                <span>{tx("පදනම ප්‍රකාශන නිල මුද්‍රණ තත්ත්ව සහතිකය")}</span>
               </div>
             </div>
           </div>
@@ -432,7 +434,7 @@ export default function CartPage() {
       {/* Mobile Sticky Checkout Bar (Always accessible when reviewing cart on phone) */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-maroon-100 px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] lg:hidden flex items-center justify-between gap-3 safe-area-inset-bottom">
         <div>
-          <span className="text-[10px] text-ink-muted block leading-none">මුළු එකතුව (Total)</span>
+          <span className="text-[10px] text-ink-muted block leading-none">{tx("මුළු එකතුව (Total)")}</span>
           <span className="font-display font-black text-lg text-brandNavy leading-tight">
             {formatLkr(grandTotalCents, "si")}
           </span>
@@ -441,7 +443,7 @@ export default function CartPage() {
           href="/checkout"
           className="px-5 py-3 rounded-xl bg-brandRed hover:bg-brandRed-600 text-white font-extrabold text-xs shadow-md flex items-center gap-2 shrink-0 active:scale-95 transition-all"
         >
-          <span>ගෙවීම් පිටුවට (Checkout)</span>
+          <span>{tx("ගෙවීම් පිටුවට (Checkout)")}</span>
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>

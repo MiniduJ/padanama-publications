@@ -17,6 +17,13 @@ import {
   ExternalLink,
   ShieldCheck,
   Store,
+  Images,
+  Star,
+  Share2,
+  FileText,
+  Inbox,
+  Users,
+  UserCheck,
 } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 
@@ -24,14 +31,20 @@ interface AdminLayoutShellProps {
   children: React.ReactNode;
 }
 
-const NAV_ITEMS = [
+const NAV_ITEMS: { href: string; label: string; icon: any; badge?: number }[] = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/catalog", label: "Catalog Management", icon: BookOpen },
-  { href: "/admin/library", label: "Digital Library & Samples", icon: Library },
-  { href: "/admin/orders", label: "Orders & Fulfillment", icon: ShoppingBag },
-  { href: "/admin/slips", label: "Bank Slip Queue", icon: FileCheck, badge: 3 },
-  { href: "/admin/reports", label: "Royalties & Reports", icon: TrendingUp },
-  { href: "/admin/settings", label: "Tax, Shipping & Gateways", icon: Settings },
+  { href: "/admin/orders", label: "Orders & Deliveries", icon: ShoppingBag },
+  { href: "/admin/slips", label: "Bank Slip Queue", icon: FileCheck },
+  { href: "/admin/catalog", label: "Catalogue", icon: BookOpen },
+  { href: "/admin/categories", label: "Categories", icon: Library },
+  { href: "/admin/banners", label: "Hero Slides", icon: Images },
+  { href: "/admin/testimonials", label: "Reviews", icon: Star },
+  { href: "/admin/social", label: "Social Feed", icon: Share2 },
+  { href: "/admin/content", label: "Page Content", icon: FileText },
+  { href: "/admin/messages", label: "Inbox", icon: Inbox },
+  { href: "/admin/customers", label: "Customers", icon: UserCheck },
+  { href: "/admin/finance", label: "Finance", icon: TrendingUp },
+  { href: "/admin/staff", label: "Staff", icon: Users },
 ];
 
 export function AdminLayoutShell({ children }: AdminLayoutShellProps) {
@@ -80,15 +93,7 @@ export function AdminLayoutShell({ children }: AdminLayoutShellProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Quick Bank Slip Alert Badge on Mobile */}
-          <Link
-            href="/admin/slips"
-            className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-brandRed text-white text-[11px] font-black shadow animate-pulse"
-            title="Pending Bank Slips"
-          >
-            <FileCheck className="w-3.5 h-3.5" />
-            <span>3 Slips</span>
-          </Link>
+          
 
           <Link
             href="/"
@@ -234,13 +239,13 @@ export function AdminLayoutShell({ children }: AdminLayoutShellProps) {
             className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-red-300 hover:text-white hover:bg-red-500/20 transition-colors cursor-pointer text-left"
           >
             <LogOut className="w-3.5 h-3.5 text-red-400" />
-            <span>Sign Out (පිටවීම)</span>
+            <span>Sign out</span>
           </button>
         </div>
       </aside>
 
       {/* ================= ADMIN CONTENT AREA ================= */}
-      <main className="flex-1 flex flex-col min-w-0 w-full overflow-y-auto overflow-x-hidden">
+      <main className="flex-1 flex flex-col min-w-0 w-full overflow-y-auto overflow-x-hidden px-4 sm:px-6 lg:px-8 pt-6 lg:pt-8 pb-12">
         {children}
       </main>
     </div>

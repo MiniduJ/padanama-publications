@@ -1,5 +1,8 @@
 import { PrismaClient, BookFormat, BookLanguage, RoleType, SampleType } from "@prisma/client";
 
+import { REAL_PUBLISHER_BOOKS } from "../src/data/publisher-books";
+import { DEFAULT_SLIDES, DEFAULT_SOCIAL, DEFAULT_SETTINGS, DEFAULT_REVIEWS, HERO_ALTS_SI, HERO_ALTS_EN } from "../src/data/site-defaults";
+
 const prisma = new PrismaClient();
 
 async function main() {
@@ -418,6 +421,77 @@ async function main() {
       description: "Convenience surcharge for Cash on Delivery (Rs. 100.00)",
     },
   });
+
+  // Import the full publisher catalogue (ids match the static fallback so existing carts keep working).
+  // Existing rows keep admin edits unless SEED_REFRESH_CATALOG=1.
+  const refresh = process.env.SEED_REFRESH_CATALOG === "1";
+  const cats = new Map<string, string>();
+  const authors = new Map<string, string>();
+  const isbns = new Set((await prisma.bookEdition.findMany({ where: { isbn: { not: null } }, select: { isbn: true } })).map((e) => e.isbn));
+  for (const b of REAL_PUBLISHER_BOOKS) {
+    if (!cats.has(b.categorySlug)) {
+      const c = await prisma.category.upsert({ where: { slug: b.categorySlug }, update: {}, create: { slug: b.categorySlug, nameSi: b.categoryNameSi, nameEn: b.categoryNameSi } });
+      cats.set(b.categorySlug, c.id);
+    }
+    if (!authors.has(b.author)) {
+      const slug = b.author.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `author-${authors.size}`;
+      const a = await prisma.author.upsert({ where: { slug }, update: {}, create: { slug, nameSi: b.author, nameEn: b.author } });
+      authors.set(b.author, a.id);
+    }
+    // Legacy site reuses some ISBNs across products; the unique column only takes the first.
+    const isbn = b.isbn && !isbns.has(b.isbn) ? b.isbn : null;
+    if (isbn) isbns.add(isbn);
+    const fields = {
+      slug: b.slug, titleSi: b.titleSi, titleEn: b.titleEn, transliterated: b.transliterated, language: b.language as BookLanguage,
+      coverUrl: b.coverUrl, synopsisSi: b.description, grade: b.grade, subject: b.subject, bookType: b.type,
+      galleryUrls: b.gallery, previewUrl: b.previewUrl, materialsUrl: b.materialsUrl, publisherId: publisher.id,
+    };
+    const exists = await prisma.book.findUnique({ where: { id: b.id }, select: { id: true } });
+    if (exists && !refresh) continue;
+    if (exists) {
+      await prisma.book.update({ where: { id: b.id }, data: fields });
+      await prisma.bookEdition.updateMany({ where: { id: `${b.id}-ed-pb` }, data: { priceCents: b.priceCents, salePriceCents: b.salePriceCents, stockQuantity: b.stock, ...(isbn ? { isbn } : {}) } });
+      await prisma.bookEdition.updateMany({ where: { id: `${b.id}-ed-eb` }, data: { priceCents: Math.round(b.priceCents * 0.65), salePriceCents: b.salePriceCents ? Math.round(b.salePriceCents * 0.65) : null } });
+      await prisma.bookCategory.deleteMany({ where: { bookId: b.id } });
+      await prisma.bookCategory.create({ data: { bookId: b.id, categoryId: cats.get(b.categorySlug)! } });
+      await prisma.bookAuthor.deleteMany({ where: { bookId: b.id } });
+      await prisma.bookAuthor.create({ data: { bookId: b.id, authorId: authors.get(b.author)! } });
+      continue;
+    }
+    await prisma.book.create({
+      data: {
+        id: b.id, ...fields,
+        categories: { create: { categoryId: cats.get(b.categorySlug)! } },
+        authors: { create: { authorId: authors.get(b.author)! } },
+        sampleConfig: { create: { sampleType: SampleType.PAGE_RANGE, maxPages: 20 } },
+        editions: {
+          create: [
+            { id: `${b.id}-ed-pb`, format: BookFormat.PAPERBACK, sku: `PDN-${b.originalId}-PB`, isbn, priceCents: b.priceCents, salePriceCents: b.salePriceCents, stockQuantity: b.stock },
+            { id: `${b.id}-ed-eb`, format: BookFormat.EBOOK, sku: `PDN-${b.originalId}-EB`, isDigital: true, stockQuantity: 99999,
+              priceCents: Math.round(b.priceCents * 0.65), salePriceCents: b.salePriceCents ? Math.round(b.salePriceCents * 0.65) : null },
+          ],
+        },
+      },
+    });
+  }
+  console.log(`📚 Catalogue: ${REAL_PUBLISHER_BOOKS.length} books, ${cats.size} categories, ${authors.size} authors`);
+
+  // Site content shown on the storefront → editable in admin (only seeded into empty tables)
+  if (!(await prisma.banner.count())) {
+    await prisma.banner.createMany({ data: DEFAULT_SLIDES.map((sl, i) => ({ imageUrl: sl.image, linkUrl: sl.href, titleSi: HERO_ALTS_SI[i], titleEn: HERO_ALTS_EN[i], sortOrder: i })) });
+  }
+  if (!(await prisma.socialPost.count())) {
+    await prisma.socialPost.createMany({ data: DEFAULT_SOCIAL.map((p, i) => ({ kind: p.kind, url: p.url, thumbnailUrl: p.thumbnailUrl ?? null, caption: p.caption ?? null, sortOrder: i })) });
+  }
+  if (!(await prisma.testimonial.count())) {
+    await prisma.testimonial.createMany({ data: DEFAULT_REVIEWS.map((r, i) => ({ name: r.name, location: r.location, rating: r.rating, comment: r.title ? `${r.title}
+
+${r.comment}` : r.comment, likes: r.helpfulCount, sortOrder: i })) });
+  }
+  for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
+    await prisma.setting.upsert({ where: { key }, update: {}, create: { key, value, description: "Shown on storefront" } });
+  }
+  console.log("🖼️  Site content: hero slides, social feed, reviews, contact settings");
 
   console.log("✅ Padanama Publications database seeding completed successfully!");
 }

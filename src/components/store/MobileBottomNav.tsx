@@ -5,12 +5,15 @@ import { Link, usePathname } from "@/i18n/routing";
 import { Home, BookOpen, BookMarked, ShoppingBag, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/lib/cart-store";
-import { useTranslations } from "next-intl";
+
+// Nav + top bar stay the same in every language (by design); only page content is translated.
+const NAV_LABELS: Record<string, string> = { home: "Home", books: "All Books", shop: "Book Shop", digitalLibrary: "Digital Library", samples: "Free Samples", about: "About Us", contact: "Contact", bookFair: "Book Fair" };
+const TOP_LABELS: Record<string, string> = { freeDeliveryNotice: "රු. 3,500 ට වැඩි ඇණවුම් සඳහා දිවයින පුරා නොමිලේ බෙදාහැරීම", searchPlaceholder: "Search books, authors, ISBN, or type in Singlish..." };
 
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const nav = useTranslations("nav");
-  const common = useTranslations("common");
+  const nav = (k: string) => NAV_LABELS[k];
+  const common = (k: string) => ({ cart: "Cart", account: "Account" })[k];
   const { itemCount, isHydrated } = useCart();
 
   const tabs = [

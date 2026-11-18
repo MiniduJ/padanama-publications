@@ -7,14 +7,24 @@ import { Logo } from "@/components/ui/Logo";
 import { Phone, Mail, MapPin, Instagram, ShieldCheck, Truck, CreditCard, CheckCircle2 } from "lucide-react";
 import { FacebookIcon, YouTubeIcon, WhatsAppIcon } from "@/components/ui/BrandIcons";
 
+const FLOATERS = ["අ", "ආ", "ඉ", "ක", "ග", "ම", "A", "B", "அ", "க", "1", "2", "π", "∑", "ශ", "ප", "√", "x²"];
+
 export function StoreFooter() {
   const f = useTranslations("footer");
   const nav = useTranslations("nav");
   const c = useTranslations("common");
 
   return (
-    <footer className="bg-brandNavy text-cream pt-14 pb-20 md:pb-12 border-t-4 border-brandYellow mt-20 w-full">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+    <footer className="footer-live relative overflow-hidden bg-brandNavy text-cream pt-14 pb-20 md:pb-12 border-t-4 border-brandYellow mt-20 w-full isolate">
+      {/* Live background: drifting aurora + floating letters (decorative, motion-safe) */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <div className="footer-aurora footer-aurora-1" />
+        <div className="footer-aurora footer-aurora-2" />
+        {FLOATERS.map((ch, i) => (
+          <span key={i} className="footer-floater" style={{ left: `${(i * 37) % 100}%`, animationDelay: `${-(i * 2.3) % 18}s`, animationDuration: `${14 + (i % 5) * 3}s`, fontSize: `${14 + (i % 4) * 8}px` }}>{ch}</span>
+        ))}
+      </div>
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Column 1: Publisher Brand */}
           <div className="space-y-4">
