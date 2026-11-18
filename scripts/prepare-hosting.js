@@ -56,4 +56,19 @@ if (fs.existsSync(siHtml)) {
   fs.copyFileSync(siHtml, path.join(outDir, 'index.html'));
 }
 
+// 4. Copy static assets from public/ to public_html/
+const publicDir = path.join(__dirname, '..', 'public');
+if (fs.existsSync(publicDir)) {
+  const entries = fs.readdirSync(publicDir, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path.join(publicDir, entry.name);
+    const destPath = path.join(outDir, entry.name);
+    if (entry.isDirectory()) {
+      copyDir(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
 console.log('Firebase Hosting public directory prepared successfully at:', outDir);

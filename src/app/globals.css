@@ -14,6 +14,11 @@
   --lotus-pink: #E85D8C; /* Lotus pink - Playful highlights */
   --ocean: #0E7C9B;      /* Indian Ocean turquoise */
   --palm: #2E8B57;       /* Palm green */
+
+  /* Exact Padanama Logo Color Palette */
+  --brand-red: #D32F2F;    /* Logo Red - "පදනම" */
+  --brand-yellow: #FFD600; /* Logo Yellow - Emblem & Glow */
+  --brand-navy: #0D2240;   /* Logo Navy Blue - "ප්‍රකාශන" */
 }
 
 .dark {

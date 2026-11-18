@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "@/i18n/routing";
 import { getBooks } from "@/server/catalog/books";
 import { BookCard } from "@/components/ui/BookCard";
+import { HeroSlider } from "@/components/store/HeroSlider";
 import {
   BookOpen,
   ShieldCheck,
@@ -13,6 +14,8 @@ import {
   GraduationCap,
   Award,
   Layers,
+  Tag,
+  CheckCircle2,
 } from "lucide-react";
 
 export default async function HomePage() {
@@ -33,151 +36,130 @@ export default async function HomePage() {
     { slug: "gov-exam-past-papers", name: "පසුගිය ප්‍රශ්න පත්‍ර", desc: "විභාග පෙරහුරු අත්පොත්" },
   ];
 
+  const featureCards = [
+    {
+      title: "කෙටි සටහන් සහ සූත්‍ර",
+      subtitle: "Short Notes & Formulas",
+      image: "https://www.padanamapublication.lk/image/others/shortnotes.jpg",
+      link: "/products?category=gce-ol",
+      tag: "O/L & A/L",
+    },
+    {
+      title: "වාර විභාග ප්‍රශ්න පත්‍ර",
+      subtitle: "Term Test Papers",
+      image: "https://www.padanamapublication.lk/image/others/termpapers.jpg",
+      link: "/products",
+      tag: "සියලු ශ්‍රේණි",
+    },
+    {
+      title: "ආදර්ශ ප්‍රශ්න පත්‍ර",
+      subtitle: "Model Examination Papers",
+      image: "https://www.padanamapublication.lk/image/others/modelpapers.jpg",
+      link: "/products?category=primary",
+      tag: "ශිෂ්‍යත්ව පෙරහුරු",
+    },
+  ];
+
   return (
-    <div className="flex flex-col space-y-16 py-8">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-maroon-50 via-cream to-white py-12 md:py-20 border-b border-maroon-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-10 items-center">
-          <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-maroon-100 border border-maroon-200 text-maroon-900 text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5 text-gold-600" />
-              <span>නිල පදනම ප්‍රකාශන වෙබ් අඩවිය (padanamapublication.lk)</span>
-            </div>
+    <div className="flex flex-col space-y-14 py-6">
+      {/* 1. Hero Carousel Slider with Genuine padanamapublication.lk Slides */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <HeroSlider />
+      </section>
 
-            <h1 className="font-display font-extrabold text-3xl sm:text-5xl text-maroon-900 tracking-tight leading-tight">
-              දැනුමෙන් සන්නද්ධ දරු පරපුරකට <br className="hidden sm:inline" />
-              <span className="text-saffron-500 underline decoration-gold-500 decoration-wavy decoration-2">
-                විශ්වාසනීය පදනම
-              </span>
-            </h1>
-
-            <p className="text-base sm:text-lg text-ink-muted leading-relaxed max-w-xl">
-              1 වසරේ සිට උසස් පෙළ දක්වා විෂයානුබද්ධ වැඩ පොත්, කෙටි සටහන්, පසුගිය විභාග ප්‍රශ්න පත්‍ර සහ ආදර්ශ ගැටලු විසඳුම් දැන් නිවසටම ගෙන්වා ගන්න.
-            </p>
-
-            <div className="flex flex-wrap gap-4 pt-2">
-              <Link
-                href="/books"
-                className="px-6 py-3.5 rounded-xl bg-saffron-500 hover:bg-saffron-600 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2"
-              >
-                <span>සියලු පොත් බලන්න</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href="/library"
-                className="px-6 py-3.5 rounded-xl bg-white border-2 border-maroon-500 text-maroon-900 hover:bg-maroon-50 font-bold text-sm shadow-sm transition-all flex items-center gap-2"
-              >
-                <BookOpen className="w-4 h-4 text-maroon-700" />
-                <span>නොමිලේ සාම්පල කියවීම</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Hero Visual Presentation with Real Cover */}
-          <div className="relative flex justify-center">
-            <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-maroon-100 p-6 relative z-10 space-y-4">
-              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-                <span className="text-xs font-bold text-maroon-700 uppercase tracking-wider flex items-center gap-1.5">
-                  <Award className="w-4 h-4 text-gold-500" />
-                  <span>ජනප්‍රියම අධ්‍යාපනික කෘතිය</span>
+      {/* 2. Three Feature Category Cards (From publisher site) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {featureCards.map((card, idx) => (
+            <Link
+              key={idx}
+              href={card.link}
+              className="group relative overflow-hidden rounded-3xl border border-maroon-100 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white"
+            >
+              <div className="aspect-[16/10] overflow-hidden relative">
+                <img
+                  src={card.image}
+                  alt={card.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-brandNavy/90 via-brandNavy/40 to-transparent" />
+                <span className="absolute top-3 right-3 px-2.5 py-0.5 rounded-full bg-brandYellow text-brandNavy font-extrabold text-[11px] shadow">
+                  {card.tag}
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-green-50 text-green-700 text-[11px] font-bold">
-                  ඉන්ස්ටන්ට් සාම්පලය
-                </span>
-              </div>
-              <div className="p-4 rounded-2xl bg-cream border border-gold-500/20 text-center space-y-3">
-                <div className="w-32 h-44 mx-auto rounded-lg overflow-hidden shadow-lg border-2 border-white bg-maroon-100">
-                  <img
-                    src="https://padanamapublication.lk/image/books/1627556979.jpg"
-                    alt="සිංහල ව්‍යාකරණ 10-11 ශ්‍රේණි"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h3 className="font-bold text-maroon-900 text-base">
-                  සිංහල ව්‍යාකරණ 10-11 ශ්‍රේණි
-                </h3>
-                <p className="text-xs text-ink-muted">
-                  සාමාන්‍ය පෙළ විභාගය ඉලක්ක කරගත් සම්පූර්ණ ව්‍යාකරණ සංග්‍රහය.
-                </p>
-                <div className="flex justify-center gap-2 pt-1">
-                  <Link
-                    href="/read/pdn-189"
-                    className="py-2 px-4 bg-maroon-500 hover:bg-maroon-700 text-cream text-xs font-bold rounded-lg shadow transition-colors flex items-center gap-1"
-                  >
-                    <BookOpen className="w-3.5 h-3.5" />
-                    <span>පෙරදසුන බලන්න</span>
-                  </Link>
-                  <Link
-                    href="/books/pdn-189"
-                    className="py-2 px-4 bg-saffron-500 hover:bg-saffron-600 text-white text-xs font-bold rounded-lg shadow transition-colors"
-                  >
-                    මිලදී ගන්න (Rs. 184)
-                  </Link>
+                <div className="absolute bottom-3 left-4 right-4 text-white">
+                  <h3 className="font-display font-extrabold text-base sm:text-lg group-hover:text-brandYellow transition-colors">
+                    {card.title}
+                  </h3>
+                  <p className="text-xs text-cream/80">{card.subtitle}</p>
                 </div>
               </div>
-            </div>
-          </div>
+            </Link>
+          ))}
         </div>
       </section>
 
-      {/* Trust & Guarantee Bar */}
+      {/* 3. Trust & Guarantee Bar with Logo Color Highlights */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="bg-white rounded-2xl border border-maroon-100 p-6 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-maroon-50 text-maroon-700 flex items-center justify-center shrink-0">
+        <div className="bg-white rounded-3xl border border-maroon-100 p-6 sm:p-8 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-brandRed/10 text-brandRed flex items-center justify-center shrink-0">
               <Truck className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-bold text-ink">දිවයින පුරා බෙදාහැරීම</h4>
+              <h4 className="text-xs sm:text-sm font-extrabold text-brandNavy">දිවයින පුරා බෙදාහැරීම</h4>
               <p className="text-[11px] text-ink-muted">දින 2-4ක් ඇතුළත නිවසටම</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-saffron-50 text-saffron-700 flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-brandYellow/30 text-brandNavy flex items-center justify-center shrink-0">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-bold text-ink">ආරක්ෂිත ගෙවීම්</h4>
+              <h4 className="text-xs sm:text-sm font-extrabold text-brandNavy">ආරක්ෂිත ගෙවීම්</h4>
               <p className="text-[11px] text-ink-muted">PayHere & Koko BNPL</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-green-50 text-green-700 flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-green-50 text-green-700 flex items-center justify-center shrink-0">
               <CreditCard className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-bold text-ink">භාණ්ඩ ලැබුණු පසු ගෙවීම</h4>
+              <h4 className="text-xs sm:text-sm font-extrabold text-brandNavy">භාණ්ඩ ලැබුණු පසු මුදල්</h4>
               <p className="text-[11px] text-ink-muted">Cash on Delivery (COD)</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gold-50 text-gold-700 flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-brandNavy/10 text-brandNavy flex items-center justify-center shrink-0">
               <BookOpen className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-bold text-ink">100% නිල මුද්‍රණ</h4>
+              <h4 className="text-xs sm:text-sm font-extrabold text-brandNavy">100% නිල මුද්‍රණ</h4>
               <p className="text-[11px] text-ink-muted">පදනම ප්‍රකාශන සත්‍යාපිත</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Grade Categories Exploration */}
+      {/* 4. Grade-Wise Explorer Bar */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-6">
         <div className="flex items-end justify-between border-b border-maroon-100 pb-4">
           <div>
-            <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-maroon-900 tracking-tight">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brandRed uppercase tracking-wider mb-1">
+              <GraduationCap className="w-4 h-4" />
+              <span>පාසල් විෂය නිර්දේශය</span>
+            </div>
+            <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-brandNavy tracking-tight">
               ශ්‍රේණි අනුව ග්‍රන්ථ නාමාවලිය
             </h2>
-            <p className="text-xs sm:text-sm text-ink-muted mt-1">
-              පෙර පාසලේ සිට උසස් පෙළ දක්වා ඔබට අවශ්‍ය ශ්‍රේණිය තෝරන්න.
-            </p>
           </div>
-          <Link href="/books" className="text-xs font-bold text-saffron-600 hover:underline flex items-center gap-1">
-            <span>සියල්ල</span>
+          <Link
+            href="/products"
+            className="text-xs font-extrabold text-brandRed hover:underline flex items-center gap-1"
+          >
+            <span>සියලු පොත් බලන්න</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -186,17 +168,17 @@ export default async function HomePage() {
           {categories.map((cat) => (
             <Link
               key={cat.slug}
-              href={`/books?category=${cat.slug}`}
-              className="group p-5 bg-white rounded-2xl border border-maroon-100 hover:border-saffron-500 hover:shadow-md transition-all flex flex-col justify-between"
+              href={`/products?category=${cat.slug}`}
+              className="group p-5 bg-white rounded-2xl border border-maroon-100 hover:border-brandRed hover:shadow-lg transition-all flex flex-col justify-between"
             >
               <div className="flex items-start justify-between">
-                <div className="w-9 h-9 rounded-xl bg-maroon-50 text-maroon-700 group-hover:bg-saffron-50 group-hover:text-saffron-700 flex items-center justify-center transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-brandYellow/30 text-brandNavy group-hover:bg-brandRed group-hover:text-white flex items-center justify-center transition-colors">
                   <GraduationCap className="w-5 h-5" />
                 </div>
-                <ArrowRight className="w-4 h-4 text-ink-muted group-hover:text-saffron-600 transform group-hover:translate-x-1 transition-all" />
+                <ArrowRight className="w-4 h-4 text-ink-muted group-hover:text-brandRed transform group-hover:translate-x-1 transition-all" />
               </div>
               <div className="mt-4">
-                <h3 className="font-bold text-sm text-maroon-900 group-hover:text-saffron-700 transition-colors">
+                <h3 className="font-bold text-sm text-brandNavy group-hover:text-brandRed transition-colors">
                   {cat.name}
                 </h3>
                 <p className="text-[11px] text-ink-muted mt-0.5">{cat.desc}</p>
@@ -206,21 +188,24 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Featured Publisher Books (Live Covers & Pricing) */}
+      {/* 5. Featured Bestseller Books (Enhanced Cards with Discounts & Instant Cart) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-6">
-        <div className="flex items-end justify-between border-b border-maroon-100 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-maroon-100 pb-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-gold-600 uppercase tracking-wider mb-1">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>නවතම නිකුත් කිරීම්</span>
+            <div className="inline-flex items-center gap-1.5 text-xs font-extrabold text-brandRed uppercase tracking-wider mb-1">
+              <Sparkles className="w-3.5 h-3.5 text-brandYellow" />
+              <span>නවතම නිකුත් කිරීම් සහ වට්ටම්</span>
             </div>
-            <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-maroon-900 tracking-tight">
-              විශේෂාංග පොත්පත් (Featured Books)
+            <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-brandNavy tracking-tight">
+              ජනප්‍රියම ග්‍රන්ථ (Bestselling Books)
             </h2>
           </div>
-          <Link href="/books" className="text-xs font-bold text-saffron-600 hover:underline flex items-center gap-1">
-            <span>තවත් බලන්න</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+          <Link
+            href="/products"
+            className="px-5 py-2.5 rounded-xl bg-brandRed hover:bg-brandRed-600 text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-1.5 self-start sm:self-auto"
+          >
+            <span>පොත් සාප්පුවට යන්න (Shop All)</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
@@ -228,6 +213,7 @@ export default async function HomePage() {
           {featuredBooks.map((book: any) => {
             const primaryEdition = book.editions?.[0] || {};
             const author = book.authors?.[0]?.author?.nameSi || "පදනම ප්‍රකාශන";
+            const catName = book.categories?.[0]?.category?.nameSi;
 
             return (
               <BookCard
@@ -235,10 +221,11 @@ export default async function HomePage() {
                 slug={book.slug}
                 title={book.titleSi}
                 authorName={author}
+                categoryName={catName}
                 coverUrl={book.coverUrl}
                 priceCents={primaryEdition.priceCents || 75000}
                 salePriceCents={primaryEdition.salePriceCents}
-                rating={book.averageRating || 4.8}
+                rating={book.averageRating || 4.9}
                 format={primaryEdition.format || "Paperback"}
                 hasFreeSample={true}
                 isBestSeller={book.isBestSeller}
@@ -248,17 +235,44 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Primary & Scholarship Section */}
+      {/* 6. Promotional Banner Strip (Publisher Ads from Padanama) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Link
+            href="/products?category=gce-ol"
+            className="group relative rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all border border-maroon-100 block"
+          >
+            <img
+              src="https://www.padanamapublication.lk/image/bg-images/570+169_pixel_ad_1.jpg"
+              alt="සාමාන්‍ය පෙළ විශේෂ ප්‍රශ්න පත්‍ර කට්ටල"
+              className="w-full h-auto object-cover group-hover:scale-102 transition-transform duration-300"
+            />
+          </Link>
+
+          <Link
+            href="/products?category=primary"
+            className="group relative rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all border border-maroon-100 block"
+          >
+            <img
+              src="https://www.padanamapublication.lk/image/bg-images/570+169_pixel.jpg"
+              alt="5 ශ්‍රේණිය ශිෂ්‍යත්ව විශේෂ පුහුණු පොත්"
+              className="w-full h-auto object-cover group-hover:scale-102 transition-transform duration-300"
+            />
+          </Link>
+        </div>
+      </section>
+
+      {/* 7. Primary & Scholarship Section */}
       {primaryBooks.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-6">
           <div className="flex items-end justify-between border-b border-maroon-100 pb-4">
             <div>
-              <h2 className="font-display font-extrabold text-2xl text-maroon-900 tracking-tight">
+              <h2 className="font-display font-extrabold text-2xl text-brandNavy tracking-tight">
                 ප්‍රාථමික සහ 5 ශ්‍රේණිය ශිෂ්‍යත්ව අත්වැල
               </h2>
               <p className="text-xs text-ink-muted mt-1">ශිෂ්‍යත්ව විභාගයට ඉලක්කගත ආදර්ශ ප්‍රශ්න පත්‍ර සහ පෙරහුරු අභ්‍යාස</p>
             </div>
-            <Link href="/books?category=primary" className="text-xs font-bold text-saffron-600 hover:underline">
+            <Link href="/products?category=primary" className="text-xs font-extrabold text-brandRed hover:underline">
               ප්‍රාථමික සියලු පොත්
             </Link>
           </div>
@@ -267,6 +281,7 @@ export default async function HomePage() {
             {primaryBooks.map((book: any) => {
               const primaryEdition = book.editions?.[0] || {};
               const author = book.authors?.[0]?.author?.nameSi || "පදනම ප්‍රකාශන";
+              const catName = book.categories?.[0]?.category?.nameSi;
 
               return (
                 <BookCard
@@ -274,10 +289,11 @@ export default async function HomePage() {
                   slug={book.slug}
                   title={book.titleSi}
                   authorName={author}
+                  categoryName={catName}
                   coverUrl={book.coverUrl}
                   priceCents={primaryEdition.priceCents || 75000}
                   salePriceCents={primaryEdition.salePriceCents}
-                  rating={book.averageRating || 4.8}
+                  rating={book.averageRating || 4.9}
                   format={primaryEdition.format || "Paperback"}
                   hasFreeSample={true}
                   isBestSeller={book.isBestSeller}
@@ -288,17 +304,17 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* O/L Section */}
+      {/* 8. G.C.E. O/L Section */}
       {olBooks.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-6">
           <div className="flex items-end justify-between border-b border-maroon-100 pb-4">
             <div>
-              <h2 className="font-display font-extrabold text-2xl text-maroon-900 tracking-tight">
+              <h2 className="font-display font-extrabold text-2xl text-brandNavy tracking-tight">
                 සාමාන්‍ය පෙළ (O/L) කෙටි සටහන් සහ විභාග ප්‍රශ්න පත්‍ර
               </h2>
               <p className="text-xs text-ink-muted mt-1">10 සහ 11 ශ්‍රේණි සඳහා විද්‍යාව, ගණිතය, සිංහල, ඉතිහාසය සහ වාණිජ</p>
             </div>
-            <Link href="/books?category=gce-ol" className="text-xs font-bold text-saffron-600 hover:underline">
+            <Link href="/products?category=gce-ol" className="text-xs font-extrabold text-brandRed hover:underline">
               සා.පෙ. සියලු පොත්
             </Link>
           </div>
@@ -307,6 +323,7 @@ export default async function HomePage() {
             {olBooks.map((book: any) => {
               const primaryEdition = book.editions?.[0] || {};
               const author = book.authors?.[0]?.author?.nameSi || "පදනම ප්‍රකාශන";
+              const catName = book.categories?.[0]?.category?.nameSi;
 
               return (
                 <BookCard
@@ -314,10 +331,11 @@ export default async function HomePage() {
                   slug={book.slug}
                   title={book.titleSi}
                   authorName={author}
+                  categoryName={catName}
                   coverUrl={book.coverUrl}
                   priceCents={primaryEdition.priceCents || 75000}
                   salePriceCents={primaryEdition.salePriceCents}
-                  rating={book.averageRating || 4.8}
+                  rating={book.averageRating || 4.9}
                   format={primaryEdition.format || "Paperback"}
                   hasFreeSample={true}
                   isBestSeller={book.isBestSeller}
@@ -328,68 +346,42 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* A/L Science Section */}
-      {alScienceBooks.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-6">
-          <div className="flex items-end justify-between border-b border-maroon-100 pb-4">
-            <div>
-              <h2 className="font-display font-extrabold text-2xl text-maroon-900 tracking-tight">
-                උසස් පෙළ (A/L) විෂය ධාරා
-              </h2>
-              <p className="text-xs text-ink-muted mt-1">විද්‍යා, ගණිත, වාණිජ, තාක්ෂණවේදය සහ කලා විභාග සහයක කෘති</p>
+      {/* 9. Official Publisher Direct Callout */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="bg-gradient-to-r from-brandNavy via-brandNavy to-maroon-900 text-cream rounded-3xl p-8 md:p-12 border-2 border-brandYellow/60 shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="space-y-3 text-center md:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brandYellow text-brandNavy font-black text-xs">
+              <Phone className="w-3.5 h-3.5" />
+              <span>පදනම ක්ෂණික පාරිභෝගික සේවය</span>
             </div>
-            <Link href="/books?category=gce-al-science" className="text-xs font-bold text-saffron-600 hover:underline">
-              උසස් පෙළ සියලු පොත්
+            <h3 className="font-display font-extrabold text-2xl md:text-3xl text-white">
+              පොත් ඇණවුම් සහ විමසීම් සඳහා අප අමතන්න
+            </h3>
+            <p className="text-sm opacity-90 max-w-xl leading-relaxed">
+              නො. 912/A, බෝගහ හන්දිය පාර, 10120, ශ්‍රී ලංකාව. තොග ඇණවුම්, පාසල් සැපයුම් හෝ බෙදාහැරීම් පිළිබඳ ඕනෑම සහයක් සඳහා අප අමතන්න.
+            </p>
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs pt-1">
+              <span className="font-bold text-brandYellow">දුරකථන: +94 71 800 8533 / +94 77 088 2228</span>
+              <span>•</span>
+              <span className="font-bold text-brandYellow">විද්‍යුත් තැපෑල: hello@padanamapublication.lk</span>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+            <a
+              href="https://wa.me/94718008533"
+              target="_blank"
+              rel="noreferrer"
+              className="px-6 py-3.5 bg-green-600 hover:bg-green-700 text-white font-extrabold text-sm rounded-xl shadow-lg transition-transform hover:scale-105 text-center"
+            >
+              WhatsApp (+94 71 800 8533)
+            </a>
+            <Link
+              href="/contact"
+              className="px-6 py-3.5 bg-brandYellow hover:bg-amber-400 text-brandNavy font-extrabold text-sm rounded-xl shadow-lg transition-transform hover:scale-105 text-center"
+            >
+              සම්බන්ධ වන්න
             </Link>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {alScienceBooks.map((book: any) => {
-              const primaryEdition = book.editions?.[0] || {};
-              const author = book.authors?.[0]?.author?.nameSi || "පදනම ප්‍රකාශන";
-
-              return (
-                <BookCard
-                  key={book.id}
-                  slug={book.slug}
-                  title={book.titleSi}
-                  authorName={author}
-                  coverUrl={book.coverUrl}
-                  priceCents={primaryEdition.priceCents || 75000}
-                  salePriceCents={primaryEdition.salePriceCents}
-                  rating={book.averageRating || 4.8}
-                  format={primaryEdition.format || "Paperback"}
-                  hasFreeSample={true}
-                  isBestSeller={book.isBestSeller}
-                />
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* Official Publisher Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="bg-maroon-900 text-cream rounded-3xl p-8 md:p-12 border-2 border-gold-500/50 shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="space-y-3 text-center md:text-left">
-            <h3 className="font-display font-bold text-2xl md:text-3xl text-gold-500">
-              පදනම ප්‍රකාශන නිල සේවාව හා සම්බන්ධ වන්න
-            </h3>
-            <p className="text-sm opacity-85 max-w-xl">
-              නො. 912/A, බෝගහ හන්දිය පාර, 10120, ශ්‍රී ලංකාව. ඕනෑම විමසීමක් හෝ පාසල් තොග ඇණවුම් සඳහා අපගේ දුරකථන අංක අමතන්න.
-            </p>
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs pt-2">
-              <span className="font-semibold text-gold-400">දුරකථන: +94 71 800 8533 / +94 77 088 2228</span>
-              <span>•</span>
-              <span className="font-semibold text-gold-400">විද්‍යුත් තැපෑල: hello@padanamapublication.lk</span>
-            </div>
-          </div>
-          <Link
-            href="/contact"
-            className="px-8 py-4 bg-gold-500 hover:bg-gold-600 text-maroon-950 font-extrabold text-sm rounded-xl shadow-lg transition-transform hover:scale-105 shrink-0"
-          >
-            සම්බන්ධ වන්න
-          </Link>
         </div>
       </section>
     </div>

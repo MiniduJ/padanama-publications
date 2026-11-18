@@ -7,37 +7,24 @@ export interface LogoProps {
   showText?: boolean;
 }
 
-export function Logo({ className, size = "md", showText = true }: LogoProps) {
-  const sizeMap = {
-    sm: "w-8 h-8 text-lg",
-    md: "w-11 h-11 text-2xl",
-    lg: "w-16 h-16 text-4xl",
+export function Logo({ className, size = "md" }: LogoProps) {
+  const heightMap = {
+    sm: "h-9 sm:h-10",
+    md: "h-11 sm:h-12",
+    lg: "h-14 sm:h-16",
   };
 
   return (
-    <div className={cn("inline-flex items-center gap-3", className)}>
-      <div
-        className={cn(
-          "rounded-2xl bg-gradient-to-br from-maroon-500 to-maroon-700 text-cream flex items-center justify-center font-display font-extrabold shadow-md border-2 border-gold-500 relative select-none",
-          sizeMap[size]
-        )}
-      >
-        <span className="leading-none pt-0.5">ප</span>
-        <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-gold-500 rounded-full border-2 border-white flex items-center justify-center text-[7px] text-maroon-900 font-black">
-          ★
-        </div>
-      </div>
-
-      {showText && (
-        <div className="flex flex-col text-left">
-          <span className="font-display font-bold text-xl tracking-tight text-maroon-900 leading-tight">
-            පදනම ප්‍රකාශන
-          </span>
-          <span className="text-[10px] text-ink-muted uppercase tracking-widest font-semibold">
-            Padanama Publications
-          </span>
-        </div>
-      )}
+    <div className={cn("inline-flex items-center gap-2 select-none", className)}>
+      <picture>
+        <source srcSet="/images/logo.webp" type="image/webp" />
+        <source srcSet="/images/logo.png" type="image/png" />
+        <img
+          src="/images/logo.webp"
+          alt="පදනම ප්‍රකාශන - Padanama Publication"
+          className={cn("w-auto max-w-[240px] sm:max-w-[280px] object-contain drop-shadow-sm transition-transform duration-200 hover:scale-[1.02]", heightMap[size])}
+        />
+      </picture>
     </div>
   );
 }

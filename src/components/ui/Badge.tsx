@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "maroon" | "saffron" | "green" | "gold" | "gray" | "outline";
+  variant?: "maroon" | "saffron" | "green" | "gold" | "gray" | "outline" | "brandRed" | "brandYellow" | "brandNavy";
 }
 
 export function Badge({ className, variant = "maroon", children, ...props }: BadgeProps) {
@@ -13,6 +13,9 @@ export function Badge({ className, variant = "maroon", children, ...props }: Bad
     gold: "bg-gold-50 text-ink border-gold-300 font-bold",
     gray: "bg-gray-100 text-gray-800 border-gray-200",
     outline: "border border-ink/20 text-ink bg-transparent",
+    brandRed: "bg-brandRed text-white border-brandRed-700 font-bold shadow-sm",
+    brandYellow: "bg-brandYellow text-brandNavy font-extrabold border-brandYellow-600 shadow-sm",
+    brandNavy: "bg-brandNavy text-white font-semibold border-brandNavy-800 shadow-sm",
   };
 
   return (
