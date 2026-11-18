@@ -1,0 +1,69 @@
+{
+  "common": {
+    "appName": "Padanama Publications",
+    "tagline": "The Sri Lankan Home of Knowledge & Literature",
+    "searchPlaceholder": "Search books, authors, ISBN, or type in Singlish...",
+    "cart": "Cart",
+    "account": "My Account",
+    "readSample": "Read Free Sample",
+    "currency": "Rs.",
+    "freeDeliveryNotice": "Free islandwide delivery on orders over Rs. 3,500"
+  },
+  "nav": {
+    "home": "Home",
+    "books": "All Books",
+    "categories": "Categories",
+    "digitalLibrary": "Digital Library",
+    "authors": "Authors",
+    "about": "About Us",
+    "contact": "Contact",
+    "bookFair": "Book Fair"
+  },
+  "trust": {
+    "islandwideDelivery": "Islandwide Delivery",
+    "deliverySub": "Doorstep delivery in 2-4 days",
+    "securePayment": "Secure Payments",
+    "paymentSub": "PayHere / Bank Transfer / Koko",
+    "cashOnDelivery": "Cash on Delivery (COD)",
+    "codSub": "Reliable courier service",
+    "authenticBooks": "Official Publisher Edition",
+    "authenticSub": "100% Quality Guaranteed"
+  },
+  "book": {
+    "readFreeSample": "Read Free Sample",
+    "addToCart": "Add to Cart",
+    "buyNow": "Buy Now",
+    "paperback": "Paperback",
+    "hardcover": "Hardcover",
+    "ebook": "E-Book (Digital)",
+    "bundle": "Print + E-Book Bundle",
+    "inStock": "In Stock",
+    "lowStock": "Limited Stock Available",
+    "outOfStock": "Out of Stock",
+    "author": "Author",
+    "pages": "Pages",
+    "isbn": "ISBN",
+    "language": "Language",
+    "specs": "Specifications"
+  },
+  "reader": {
+    "previewTitle": "Free Sample Preview",
+    "paywallTitle": "You have reached the end of the free sample",
+    "paywallDescription": "To continue reading the complete work, please purchase the e-book or order the paperback.",
+    "buyEbookAction": "Buy E-Book",
+    "buyPaperbackAction": "Buy Paperback",
+    "page": "Page",
+    "of": "of"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "stepAddress": "Address",
+    "stepDelivery": "Delivery",
+    "stepPayment": "Payment",
+    "payhere": "Credit / Debit Cards / eZ Cash (PayHere)",
+    "bankDeposit": "Bank Transfer (Upload Payment Slip)",
+    "koko": "Koko - 3 Interest-Free Installments",
+    "cod": "Cash on Delivery (COD)",
+    "uploadSlipNotice": "Please upload a clear photo or screenshot of your bank transfer receipt."
+  }
+}

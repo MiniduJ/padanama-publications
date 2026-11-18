@@ -1,0 +1,69 @@
+{
+  "common": {
+    "appName": "පදනම ප්‍රකාශන",
+    "tagline": "දැනුම හා සාහිත්‍යයේ ශ්‍රී ලාංකීය නවාතැන",
+    "searchPlaceholder": "පොත්, කතුවරුන්, ISBN හෝ සිංග්ලිෂ් වලින් සොයන්න...",
+    "cart": "සාප්පු බෑගය",
+    "account": "මගේ ගිණුම",
+    "readSample": "නොමිලේ කියවන්න",
+    "currency": "රු.",
+    "freeDeliveryNotice": "දිවයින පුරා නොමිලේ බෙදාහැරීම රු. 3,500 ට වැඩි ඇණවුම් සඳහා"
+  },
+  "nav": {
+    "home": "මුල් පිටුව",
+    "books": "සියලු පොත්",
+    "categories": "ප්‍රවර්ග",
+    "digitalLibrary": "ඩිජිටල් පුස්තකාලය",
+    "authors": "කතුවරුන්",
+    "about": "අප ගැන",
+    "contact": "සම්බන්ධ වන්න",
+    "bookFair": "පොත් ප්‍රදර්ශනය"
+  },
+  "trust": {
+    "islandwideDelivery": "දිවයින පුරා බෙදාහැරීම",
+    "deliverySub": "දින 2-4ක් ඇතුළත ඔබේ නිවසටම",
+    "securePayment": "ආරක්ෂිත ගෙවීම්",
+    "paymentSub": "PayHere / බැංකු තැන්පතු / Koko",
+    "cashOnDelivery": "භාණ්ඩ ලැබුණු පසු මුදල් ගෙවීම (COD)",
+    "codSub": "විශ්වාසනීය කුරියර් සේවාව",
+    "authenticBooks": "නිල ප්‍රකාශන මුද්‍රණය",
+    "authenticSub": "100% උසස් ප්‍රමිතිය"
+  },
+  "book": {
+    "readFreeSample": "නොමිලේ සාම්පලය කියවන්න",
+    "addToCart": "බෑගයට එක් කරන්න",
+    "buyNow": "දැන්ම මිලදී ගන්න",
+    "paperback": "සාමාන්‍ය මුද්‍රණය",
+    "hardcover": "දෘඩ කවරය",
+    "ebook": "ඊ-පොත (ඩිජිටල්)",
+    "bundle": "මුද්‍රිත + ඊ-පොත එකතුව",
+    "inStock": "තොග ඇත",
+    "lowStock": "සීමිත පිටපත් ප්‍රමාණයක් ඇත",
+    "outOfStock": "තොග අවසන්",
+    "author": "කතුවරයා",
+    "pages": "පිටු ගණන",
+    "isbn": "ISBN අංකය",
+    "language": "භාෂාව",
+    "specs": "පොත පිළිබඳ විස්තර"
+  },
+  "reader": {
+    "previewTitle": "නොමිලේ සාම්පල කියවීම",
+    "paywallTitle": "නොමිලේ සාම්පලය මෙතැනින් අවසන් වේ",
+    "paywallDescription": "මෙම පොතෙහි සම්පූර්ණ අන්තර්ගතය කියවීම සඳහා කරුණාකර පොත මිලදී ගන්න.",
+    "buyEbookAction": "ඊ-පොත මිලදී ගන්න",
+    "buyPaperbackAction": "මුද්‍රිත පොත ඇණවුම් කරන්න",
+    "page": "පිටුව",
+    "of": "න්"
+  },
+  "checkout": {
+    "title": "ඇණවුම සම්පූර්ණ කිරීම",
+    "stepAddress": "ලිපිනය",
+    "stepDelivery": "බෙදාහැරීම",
+    "stepPayment": "ගෙවීම",
+    "payhere": "කාඩ්පත් / eZ Cash / Genie (PayHere)",
+    "bankDeposit": "බැංකු තැන්පතු (ස්ලිප් පත උඩුගත කරන්න)",
+    "koko": "Koko - කොටස් 3කින් ගෙවන්න",
+    "cod": "භාණ්ඩ ලැබුණු පසු මුදල් ගෙවීම (COD)",
+    "uploadSlipNotice": "කරුණාකර ඔබගේ බැංකු තැන්පතු ලදුපතෙහි පැහැදිලි ඡායාරූපයක් උඩුගත කරන්න."
+  }
+}

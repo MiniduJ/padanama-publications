@@ -1,0 +1,42 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, "phase-*"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Lint, Typecheck, Test & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Verify Prisma Schema & Client Generation
+        run: npx prisma generate
+
+      - name: Run TypeScript Typecheck
+        run: npm run typecheck
+
+      - name: Run Unit Tests
+        run: npm run test
+
+      - name: Build Next.js Application
+        run: npm run build
+        env:
+          DATABASE_URL: "postgresql://padanama:padanama_dev_password@localhost:5432/padanama_db?schema=public"
+          AUTH_SECRET: "test-auth-secret-for-ci-build-32-chars-long"
+          PAYHERE_MERCHANT_ID: "1211111"
+          PAYHERE_MERCHANT_SECRET: "test-secret"
