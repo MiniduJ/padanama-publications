@@ -71,7 +71,12 @@ jobs:
       # Non-destructive schema sync (fails instead of dropping data)
       - name: Sync database schema
         if: github.event_name != 'pull_request'
-        run: npx prisma db push --skip-generate
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::warning::DATABASE_URL secret not set - skipping schema sync (site will use built-in catalogue)"
+            exit 0
+          fi
+          npx prisma db push --skip-generate
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
