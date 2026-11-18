@@ -464,7 +464,7 @@ export default function CheckoutPage() {
                   onClick={() => {
                     if (validateStep1()) setStep(2);
                   }}
-                  className="py-3 px-6 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2"
+                  className="py-3 px-6 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-2"
                 >
                   <span>ඊළඟ පියවර: බෙදාහැරීම තෝරන්න (Next)</span>
                   <ArrowRight className="w-4 h-4" />
@@ -587,7 +587,7 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => setStep(3)}
-                  className="py-3 px-6 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2"
+                  className="py-3 px-6 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-2"
                 >
                   <span>ඊළඟ පියවර: ගෙවීම් ක්‍රමය (Next)</span>
                   <ArrowRight className="w-4 h-4" />
@@ -872,7 +872,7 @@ export default function CheckoutPage() {
                   handlePlaceOrder();
                 }
               }}
-              className="w-full py-4 px-6 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full py-4 px-6 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white font-extrabold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-60"
             >
               <Lock className="w-4 h-4" />
               <span>

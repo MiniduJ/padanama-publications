@@ -5,7 +5,7 @@ import { formatLkr } from "@/lib/money";
 import { Badge } from "@/components/ui/Badge";
 import { Rating } from "@/components/ui/Rating";
 import {
-  BookOpen,
+  BookMarked,
   Sparkles,
   Eye,
   CheckCircle2,
@@ -27,6 +27,7 @@ interface LibraryPageProps {
 }
 
 export default async function DigitalLibraryPage({ params, searchParams }: LibraryPageProps) {
+  const { locale } = await params;
   const { category } = await searchParams;
   const result = await getBooks({ category, limit: 20 });
   const books = result.books;
@@ -137,7 +138,7 @@ export default async function DigitalLibraryPage({ params, searchParams }: Libra
 
                 <div className="flex items-center justify-between text-xs pt-1">
                   <span className="font-bold text-saffron-700">
-                    {formatLkr(primaryEdition.salePriceCents || primaryEdition.priceCents || 65000, "si")}
+                    {formatLkr(primaryEdition.salePriceCents || primaryEdition.priceCents || 65000, locale as any)}
                   </span>
                   <Rating value={book.averageRating || 4.9} size="sm" />
                 </div>
@@ -146,9 +147,9 @@ export default async function DigitalLibraryPage({ params, searchParams }: Libra
                 <div className="space-y-2 pt-2 border-t border-gray-100">
                   <Link
                     href={`/read/${book.slug}`}
-                    className="w-full py-2.5 px-3 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 transition-colors"
+                    className="w-full py-2.5 px-3 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white font-extrabold text-xs shadow-sm flex items-center justify-center gap-1.5 transition-colors"
                   >
-                    <BookOpen className="w-3.5 h-3.5" />
+                    <BookMarked className="w-3.5 h-3.5" />
                     <span>නොමිලේ කියවන්න (Read Sample)</span>
                   </Link>
 

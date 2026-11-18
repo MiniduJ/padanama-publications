@@ -6,9 +6,9 @@ import { WhatsAppFloatingButton } from "@/components/store/WhatsAppFloatingButto
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-col min-h-screen w-full overflow-x-hidden">
+    <div className="flex flex-col min-h-screen">
       <StoreHeader />
-      <main id="main-content" tabIndex={-1} className="flex-1 w-full outline-none">{children}</main>
+      <main id="main-content" tabIndex={-1} className="flex-1 outline-none">{children}</main>
       <StoreFooter />
       <WhatsAppFloatingButton />
       <MobileBottomNav />

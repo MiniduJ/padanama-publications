@@ -400,7 +400,7 @@ export default function CartPage() {
             <div className="space-y-3 pt-2">
               <Link
                 href="/checkout"
-                className="w-full py-4 px-6 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                className="w-full py-4 px-6 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white font-extrabold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
               >
                 <span>මිලදී ගැනීමට ඉදිරියට (Proceed to Checkout)</span>
                 <ArrowRight className="w-4 h-4" />

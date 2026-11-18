@@ -135,7 +135,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
               </div>
               <Link
                 href={`/read/${book.slug}`}
-                className="px-4 py-2 bg-saffron-500 hover:bg-saffron-700 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center gap-1.5 shrink-0"
+                className="px-4 py-2 bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white font-extrabold text-xs rounded-xl shadow transition-colors flex items-center gap-1.5 shrink-0"
               >
                 <BookOpen className="w-3.5 h-3.5" />
                 <span>කියවන්න</span>

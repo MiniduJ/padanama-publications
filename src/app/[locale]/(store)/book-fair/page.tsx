@@ -165,7 +165,7 @@ export default function BookFairPage() {
 
                 <Link
                   href="/cart"
-                  className="py-3 px-5 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-white font-bold text-xs shadow-md transition-colors flex items-center gap-1.5"
+                  className="py-3 px-5 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white font-extrabold text-xs shadow-md transition-colors flex items-center gap-1.5"
                 >
                   <Gift className="w-4 h-4" />
                   <span>දැන්ම මිලදී ගන්න</span>

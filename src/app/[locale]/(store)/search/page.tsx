@@ -51,7 +51,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           </div>
           <Link
             href="/books"
-            className="inline-block px-5 py-2.5 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-white font-bold text-xs shadow transition-colors"
+            className="inline-block px-5 py-2.5 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white font-extrabold text-xs shadow transition-colors"
           >
             සියලු පොත් බලන්න
           </Link>

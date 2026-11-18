@@ -12,6 +12,7 @@ import {
   UploadCloud,
   ArrowRight,
   BookOpen,
+  BookMarked,
   FileText,
   Phone,
   ShieldCheck,
@@ -191,9 +192,9 @@ export default function OrderSuccessPage({ searchParams }: SuccessPageProps) {
 
             <Link
               href="/account/my-library"
-              className="py-3 px-4 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-white font-bold text-xs text-center shadow transition-colors flex items-center justify-center gap-1.5"
+              className="py-3 px-4 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white font-extrabold text-xs text-center shadow transition-colors flex items-center justify-center gap-1.5"
             >
-              <BookOpen className="w-4 h-4" />
+              <BookMarked className="w-4 h-4" />
               <span>මගේ පුස්තකාලය (My Library)</span>
             </Link>
 

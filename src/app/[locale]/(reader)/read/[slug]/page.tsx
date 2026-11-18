@@ -322,7 +322,7 @@ export default function BookReaderPage({ params }: ReaderPageProps) {
           <button
             type="button"
             onClick={handleNextPage}
-            className="py-2 px-4 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-white flex items-center gap-1.5 text-xs font-bold shadow transition-colors"
+            className="py-2 px-4 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white flex items-center gap-1.5 text-xs font-extrabold shadow transition-colors"
           >
             <span>
               {currentPage === totalSamplePages ? "සාම්පලය අවසන් (Finish)" : "ඊළඟ පිටුව (Next)"}
