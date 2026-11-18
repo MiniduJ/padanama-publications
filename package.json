@@ -15,7 +15,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:push": "prisma db push",
     "prisma:seed": "tsx prisma/seed.ts",
-    "db:setup": "npm run prisma:generate && npm run prisma:push && npm run prisma:seed"
+    "db:setup": "npm run prisma:generate && npm run prisma:push && npm run prisma:seed",
+    "deploy:firebase": "next build && node scripts/prepare-hosting.js && firebase deploy --only hosting"
   },
   "dependencies": {
     "@prisma/client": "^6.0.1",
