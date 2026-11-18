@@ -257,7 +257,15 @@ export function StoreHeader() {
         <div className="lg:hidden bg-cream border-b border-maroon-200 px-4 py-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
           <div className="flex flex-col space-y-2 text-sm font-bold text-brandNavy">
             <Link
-              href="/products"
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-2.5 border-b border-maroon-100 flex items-center gap-2"
+            >
+              <Home className="w-4 h-4 text-brandRed" />
+              <span>{nav("home")}</span>
+            </Link>
+            <Link
+              href="/books"
               onClick={() => setMobileMenuOpen(false)}
               className="py-2.5 border-b border-maroon-100 flex items-center justify-between"
             >
@@ -271,6 +279,14 @@ export function StoreHeader() {
             >
               <BookMarked className="w-4 h-4" />
               <span>{nav("digitalLibrary")}</span>
+            </Link>
+            <Link
+              href="/book-fair"
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-2.5 border-b border-maroon-100 flex items-center gap-2 text-brandRed"
+            >
+              <Sparkles className="w-4 h-4 text-brandRed" />
+              <span>{currentLocale === "ta" ? "புத்தக கண்காட்சி (Book Fair)" : currentLocale === "en" ? "Book Fair (CIBF)" : "පොත් ප්‍රදර්ශනය (Book Fair)"}</span>
             </Link>
             <Link
               href="/about"

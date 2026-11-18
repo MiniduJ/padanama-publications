@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "@/i18n/routing";
 import { getBooks } from "@/server/catalog/books";
 import { BookCard } from "@/components/ui/BookCard";
+import { BestsellersSection } from "@/components/store/BestsellersSection";
 import { HeroSlider } from "@/components/store/HeroSlider";
 import { UserReviewsSection } from "@/components/store/UserReviewsSection";
 import { SocialMediaSection } from "@/components/store/SocialMediaSection";
@@ -211,30 +212,7 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-          {featuredBooks.map((book: any) => {
-            const primaryEdition = book.editions?.[0] || {};
-            const author = book.authors?.[0]?.author?.nameSi || "පදනම ප්‍රකාශන";
-            const catName = book.categories?.[0]?.category?.nameSi;
-
-            return (
-              <BookCard
-                key={book.id}
-                slug={book.slug}
-                title={book.titleSi}
-                authorName={author}
-                categoryName={catName}
-                coverUrl={book.coverUrl}
-                priceCents={primaryEdition.priceCents || 75000}
-                salePriceCents={primaryEdition.salePriceCents}
-                rating={book.averageRating || 4.9}
-                format={primaryEdition.format || "Paperback"}
-                hasFreeSample={true}
-                isBestSeller={book.isBestSeller}
-              />
-            );
-          })}
-        </div>
+        <BestsellersSection books={featuredBooks} />
       </section>
 
       {/* 6. Promotional Banner Strip (Publisher Ads from Padanama) */}

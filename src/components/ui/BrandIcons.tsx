@@ -12,6 +12,7 @@ export function WhatsAppIcon({ className = "w-6 h-6", size = 24 }: { className?:
       viewBox="0 0 24 24"
       width={size}
       height={size}
+      style={{ width: `${size}px`, height: `${size}px`, maxWidth: `${size}px`, maxHeight: `${size}px` }}
       className={`shrink-0 ${className}`}
       fill="currentColor"
       xmlns="http://www.w3.org/2000/svg"
@@ -28,6 +29,7 @@ export function FacebookIcon({ className = "w-6 h-6", size = 24 }: { className?:
       viewBox="0 0 24 24"
       width={size}
       height={size}
+      style={{ width: `${size}px`, height: `${size}px`, maxWidth: `${size}px`, maxHeight: `${size}px` }}
       className={`shrink-0 ${className}`}
       fill="currentColor"
       xmlns="http://www.w3.org/2000/svg"
@@ -44,6 +46,7 @@ export function YouTubeIcon({ className = "w-6 h-6", size = 24 }: { className?: 
       viewBox="0 0 24 24"
       width={size}
       height={size}
+      style={{ width: `${size}px`, height: `${size}px`, maxWidth: `${size}px`, maxHeight: `${size}px` }}
       className={`shrink-0 ${className}`}
       fill="currentColor"
       xmlns="http://www.w3.org/2000/svg"
