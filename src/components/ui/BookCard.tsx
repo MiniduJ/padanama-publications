@@ -1,9 +1,12 @@
+"use client";
+
 import * as React from "react";
 import { Link } from "@/i18n/routing";
 import { formatLkr } from "@/lib/money";
 import { Rating } from "./Rating";
 import { BookOpen, ShoppingBag, Sparkles } from "lucide-react";
 import { Badge } from "./Badge";
+import { cartActions } from "@/lib/cart-store";
 
 export interface BookCardProps {
   slug: string;
@@ -34,6 +37,25 @@ export function BookCard({
 }: BookCardProps) {
   const currentPrice = salePriceCents ?? priceCents;
   const isDiscounted = salePriceCents && salePriceCents < priceCents;
+
+  const handleCartClick = () => {
+    if (onAddToCart) {
+      onAddToCart();
+    } else {
+      cartActions.addItem({
+        id: `${slug}_PAPERBACK`,
+        bookId: slug,
+        slug,
+        title,
+        authorName,
+        format: "PAPERBACK",
+        priceCents: currentPrice,
+        originalPriceCents: priceCents,
+        coverImage: coverUrl,
+        weightGrams: 300,
+      });
+    }
+  };
 
   return (
     <div className="group flex flex-col bg-white rounded-2xl border border-maroon-100 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden text-left">
@@ -113,7 +135,8 @@ export function BookCard({
           </div>
 
           <button
-            onClick={onAddToCart}
+            type="button"
+            onClick={handleCartClick}
             className="p-2.5 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-white shadow-sm hover:shadow transition-colors"
             aria-label="Add to cart"
           >

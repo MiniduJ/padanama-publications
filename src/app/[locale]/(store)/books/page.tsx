@@ -2,7 +2,7 @@ import React from "react";
 import { getBooks } from "@/server/catalog/books";
 import { BookCard } from "@/components/ui/BookCard";
 import { Link } from "@/i18n/routing";
-import { Filter, SlidersHorizontal, BookOpen } from "lucide-react";
+import { SlidersHorizontal, BookOpen } from "lucide-react";
 
 interface BooksPageProps {
   searchParams: Promise<{
@@ -23,15 +23,23 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
     format: resolvedParams.format,
     sort: resolvedParams.sort || "newest",
     page,
-    limit: 12,
+    limit: 18,
   });
 
   const categories = [
     { slug: "all", name: "සියලු පොත් (All Books)" },
-    { slug: "scholarship-grade-5", name: "5 ශ්‍රේණිය ශිෂ්‍යත්වය" },
-    { slug: "ordinary-level", name: "සාමාන්‍ය පෙළ (O/L)" },
-    { slug: "advanced-level", name: "උසස් පෙළ (A/L)" },
-    { slug: "sinhala-novels", name: "සිංහල නවකතා හා සාහිත්‍ය" },
+    { slug: "preschool-grade-1-2", name: "පෙර පාසල, 1 සහ 2 ශ්‍රේණි" },
+    { slug: "primary", name: "ප්‍රාථමික ශ්‍රේණි (3, 4, 5)" },
+    { slug: "grade-6-7", name: "6 සහ 7 ශ්‍රේණි" },
+    { slug: "grade-8-9", name: "8 සහ 9 ශ්‍රේණි" },
+    { slug: "gce-ol", name: "සාමාන්‍ය පෙළ (O/L) 10, 11 ශ්‍රේණි" },
+    { slug: "gce-al-science", name: "උසස් පෙළ (A/L) Science" },
+    { slug: "gce-al-tech", name: "උසස් පෙළ (A/L) Technology" },
+    { slug: "gce-al-commerce", name: "උසස් පෙළ (A/L) Commerce" },
+    { slug: "gce-al-art", name: "උසස් පෙළ (A/L) Art" },
+    { slug: "gov-exam-past-papers", name: "රජයේ විභාග පසුගිය ප්‍රශ්න පත්‍ර" },
+    { slug: "gov-books", name: "රජයේ පෙළපොත්" },
+    { slug: "donations", name: "ධර්ම දානය සඳහා" },
   ];
 
   return (
@@ -40,10 +48,10 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
       <div className="border-b border-maroon-100 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-maroon-900 tracking-tight">
-            පොත් නාමාවලිය (Book Catalog)
+            පොත් නාමාවලිය (Official Book Catalog)
           </h1>
           <p className="text-sm text-ink-muted mt-1">
-            ශ්‍රී ලංකා විෂය නිර්දේශයට අනුකූල අධ්‍යාපනික වැඩපොත් සහ සම්මානනීය කෘති {pagination.total}ක්.
+            ශ්‍රී ලංකා විෂය නිර්දේශයට අනුකූල නිල පදනම ප්‍රකාශන පොත්පත් සහ පසුගිය ප්‍රශ්න පත්‍ර {pagination.total}ක්.
           </p>
         </div>
 
@@ -71,7 +79,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
           <div className="flex items-center justify-between pb-3 border-b border-gray-100">
             <h3 className="font-bold text-sm text-maroon-900 flex items-center gap-2">
               <SlidersHorizontal className="w-4 h-4 text-saffron-500" />
-              <span>පෙරහන් (Filters)</span>
+              <span>පෙරහන් (Categories)</span>
             </h3>
             <Link href="/books" className="text-xs text-saffron-600 hover:underline">
               ඉවත් කරන්න
@@ -79,11 +87,11 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
           </div>
 
           {/* Categories */}
-          <div className="space-y-2">
-            <h4 className="text-xs font-bold text-ink-muted uppercase tracking-wider">
-              ප්‍රවර්ග (Categories)
+          <div className="space-y-1">
+            <h4 className="text-xs font-bold text-ink-muted uppercase tracking-wider mb-2">
+              ශ්‍රේණි සහ විෂය ධාරා
             </h4>
-            <div className="space-y-1.5 text-xs font-medium">
+            <div className="space-y-1 text-xs font-medium max-h-[480px] overflow-y-auto pr-1">
               {categories.map((c) => {
                 const isActive = resolvedParams.category === c.slug || (!resolvedParams.category && c.slug === "all");
                 return (
@@ -101,14 +109,11 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
             </div>
           </div>
 
-          {/* Free Digital Sample Filter */}
-          <div className="pt-4 border-t border-gray-100">
-            <Link
-              href="/library"
-              className="p-3 rounded-xl bg-gold-50 border border-gold-200 block text-center space-y-1 hover:bg-gold-100 transition-colors"
-            >
+          {/* Promo Box */}
+          <div className="p-4 bg-maroon-50 border border-maroon-100 rounded-xl space-y-2 text-center">
+            <Link href="/library" className="block group">
               <BookOpen className="w-5 h-5 text-maroon-700 mx-auto" />
-              <span className="text-xs font-bold text-maroon-900 block">
+              <span className="text-xs font-bold text-maroon-900 block mt-1">
                 ඩිජිටල් සාම්පල පුස්තකාලය
               </span>
               <span className="text-[10px] text-ink-muted block">
@@ -139,13 +144,37 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
                     slug={book.slug}
                     title={book.titleSi}
                     authorName={author}
+                    coverUrl={book.coverUrl}
                     priceCents={primaryEdition.priceCents || 75000}
                     salePriceCents={primaryEdition.salePriceCents}
                     rating={book.averageRating || 4.8}
                     format={primaryEdition.format || "Paperback"}
-                    hasFreeSample={!!book.sampleConfig}
+                    hasFreeSample={true}
                     isBestSeller={book.isBestSeller}
                   />
+                );
+              })}
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {pagination.totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 pt-6 border-t border-maroon-100">
+              {Array.from({ length: Math.min(8, pagination.totalPages) }, (_, i) => i + 1).map((p) => {
+                const isActive = p === pagination.page;
+                const catParam = resolvedParams.category ? `&category=${resolvedParams.category}` : "";
+                return (
+                  <Link
+                    key={p}
+                    href={`/books?page=${p}${catParam}`}
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold transition-colors ${
+                      isActive
+                        ? "bg-maroon-500 text-white shadow-sm"
+                        : "bg-white text-ink border border-maroon-100 hover:bg-maroon-50"
+                    }`}
+                  >
+                    {p}
+                  </Link>
                 );
               })}
             </div>

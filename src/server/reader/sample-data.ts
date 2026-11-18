@@ -1,3 +1,5 @@
+import { REAL_PUBLISHER_BOOKS } from "@/data/publisher-books";
+
 export interface ReaderPage {
   pageNumber: number;
   chapterTitle: string;
@@ -61,69 +63,38 @@ const DEFAULT_SAMPLE_PAGES: Record<string, { chapters: ReaderChapter[]; pages: R
       {
         pageNumber: 3,
         chapterTitle: "පෙරවදන සහ විභාග මඟපෙන්වීම",
-        subTitle: "දෙවන ප්‍රශ්න පත්‍රය (භාෂාව සහ ගණිත ගැටලු)",
+        subTitle: "දෙවන ප්‍රශ්න පත්‍රයේ ලකුණු ලබා ගැනීමේ උපාය මාර්ග",
         content: [
-          "දෙවන ප්‍රශ්න පත්‍රය සඳහා පැය 1යි මිනිත්තු 15ක කාලයක් හිමිවේ. මෙහිදී ලකුණු 100ක් ලබාගත හැක.",
-          "ගණිත සංකල්ප: භාග, පරිමිතිය, වර්ගඵලය, කාලය හා දින දර්ශනය, මුදල් ගණනය කිරීම් සහ රටා හඳුනාගැනීම විශේෂයෙන් වැදගත් වේ.",
-          "භාෂා කුසලතා: වාක්‍ය ගැලපීම, අක්ෂර වින්‍යාසය, විරුද්ධ පද, සමාන පද සහ නිවැරදි කරුණු අවබෝධය පරීක්ෂා කෙරේ.",
+          "දෙවන ප්‍රශ්න පත්‍රය භාෂා ඥානය සහ පරිසරය ආශ්‍රිත ප්‍රශ්නවලින් සමන්විත වේ.",
+          "සෑම විටම පිළිතුර පැහැදිලි සහ සංක්ෂිප්ත අත්අකුරින් ලියන්න.",
+          "රූප සටහන් ඇඳීමේදී සහ නම් කිරීමේදී පැන්සලක් භාවිතා කරන්න.",
         ],
       },
       {
         pageNumber: 4,
-        chapterTitle: "පළමු ආදර්ශ ප්‍රශ්න පත්‍රය (Model Paper 1)",
-        subTitle: "පළමු කොටස — බුද්ධි පරීක්ෂණය (IQ)",
+        chapterTitle: "පළමු ආදර්ශ ප්‍රශ්න පත්‍රය (Paper 1)",
+        subTitle: "තාර්කික බුද්ධි පරීක්ෂණය (IQ & Mental Aptitude)",
         content: [
-          "1. පහත සඳහන් රූප රටාවේ හිස්තැනට ගැළපෙන රූපය තෝරන්න:",
-          "  (අ) ത്രിಕೋණය  (ආ) චතුරස්‍රය  (ඇ) වෘත්තය  (ඈ) ෂඩාස්‍රය",
-          "2. කමල්, නිමල්ට වඩා උසය. සුනිල්, කමල්ට වඩා උසය. වැඩිම උස ඇත්තේ කාටද?",
-          "  (1) නිමල්  (2) කමල්  (3) සුනිල්  (4) නිශ්චය කළ නොහැක",
+          "1. පහත දී ඇති රූප පෙළෙහි ඊළඟට පැමිණිය යුතු රූපය කුමක්ද?",
+          "   [■ ▲ ●] -> [▲ ● ■] -> [● ■ ▲] -> [?]",
+          "   (1) [■ ▲ ●]   (2) [▲ ■ ●]   (3) [■ ● ▲]",
+          "2. අශ්වයා : හේෂාරවය නම්, ඇතා : ?",
+          "   (1) කුංචනාදය   (2) නාදය   (3) ගර්ජනය",
+          "3. 2, 5, 10, 17, 26, ... ශ්‍රේණියේ ඊළඟ සංඛ්‍යාව කුමක්ද?",
+          "   විසඳුම: +3, +5, +7, +9, +11 => 26 + 11 = 37.",
         ],
-        notes: "ආදර්ශ ප්‍රශ්නාවලිය • ලකුණු 100",
+        notes: "පදනම ශිෂ්‍යත්ව ආදර්ශ පත්‍රිකා • සියලු හිමිකම් ඇවිරිණි",
       },
       {
         pageNumber: 5,
-        chapterTitle: "පළමු ආදර්ශ ප්‍රශ්න පත්‍රය (Model Paper 1)",
-        subTitle: "ගණිතමය තර්කනය සහ සංඛ්‍යා රටා",
+        chapterTitle: "පළමු ආදර්ශ ප්‍රශ්න පත්‍රය (Paper 1)",
+        subTitle: "ගණිතමය සංකල්ප සහ රටා",
         content: [
-          "3. පහත සංඛ්‍යා රටාවේ ඊළඟට එන සංඛ්‍යාව කුමක්ද?",
-          "   2, 5, 10, 17, 26, .....?",
-          "   විසඳුම: +3, +5, +7, +9, +11... එබැවින් 26 + 11 = 37.",
-          "4. පෙට්ටියක රතු බෝල 5ක්, නිල් බෝල 7ක් සහ කහ බෝල 3ක් ඇත. අහඹු ලෙස එකක් ගන්නා විට එය නිල් බෝලයක් වීමේ සම්භාවිතාව කොපමණද?",
+          "4. කූඩයක ඇති අඹ ගෙඩි 24 න් 1/3 ක් ඉදුණු ඒවාය. නොඉදුණු අඹ ගෙඩි ගණන කීයද?",
+          "   විසඳුම: ඉදුණු අඹ = 24 / 3 = 8. නොඉදුණු අඹ = 24 - 8 = 16.",
+          "5. පැය 2 යි මිනිත්තු 35 ට මිනිත්තු 45 ක් එකතු කළ විට ලැබෙන වේලාව කීයද?",
+          "   විසඳුම: පැය 2 යි මිනිත්තු 80 => පැය 3 යි මිනිත්තු 20.",
         ],
-      },
-      {
-        pageNumber: 6,
-        chapterTitle: "පළමු ආදර්ශ ප්‍රශ්න පත්‍රය (Model Paper 1)",
-        subTitle: "පාරිසරික අධ්‍යයනය හා සාමාන්‍ය දැනුම",
-        content: [
-          "5. ශ්‍රී ලංකාවේ උසම දියඇල්ල කුමක්ද?",
-          "   (1) දියලුම ඇල්ල  (2) බඹරකන්ද ඇල්ල  (3) දුන්හිඳ ඇල්ල  (4) රම්බොඩ ඇල්ල",
-          "   පිළිතුර: (2) බඹරකන්ද ඇල්ල (උස මීටර් 263)",
-          "6. ශාක ප්‍රභාසංශ්ලේෂණය සඳහා අත්‍යවශ්‍ය වන වායුව කුමක්ද?",
-          "   (1) ඔක්සිජන්  (2) කාබන් ඩයොක්සයිඩ්  (3) නයිට්‍රජන්  (4) හයිඩ්‍රජන්",
-        ],
-      },
-      {
-        pageNumber: 7,
-        chapterTitle: "පළමු ආදර්ශ ප්‍රශ්න පත්‍රය (Model Paper 1)",
-        subTitle: "භාෂා ඥානය සහ අක්ෂර වින්‍යාසය",
-        content: [
-          "7. නිවැරදි අක්ෂර වින්‍යාසය සහිත වචනය තෝරන්න:",
-          "   (1) ආරම්භය  (2) ආරම්බය  (3) ආරම්භ්‍ය  (4) ආරාම්භය",
-          "8. 'ක්ෂේමභූමිය' යන්නෙහි අර්ථය වන්නේ:",
-          "   (1) විශාල වනාන්තරය  (2) කාන්තාරයක දිය උල්පත් සහිත සාරවත් බිම  (3) මුහුදු වෙරළ",
-        ],
-      },
-      {
-        pageNumber: 8,
-        chapterTitle: "පළමු ආදර්ශ ප්‍රශ්න පත්‍රය (Model Paper 1)",
-        subTitle: "විවරණ සහ ලකුණු ලබාදීමේ ක්‍රමවේදය",
-        content: [
-          "ප්‍රශ්න 1 සිට 10 දක්වා පිළිතුරු විවරණය:",
-          "දරුවා සෑම ප්‍රශ්නයකටම ලබාදුන් පිළිතුර පරීක්ෂා කර, වැරදුණු ප්‍රශ්න සඳහා නැවත එම සංකල්පය පැහැදිලි කරදීම දෙමව්පියන්ගේ වගකීමකි.",
-          "විශේෂයෙන් සංඛ්‍යා රටා සහ සමාන අසමානතා ප්‍රශ්න දිනපතා පුහුණු කිරීම වැදගත්ය.",
-        ],
-        notes: "පදනම විභාග මණ්ඩලය",
       },
     ],
   },
@@ -131,41 +102,39 @@ const DEFAULT_SAMPLE_PAGES: Record<string, { chapters: ReaderChapter[]; pages: R
     chapters: [
       { id: "ch-1", title: "1. සංඛ්‍යා සහ දර්ශක (Numbers & Indices)", startPage: 1 },
       { id: "ch-2", title: "2. වීජ ගණිතය සහ සමීකරණ (Algebra)", startPage: 5 },
-      { id: "ch-3", title: "3. ත්‍රිකෝණමිතිය සහ ජ්‍යාමිතිය (Geometry)", startPage: 11 },
+      { id: "ch-3", title: "3. ජ්‍යාමිතිය ප්‍රමේය (Geometric Theorems)", startPage: 10 },
     ],
     pages: [
       {
         pageNumber: 1,
         chapterTitle: "1. සංඛ්‍යා සහ දර්ශක (Numbers & Indices)",
-        subTitle: "දර්ශක නීති (Laws of Indices)",
+        subTitle: "මූලික දර්ශක නීති (Rules of Indices)",
         content: [
-          "සාමාන්‍ය පෙළ ගණිතය විභාගයේ ප්‍රධානතම පදනම වන්නේ දර්ශක නීති පිළිබඳ මනා දැනුමයි.",
-          "නීතිය 1: a^m × a^n = a^(m+n) (පාද සමාන වන විට ගුණ කිරීමේදී දර්ශක එකතු වේ)",
-          "නීතිය 2: a^m ÷ a^n = a^(m-n) (පාද සමාන වන විට බෙදීමේදී දර්ශක අඩු වේ)",
-          "නීතිය 3: (a^m)^n = a^(mn)",
-          "නීතිය 4: a^0 = 1 (ඕනෑම ශූන්‍ය නොවන සංඛ්‍යාවක ශූන්‍ය වන බලය 1 කි)",
-          "නීතිය 5: a^(-n) = 1 / (a^n)",
+          "1. a^m × a^n = a^(m + n)",
+          "2. a^m ÷ a^n = a^(m - n)",
+          "3. (a^m)^n = a^(m × n)",
+          "4. a^0 = 1 (a ≠ 0)",
+          "5. a^(-n) = 1 / a^n",
+          "6. a^(1/n) = n√a",
         ],
-        notes: "සාමාන්‍ය පෙළ ගණිතය • පදනම අධ්‍යාපන මාලාව",
+        notes: "පදනම සාමාන්‍ය පෙළ කෙටි සටහන් පෙළ",
       },
       {
         pageNumber: 2,
         chapterTitle: "1. සංඛ්‍යා සහ දර්ශක (Numbers & Indices)",
-        subTitle: "ලඝුගණක සූත්‍ර සහ භාවිතය (Logarithms)",
+        subTitle: "ලඝුගණක මූලධර්ම (Logarithmic Principles)",
         content: [
-          "ලඝුගණක යනු දර්ශක ආකෘතියේ ප්‍රතිලෝමයයි.",
-          "y = a^x නම්, log_a(y) = x වේ.",
-          "ලඝුගණක මූලික නීති:",
-          "• log(AB) = log A + log B",
-          "• log(A / B) = log A - log B",
-          "• log(A^k) = k × log A",
-          "විභාග උපදෙස: ලඝුගණක වගුව භාවිතයෙන් ගණනය කිරීම් සිදුකිරීමේදී ලක්ෂණය සහ පූර්ණාංශය නිවැරදිව වෙන්කර හඳුනාගන්න.",
+          "දර්ශක ආකාරය y = a^x නම්, එහි ලඝුගණක ආකාරය log_a(y) = x වේ.",
+          "1. log_a(xy) = log_a(x) + log_a(y)",
+          "2. log_a(x / y) = log_a(x) - log_a(y)",
+          "3. log_a(x^k) = k × log_a(x)",
+          "4. log_a(a) = 1 සහ log_a(1) = 0",
         ],
       },
       {
         pageNumber: 3,
         chapterTitle: "1. සංඛ්‍යා සහ දර්ශක (Numbers & Indices)",
-        subTitle: "ප්‍රතිශත සහ වාණිජ ගණිතය (Percentages & Finance)",
+        subTitle: "වාණිජ ගණිතය සහ ප්‍රතිශත (Commercial Arithmetic)",
         content: [
           "1. සුළු පොලිය (Simple Interest): I = (P × R × T) / 100",
           "   P = මූලධනය, R = වාර්ෂික පොලී අනුපාතිකය, T = කාලය (වසර වලින්)",
@@ -203,6 +172,10 @@ export function getReaderBookContent(
   options: { isEntitled?: boolean; userIdentifier?: string } = {}
 ): ReaderBookData {
   const isEntitled = Boolean(options.isEntitled);
+
+  // Look up matched book in REAL_PUBLISHER_BOOKS
+  const matchedBook = REAL_PUBLISHER_BOOKS.find((b) => b.slug === slug || b.id === slug || `pdn-${b.originalId}` === slug);
+
   const sampleData = DEFAULT_SAMPLE_PAGES[slug] || DEFAULT_SAMPLE_PAGES["scholarship-grade-5-model-papers"];
 
   const sampleMaxPages = 20;
@@ -214,23 +187,17 @@ export function getReaderBookContent(
 
   return {
     slug,
-    titleSi:
-      slug === "ol-mathematics-short-notes"
-        ? "සාමාන්‍ය පෙළ ගණිතය කෙටි සටහන් සහ සූත්‍ර සංග්‍රහය"
-        : "5 ශ්‍රේණිය ශිෂ්‍යත්ව පෙරහුරු ප්‍රශ්න පත්‍ර",
-    titleEn:
-      slug === "ol-mathematics-short-notes"
-        ? "O/L Mathematics Short Notes & Formula Book"
-        : "Grade 5 Scholarship Model Papers",
+    titleSi: matchedBook ? matchedBook.titleSi : (slug === "ol-mathematics-short-notes" ? "සාමාන්‍ය පෙළ ගණිතය කෙටි සටහන් සහ සූත්‍ර සංග්‍රහය" : "5 ශ්‍රේණිය ශිෂ්‍යත්ව පෙරහුරු ප්‍රශ්න පත්‍ර"),
+    titleEn: matchedBook ? matchedBook.titleEn : (slug === "ol-mathematics-short-notes" ? "O/L Mathematics Short Notes" : "Grade 5 Scholarship Model Papers"),
     authorName: "පදනම අධ්‍යාපනික මණ්ඩලය",
-    coverImage: "/images/books/placeholder.jpg",
+    coverImage: matchedBook?.coverUrl || "https://padanamapublication.lk/image/books/1627556979.jpg",
     totalPages,
     sampleMaxPages,
     chapters: sampleData.chapters,
     pages: sampleData.pages,
     isEntitled,
     watermark,
-    paperbackPriceCents: slug === "ol-mathematics-short-notes" ? 58000 : 65000,
-    ebookPriceCents: slug === "ol-mathematics-short-notes" ? 32000 : 35000,
+    paperbackPriceCents: matchedBook ? (matchedBook.salePriceCents || matchedBook.priceCents) : 58000,
+    ebookPriceCents: matchedBook ? Math.round(matchedBook.priceCents * 0.6) : 32000,
   };
 }

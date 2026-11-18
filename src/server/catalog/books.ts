@@ -1,5 +1,6 @@
 import { db } from "@/server/db";
 import { singlishToSinhala } from "@/lib/transliteration";
+import { REAL_PUBLISHER_BOOKS } from "@/data/publisher-books";
 
 export interface BookFilterParams {
   category?: string;
@@ -24,7 +25,7 @@ export async function getBooks(params: BookFilterParams = {}) {
       isDeleted: false,
     };
 
-    if (category) {
+    if (category && category !== "all") {
       where.categories = {
         some: {
           category: {
@@ -87,16 +88,19 @@ export async function getBooks(params: BookFilterParams = {}) {
       db.book.count({ where }),
     ]);
 
-    return {
-      books,
-      pagination: {
-        total: totalCount,
-        page,
-        totalPages: Math.ceil(totalCount / limit),
-      },
-    };
-  } catch (error) {
-    console.warn("Database query failed, returning seeded fallback catalog:", error);
+    if (books && books.length > 0) {
+      return {
+        books,
+        pagination: {
+          total: totalCount,
+          page,
+          totalPages: Math.ceil(totalCount / limit),
+        },
+      };
+    }
+
+    return getFallbackBooks(params);
+  } catch {
     return getFallbackBooks(params);
   }
 }
@@ -117,155 +121,128 @@ export async function getBookBySlug(slug: string) {
       },
     });
     if (book) return book;
-  } catch (e) {
-    // fallback
+  } catch {
+    // fallback to static list
   }
-  const fallback = getFallbackBooks();
+  const fallback = getFallbackBooks({ limit: 500 });
   return fallback.books.find((b: any) => b.slug === slug) || null;
 }
 
-// Resilient fallback dataset matching seed data for offline / preview states
+// Convert REAL_PUBLISHER_BOOKS to internal database-like shape
+const ALL_CATALOG_BOOKS = REAL_PUBLISHER_BOOKS.map((b) => ({
+  id: b.id,
+  slug: b.slug,
+  titleSi: b.titleSi,
+  titleEn: b.titleEn,
+  transliterated: b.transliterated,
+  language: b.language,
+  publishedYear: 2026,
+  averageRating: b.rating,
+  reviewCount: b.reviewCount,
+  isFeatured: b.isFeatured,
+  isBestSeller: b.isBestSeller,
+  isAwardWinner: b.isAwardWinner,
+  coverUrl: b.coverUrl,
+  synopsisSi: `පදනම ප්‍රකාශන මඟින් ශ්‍රී ලංකා ජාතික විෂය නිර්දේශයට අනුව සම්පාදිත ${b.titleSi} ග්‍රන්ථය. දිවයිනේ ප්‍රවීණ ගුරුභවතුන්ගේ මඟපෙන්වීමෙන් නවතම විභාග ප්‍රශ්න රටාවන්ට අනුකූලව සකස් කර ඇත.`,
+  synopsisEn: `Official Padanama Publications edition of ${b.titleEn}, meticulously designed according to the latest Sri Lankan national curriculum.`,
+  authors: [
+    {
+      author: {
+        id: "auth-editorial",
+        nameSi: "පදනම අධ්‍යාපනික කර්තෘ මණ්ඩලය",
+        nameEn: "Padanama Educational Editorial Board",
+        slug: "padanama-editorial-board",
+      },
+    },
+  ],
+  categories: [
+    {
+      category: {
+        id: `cat-${b.categorySlug}`,
+        nameSi: b.categoryNameSi,
+        nameEn: b.categoryNameSi,
+        slug: b.categorySlug,
+      },
+    },
+  ],
+  sampleConfig: { maxPages: 20, percentageLimit: 20 },
+  editions: [
+    {
+      id: `${b.id}-ed-pb`,
+      format: "PAPERBACK",
+      isbn: `978-955-8001-${b.originalId.padStart(4, "0")}`,
+      sku: `PDN-${b.originalId}-PB`,
+      priceCents: b.priceCents,
+      salePriceCents: b.salePriceCents,
+      stockQuantity: 250,
+      pageCount: 140,
+      isDigital: false,
+    },
+    {
+      id: `${b.id}-ed-eb`,
+      format: "EBOOK",
+      sku: `PDN-${b.originalId}-EB`,
+      priceCents: Math.round(b.priceCents * 0.65),
+      salePriceCents: b.salePriceCents ? Math.round(b.salePriceCents * 0.65) : null,
+      stockQuantity: 99999,
+      pageCount: 140,
+      isDigital: true,
+    },
+  ],
+}));
+
+// Resilient fallback dataset populated with real publisher inventory
 export function getFallbackBooks(params: BookFilterParams = {}) {
-  const allBooks = [
-    {
-      id: "sample-book-1",
-      slug: "scholarship-grade-5-model-papers",
-      titleSi: "5 ශ්‍රේණිය ශිෂ්‍යත්ව පෙරහුරු ප්‍රශ්න පත්‍ර",
-      titleEn: "Grade 5 Scholarship Model Papers",
-      transliterated: "shishyathwaya 5 perahuru prashna pathra",
-      language: "SINHALA",
-      publishedYear: 2026,
-      averageRating: 4.9,
-      reviewCount: 38,
-      isFeatured: true,
-      isBestSeller: true,
-      isAwardWinner: false,
-      synopsisSi: "නව විෂය නිර්දේශයට අනුව සැකසූ ආදර්ශ ප්‍රශ්න පත්‍ර 10ක් සහ සම්පූර්ණ ලකුණු ලබාදීමේ ක්‍රමවේද අඩංගුයි. ශිෂ්‍යත්ව විභාගයට පෙනී සිටින දූ දරුවන්ට අත්‍යවශ්‍ය පුහුණු අත්පොතකි.",
-      synopsisEn: "10 comprehensive model examination papers with step-by-step marking schemes aligned with the latest scholarship syllabus.",
-      authors: [{ author: { nameSi: "පදනම අධ්‍යාපනික කර්තෘ මණ්ඩලය", nameEn: "Padanama Editorial Board", slug: "padanama-editorial-board" } }],
-      categories: [{ category: { nameSi: "5 ශ්‍රේණිය ශිෂ්‍යත්වය", nameEn: "Grade 5 Scholarship", slug: "scholarship-grade-5" } }],
-      sampleConfig: { maxPages: 20, percentageLimit: 20 },
-      editions: [
-        {
-          id: "ed-1",
-          format: "PAPERBACK",
-          isbn: "978-955-8001-01-2",
-          sku: "PDN-SCH-01-PB",
-          priceCents: 65000,
-          salePriceCents: 52000,
-          stockQuantity: 250,
-          pageCount: 160,
-          isDigital: false,
-        },
-        {
-          id: "ed-2",
-          format: "EBOOK",
-          sku: "PDN-SCH-01-EB",
-          priceCents: 35000,
-          stockQuantity: 99999,
-          pageCount: 160,
-          isDigital: true,
-        },
-      ],
-    },
-    {
-      id: "sample-book-2",
-      slug: "ol-mathematics-short-notes",
-      titleSi: "සාමාන්‍ය පෙළ ගණිතය කෙටි සටහන් සහ සූත්‍ර සංග්‍රහය",
-      titleEn: "O/L Mathematics Short Notes & Formula Book",
-      transliterated: "ganithaya 10 11 keti satahan sutra",
-      language: "SINHALA",
-      publishedYear: 2026,
-      averageRating: 4.8,
-      reviewCount: 24,
-      isFeatured: true,
-      isBestSeller: true,
-      isAwardWinner: false,
-      synopsisSi: "10 සහ 11 ශ්‍රේණිවල සියලුම ගණිත පාඩම් ආවරණය වන පරිදි සැකසූ අත්‍යවශ්‍ය සූත්‍ර සහ කෙටි සටහන්. විභාගයට පෙර කඩිනම් පුනරීක්ෂණය සඳහා කදිමයි.",
-      synopsisEn: "Complete G.C.E. O/L revision manual covering all theorems, formulas, and past paper question models.",
-      authors: [{ author: { nameSi: "පදනම අධ්‍යාපනික කර්තෘ මණ්ඩලය", nameEn: "Padanama Editorial Board", slug: "padanama-editorial-board" } }],
-      categories: [{ category: { nameSi: "අ.පො.ස. සාමාන්‍ය පෙළ (O/L)", nameEn: "G.C.E. Ordinary Level", slug: "ordinary-level" } }],
-      sampleConfig: { maxPages: 15, percentageLimit: 15 },
-      editions: [
-        {
-          id: "ed-3",
-          format: "PAPERBACK",
-          isbn: "978-955-8001-02-9",
-          sku: "PDN-OL-MTH-PB",
-          priceCents: 85000,
-          stockQuantity: 180,
-          pageCount: 140,
-          isDigital: false,
-        },
-        {
-          id: "ed-4",
-          format: "EBOOK",
-          sku: "PDN-OL-MTH-EB",
-          priceCents: 45000,
-          stockQuantity: 99999,
-          pageCount: 140,
-          isDigital: true,
-        },
-      ],
-    },
-    {
-      id: "sample-book-3",
-      slug: "hanthana-kadu-pamula",
-      titleSi: "හන්තාන කඳු පාමුල",
-      titleEn: "At the Foot of Hanthana Mountains",
-      transliterated: "hanthana kadu pamula novel",
-      language: "SINHALA",
-      publishedYear: 2026,
-      averageRating: 4.9,
-      reviewCount: 52,
-      isFeatured: true,
-      isBestSeller: false,
-      isAwardWinner: true,
-      synopsisSi: "පේරාදෙණිය විශ්වවිද්‍යාලීය පරිසරය හා බැඳුණු සොඳුරු ආදර කතාවක් සහ තාරුණ්‍යයේ අභියෝග විවරණය කෙරෙන සම්මානනීය නවකතාව.",
-      synopsisEn: "A poignant coming-of-age Sinhala novel set against the scenic backdrop of the University of Peradeniya.",
-      authors: [{ author: { nameSi: "කුසල් ගුණසේකර", nameEn: "Kusal Gunasekara", slug: "kusal-gunasekara" } }],
-      categories: [{ category: { nameSi: "සිංහල සාහිත්‍ය හා නවකතා", nameEn: "Sinhala Literature", slug: "sinhala-novels" } }],
-      sampleConfig: { maxPages: 25, percentageLimit: 20, allowedChapters: "1,2" },
-      editions: [
-        {
-          id: "ed-5",
-          format: "PAPERBACK",
-          isbn: "978-955-8001-03-6",
-          sku: "PDN-NOV-01-PB",
-          priceCents: 95000,
-          stockQuantity: 120,
-          pageCount: 280,
-          isDigital: false,
-        },
-        {
-          id: "ed-6",
-          format: "HARDCOVER",
-          isbn: "978-955-8001-03-HC",
-          sku: "PDN-NOV-01-HC",
-          priceCents: 140000,
-          stockQuantity: 40,
-          pageCount: 280,
-          isDigital: false,
-        },
-        {
-          id: "ed-7",
-          format: "EBOOK",
-          sku: "PDN-NOV-01-EB",
-          priceCents: 49000,
-          stockQuantity: 99999,
-          pageCount: 280,
-          isDigital: true,
-        },
-      ],
-    },
-  ];
+  const { category, query, sort = "newest", page = 1, limit = 12 } = params;
+
+  let filtered = [...ALL_CATALOG_BOOKS];
+
+  if (category && category !== "all") {
+    filtered = filtered.filter((b) =>
+      b.categories.some((c: any) => c.category.slug === category)
+    );
+  }
+
+  if (query) {
+    const q = query.toLowerCase().trim();
+    const transliteratedQuery = singlishToSinhala(query).toLowerCase();
+    filtered = filtered.filter(
+      (b) =>
+        b.titleSi.toLowerCase().includes(q) ||
+        b.titleEn.toLowerCase().includes(q) ||
+        b.transliterated.toLowerCase().includes(q) ||
+        b.titleSi.toLowerCase().includes(transliteratedQuery)
+    );
+  }
+
+  if (sort === "price_asc") {
+    filtered.sort((a, b) => {
+      const pA = a.editions[0]?.salePriceCents || a.editions[0]?.priceCents || 0;
+      const pB = b.editions[0]?.salePriceCents || b.editions[0]?.priceCents || 0;
+      return pA - pB;
+    });
+  } else if (sort === "price_desc") {
+    filtered.sort((a, b) => {
+      const pA = a.editions[0]?.salePriceCents || a.editions[0]?.priceCents || 0;
+      const pB = b.editions[0]?.salePriceCents || b.editions[0]?.priceCents || 0;
+      return pB - pA;
+    });
+  } else if (sort === "rating") {
+    filtered.sort((a, b) => b.averageRating - a.averageRating);
+  } else if (sort === "title") {
+    filtered.sort((a, b) => a.titleSi.localeCompare(b.titleSi));
+  }
+
+  const total = filtered.length;
+  const startIndex = (page - 1) * limit;
+  const paginated = filtered.slice(startIndex, startIndex + limit);
 
   return {
-    books: allBooks as any,
+    books: paginated as any,
     pagination: {
-      total: allBooks.length,
-      page: 1,
-      totalPages: 1,
+      total,
+      page,
+      totalPages: Math.max(1, Math.ceil(total / limit)),
     },
   };
 }

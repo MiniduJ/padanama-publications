@@ -90,22 +90,30 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-start">
         {/* Left Column: Book Cover Presentation */}
         <div className="md:col-span-5 flex flex-col items-center">
-          <div className="w-full max-w-sm aspect-[1/1.4] bg-gradient-to-tr from-maroon-100 via-cream to-white rounded-3xl border-2 border-maroon-100 p-8 flex items-center justify-center shadow-lg relative overflow-hidden">
-            <div className="w-52 h-72 bg-maroon-700 text-cream rounded-xl shadow-2xl p-6 flex flex-col justify-between border-4 border-gold-500/40 relative transform hover:scale-105 transition-transform duration-300">
-              <span className="text-xs font-bold text-gold-500 tracking-widest uppercase">
-                පදනම ප්‍රකාශන
-              </span>
-              <div className="space-y-1">
-                <h3 className="font-display font-extrabold text-lg line-clamp-3 leading-tight">
-                  {book.titleSi}
-                </h3>
-                <p className="text-[11px] text-cream/70 line-clamp-1">{authorName}</p>
+          <div className="w-full max-w-sm aspect-[1/1.4] bg-gradient-to-tr from-maroon-100 via-cream to-white rounded-3xl border-2 border-maroon-100 p-6 flex items-center justify-center shadow-lg relative overflow-hidden">
+            {book.coverUrl ? (
+              <img
+                src={book.coverUrl}
+                alt={book.titleSi}
+                className="w-full h-full object-contain max-h-[380px] rounded-xl shadow-md transform hover:scale-105 transition-transform duration-300"
+              />
+            ) : (
+              <div className="w-52 h-72 bg-maroon-700 text-cream rounded-xl shadow-2xl p-6 flex flex-col justify-between border-4 border-gold-500/40 relative transform hover:scale-105 transition-transform duration-300">
+                <span className="text-xs font-bold text-gold-500 tracking-widest uppercase">
+                  පදනම ප්‍රකාශන
+                </span>
+                <div className="space-y-1">
+                  <h3 className="font-display font-extrabold text-lg line-clamp-3 leading-tight">
+                    {book.titleSi}
+                  </h3>
+                  <p className="text-[11px] text-cream/70 line-clamp-1">{authorName}</p>
+                </div>
+                <div className="text-[10px] text-cream/60 border-t border-cream/20 pt-2 flex justify-between items-center">
+                  <span>{primaryEdition.isbn || "ISBN Verified"}</span>
+                  <span>{book.publishedYear}</span>
+                </div>
               </div>
-              <div className="text-[10px] text-cream/60 border-t border-cream/20 pt-2 flex justify-between items-center">
-                <span>{primaryEdition.isbn || "ISBN Verified"}</span>
-                <span>{book.publishedYear}</span>
-              </div>
-            </div>
+            )}
 
             {book.isBestSeller && (
               <Badge variant="saffron" className="absolute top-4 left-4 shadow">

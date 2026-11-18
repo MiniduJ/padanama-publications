@@ -1,10 +1,14 @@
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
 const intlMiddleware = createMiddleware(routing);
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 1. Bypass static assets, internal Next.js paths, and public media
@@ -16,10 +20,47 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2. Admin Route Protection (lazy-loaded, separate route group)
+  // 2. Refresh Supabase session cookie on request
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
+
+  if (supabaseUrl && supabaseKey) {
+    const supabase = createServerClient(
+      supabaseUrl,
+      supabaseKey,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+            response = NextResponse.next({
+              request,
+            });
+            cookiesToSet.forEach(({ name, value, options }) =>
+              response.cookies.set(name, value, options)
+            );
+          },
+        },
+      }
+    );
+
+    // Refresh auth session
+    try {
+      await supabase.auth.getUser();
+    } catch {
+      // Ignore network errors in middleware
+    }
+  }
+
+  // 3. Admin Route Protection (lazy-loaded, separate route group)
   if (pathname.startsWith("/admin")) {
     if (pathname === "/admin/login" || pathname === "/admin/2fa") {
-      return NextResponse.next();
+      return response;
     }
 
     // Role check via secure httpOnly admin session cookie
@@ -30,11 +71,18 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    return NextResponse.next();
+    return response;
   }
 
-  // 3. Delegate to trilingual next-intl middleware for store, account, and reader routes
-  return intlMiddleware(request);
+  // 4. Delegate to trilingual next-intl middleware for store, account, and reader routes
+  const intlResponse = intlMiddleware(request);
+  
+  // Forward any refreshed Supabase cookies into intlResponse
+  response.cookies.getAll().forEach((cookie) => {
+    intlResponse.cookies.set(cookie.name, cookie.value);
+  });
+
+  return intlResponse;
 }
 
 export const config = {
