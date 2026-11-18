@@ -224,8 +224,8 @@
         "Exam practice handbooks"
       ]
     ],
-    "bestKicker": "New releases & offers",
-    "bestTitle": "Most chosen by parents",
+    "bestKicker": "Just added",
+    "bestTitle": "New arrivals",
     "shopAll": "Go to the book shop",
     "primaryTitle": "For children preparing for the scholarship",
     "primarySub": "Model papers and practice built on the new syllabus",
@@ -241,6 +241,8 @@
     "ctaPhone": "Phone",
     "ctaEmail": "Email",
     "ctaContact": "Contact us",
-    "featuresLabel": "Book types"
+    "featuresLabel": "Book types",
+    "finderPlaceholder": "Search by book, subject or grade…",
+    "finderBtn": "Search"
   }
 }

@@ -80,8 +80,29 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const px = "w-full px-4 sm:px-8 lg:px-12";
 
   return (
-    <div className="w-full flex flex-col space-y-16 pb-12">
+    <div className="w-full flex flex-col space-y-10 sm:space-y-16 pb-12">
       <section className="w-full"><HeroSlider slides={slides} /></section>
+
+      {/* Quick finder: what parents do first — search or pick the child's grade */}
+      <section className={px}>
+        <div className="-mt-6 sm:-mt-10 relative z-10 bg-white rounded-3xl border border-maroon-100 shadow-lg p-4 sm:p-6 space-y-4">
+          <form action={`/${locale}/search`} method="get" role="search" className="flex gap-2">
+            <label htmlFor="home-search" className="sr-only">{t("finderPlaceholder")}</label>
+            <input id="home-search" name="q" type="search" placeholder={t("finderPlaceholder")} className="flex-1 min-w-0 px-4 py-3 rounded-xl border border-maroon-200 text-sm focus:outline-none focus:ring-2 focus:ring-brandRed" />
+            <button className="px-4 sm:px-6 py-3 rounded-xl bg-brandRed hover:bg-brandRed-600 text-white text-sm font-extrabold shrink-0">{t("finderBtn")}</button>
+          </form>
+          <div>
+            <p className="text-xs font-bold text-brandNavy mb-2 flex items-center gap-1.5"><GraduationCap className="w-4 h-4 text-brandRed" />{t("gradesKicker")}</p>
+            <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] sm:flex-wrap">
+              {CATEGORY_SLUGS.map((slug, i) => (
+                <Link key={slug} href={`/books?category=${slug}`} className="shrink-0 px-3.5 py-2 rounded-full border border-maroon-200 bg-cream/40 hover:bg-brandYellow/40 hover:border-brandYellow text-xs font-bold text-brandNavy">
+                  {cats[i]?.[0]}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Book-type carousel (auto-rotates) */}
       <section className={px}>
@@ -116,30 +137,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               </div>
             );
           })}
-        </div>
-      </section>
-
-      <section className={`${px} space-y-6`}>
-        <div className="flex items-end justify-between border-b border-maroon-100 pb-4">
-          <div>
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brandRed uppercase tracking-wider mb-1"><GraduationCap className="w-4 h-4" /><span>{t("gradesKicker")}</span></div>
-            <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-brandNavy tracking-tight">{t("gradesTitle")}</h2>
-          </div>
-          <Link href="/books" className="text-xs font-extrabold text-brandRed hover:underline flex items-center gap-1"><span>{t("viewAll")}</span><ArrowRight className="w-3.5 h-3.5" /></Link>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {CATEGORY_SLUGS.map((slug, i) => (
-            <Link key={slug} href={`/books?category=${slug}`} className="group p-5 bg-white rounded-2xl border border-maroon-100 hover:border-brandRed hover:shadow-lg transition-all flex flex-col justify-between">
-              <div className="flex items-start justify-between">
-                <div className="w-10 h-10 rounded-xl bg-brandYellow/30 text-brandNavy group-hover:bg-brandRed group-hover:text-white flex items-center justify-center transition-colors"><GraduationCap className="w-5 h-5" /></div>
-                <ArrowRight className="w-4 h-4 text-ink-muted group-hover:text-brandRed group-hover:translate-x-1 transition-all" />
-              </div>
-              <div className="mt-4">
-                <h3 className="font-bold text-sm text-brandNavy group-hover:text-brandRed transition-colors">{cats[i]?.[0]}</h3>
-                <p className="text-[11px] text-ink-muted mt-0.5">{cats[i]?.[1]}</p>
-              </div>
-            </Link>
-          ))}
         </div>
       </section>
 

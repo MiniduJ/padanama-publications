@@ -132,9 +132,9 @@ export function StoreHeader() {
       </div>
 
       {/* Main Navbar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
         {/* Brand Logo with exact official image */}
-        <Link href="/" className="shrink-0 flex items-center py-1">
+        <Link href="/" className="min-w-0 flex items-center py-1 [&_img]:max-w-[150px] sm:[&_img]:max-w-[280px]">
           <Logo size="md" />
         </Link>
 
@@ -184,7 +184,7 @@ export function StoreHeader() {
         </nav>
 
         {/* Right Actions: Mobile Search Toggle, Cart & Account */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           {/* Mobile Instant Search Button (<768px) */}
           <button
             type="button"
@@ -206,7 +206,7 @@ export function StoreHeader() {
 
           <Link
             href={currentUser ? "/account" : "/login"}
-            className="p-2 sm:p-2.5 rounded-full bg-white border border-maroon-100 hover:border-brandRed text-brandNavy transition-all shadow-sm hover:scale-105 active:scale-95 relative"
+            className="hidden sm:inline-flex p-2 sm:p-2.5 rounded-full bg-white border border-maroon-100 hover:border-brandRed text-brandNavy transition-all shadow-sm hover:scale-105 active:scale-95 relative"
             aria-label={currentUser ? `User Account: ${currentUser.name}` : "User Account"}
             title={currentUser ? `Logged in as ${currentUser.name}` : "Sign In / Register"}
           >

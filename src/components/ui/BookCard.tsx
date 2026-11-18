@@ -88,25 +88,25 @@ export function BookCard({
           />
         ) : (
           <div className="w-24 sm:w-28 h-32 sm:h-40 bg-gradient-to-br from-brandNavy to-maroon-900 text-cream rounded-md shadow-md p-2 sm:p-3 flex flex-col justify-between border-2 border-brandYellow/60">
-            <span className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-brandYellow">
+            <span className="text-[11px] sm:text-[11px] font-extrabold uppercase tracking-widest text-brandYellow">
               පදනම
             </span>
             <span className="font-display font-bold text-[11px] sm:text-xs line-clamp-3 leading-snug">
               {title}
             </span>
-            <span className="text-[8px] sm:text-[9px] text-cream/70 line-clamp-1">{authorName}</span>
+            <span className="text-[8px] sm:text-[11px] text-cream/70 line-clamp-1">{authorName}</span>
           </div>
         )}
 
         {/* Badges Overlay */}
         <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
           {isDiscounted && discountPercent > 0 && (
-            <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[11px] font-black bg-brandRed text-white shadow-md border border-brandRed-700 animate-pulse">
+            <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-[11px] sm:text-[11px] font-black bg-brandRed text-white shadow-md border border-brandRed-700 animate-pulse">
               <Tag className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" /> -{discountPercent}%
             </span>
           )}
           {isBestSeller && (
-            <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-[8px] sm:text-[10px] font-bold bg-brandYellow text-brandNavy shadow-xs border border-brandYellow-600">
+            <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-[8px] sm:text-[11px] font-bold bg-brandYellow text-brandNavy shadow-xs border border-brandYellow-600">
               <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 text-brandNavy" />
               <span className="hidden xs:inline">{b("bestSeller")}</span>
             </span>
@@ -117,7 +117,7 @@ export function BookCard({
         {hasFreeSample && (
           <Link
             href={`/read/${slug}`}
-            className="absolute bottom-2 right-2 p-1.5 sm:px-2.5 sm:py-1 bg-white/95 hover:bg-brandYellow hover:text-brandNavy text-brandNavy border border-brandYellow/80 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold shadow-md flex items-center gap-1 backdrop-blur-sm opacity-90 group-hover:opacity-100 transition-all"
+            className="absolute bottom-2 right-2 p-2.5 sm:px-2.5 sm:py-1 bg-white/95 hover:bg-brandYellow hover:text-brandNavy text-brandNavy border border-brandYellow/80 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-bold shadow-md flex items-center gap-1 backdrop-blur-sm opacity-90 group-hover:opacity-100 transition-all"
             title={b("readFreeSample")}
           >
             <BookMarked className="w-3.5 h-3.5 text-brandRed" />
@@ -130,13 +130,13 @@ export function BookCard({
       <div className="p-2.5 sm:p-4 flex-1 flex flex-col justify-between space-y-2 sm:space-y-3">
         <div className="space-y-1 sm:space-y-1.5">
           {/* Metadata Row: Category & In-Stock */}
-          <div className="flex items-center justify-between text-[10px] sm:text-[11px]">
+          <div className="flex items-center justify-between text-[11px] sm:text-[11px]">
             <span className="px-1.5 py-0.5 rounded bg-cream text-maroon-900 font-semibold truncate max-w-[85px] sm:max-w-[150px]">
               {categoryName || format}
             </span>
             <div className="flex items-center gap-1 text-green-700 font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-[9px] sm:text-[10px]">{b("inStock")}</span>
+              <span className="text-[11px] sm:text-[11px]">{b("inStock")}</span>
             </div>
           </div>
 
@@ -148,11 +148,11 @@ export function BookCard({
           </Link>
 
           {/* Author & Rating */}
-          <div className="flex items-center justify-between text-[10px] sm:text-[11px] text-ink-muted pt-0.5">
+          <div className="flex items-center justify-between text-[11px] sm:text-[11px] text-ink-muted pt-0.5">
             <span className="line-clamp-1 opacity-80 max-w-[90px] sm:max-w-[120px]">{authorName}</span>
             <div className="flex items-center gap-1 shrink-0">
               <Rating value={rating} size="sm" />
-              <span className="font-bold text-ink text-[9px] sm:text-[10px]">{rating.toFixed(1)}</span>
+              <span className="font-bold text-ink text-[11px] sm:text-[11px]">{rating.toFixed(1)}</span>
             </div>
           </div>
         </div>
@@ -165,13 +165,13 @@ export function BookCard({
                 {formatLkr(currentPrice, locale as any)}
               </span>
               {isDiscounted && (
-                <span className="text-[10px] sm:text-xs text-ink-muted/70 line-through">
+                <span className="text-[11px] sm:text-xs text-ink-muted/70 line-through">
                   {formatLkr(priceCents, locale as any)}
                 </span>
               )}
             </div>
             {isDiscounted && savingsCents > 0 && (
-              <span className="text-[9px] sm:text-[10px] text-green-700 font-bold mt-0.5 truncate">
+              <span className="text-[11px] sm:text-[11px] text-green-700 font-bold mt-0.5 truncate">
                 {c("savings")}: {formatLkr(savingsCents, locale as any)}
               </span>
             )}
@@ -194,12 +194,12 @@ export function BookCard({
             {justAdded ? (
               <>
                 <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[3]" />
-                <span className="text-[10px] sm:text-[11px] font-black">+{cardCount}</span>
+                <span className="text-[11px] sm:text-[11px] font-black">+{cardCount}</span>
               </>
             ) : cardCount > 0 ? (
               <>
                 <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brandNavy" />
-                <span className="text-[10px] sm:text-[11px] font-black">{cardCount}</span>
+                <span className="text-[11px] sm:text-[11px] font-black">{cardCount}</span>
               </>
             ) : (
               <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
