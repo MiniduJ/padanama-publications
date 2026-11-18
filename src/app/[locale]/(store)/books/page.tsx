@@ -2,134 +2,237 @@ import React from "react";
 import { getBooks } from "@/server/catalog/books";
 import { BookCard } from "@/components/ui/BookCard";
 import { Link } from "@/i18n/routing";
-import { SlidersHorizontal, BookOpen } from "lucide-react";
+import { SlidersHorizontal, BookOpen, Search, ArrowUpDown, Tag, Sparkles } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 interface BooksPageProps {
+  params: Promise<{
+    locale: string;
+  }>;
   searchParams: Promise<{
     category?: string;
-    author?: string;
     format?: string;
     sort?: "newest" | "price_asc" | "price_desc" | "rating" | "title";
+    query?: string;
     page?: string;
   }>;
 }
 
-export default async function BooksPage({ searchParams }: BooksPageProps) {
+export default async function BooksPage({ params, searchParams }: BooksPageProps) {
+  const { locale } = await params;
   const resolvedParams = await searchParams;
   const page = Number(resolvedParams.page) || 1;
+  const currentCategory = resolvedParams.category || "all";
+  const currentSort = resolvedParams.sort || "newest";
+  const currentQuery = resolvedParams.query || "";
+
+  const nav = await getTranslations({ locale, namespace: "nav" });
+  const cat = await getTranslations({ locale, namespace: "categories" });
+  const common = await getTranslations({ locale, namespace: "common" });
+
   const { books, pagination } = await getBooks({
-    category: resolvedParams.category,
-    author: resolvedParams.author,
+    category: currentCategory,
     format: resolvedParams.format,
-    sort: resolvedParams.sort || "newest",
+    sort: currentSort,
+    query: currentQuery,
     page,
     limit: 18,
   });
 
   const categories = [
-    { slug: "all", name: "සියලු පොත් (All Books)" },
-    { slug: "preschool-grade-1-2", name: "පෙර පාසල, 1 සහ 2 ශ්‍රේණි" },
-    { slug: "primary", name: "ප්‍රාථමික ශ්‍රේණි (3, 4, 5)" },
-    { slug: "grade-6-7", name: "6 සහ 7 ශ්‍රේණි" },
-    { slug: "grade-8-9", name: "8 සහ 9 ශ්‍රේණි" },
-    { slug: "gce-ol", name: "සාමාන්‍ය පෙළ (O/L) 10, 11 ශ්‍රේණි" },
-    { slug: "gce-al-science", name: "උසස් පෙළ (A/L) Science" },
-    { slug: "gce-al-tech", name: "උසස් පෙළ (A/L) Technology" },
-    { slug: "gce-al-commerce", name: "උසස් පෙළ (A/L) Commerce" },
-    { slug: "gce-al-art", name: "උසස් පෙළ (A/L) Art" },
-    { slug: "gov-exam-past-papers", name: "රජයේ විභාග පසුගිය ප්‍රශ්න පත්‍ර" },
-    { slug: "gov-books", name: "රජයේ පෙළපොත්" },
-    { slug: "donations", name: "ධර්ම දානය සඳහා" },
+    { slug: "all", name: cat("all"), count: 320 },
+    { slug: "preschool-grade-1-2", name: cat("preschoolGrade12"), count: 30 },
+    { slug: "primary", name: cat("primary"), count: 39 },
+    { slug: "grade-6-7", name: cat("grade67"), count: 30 },
+    { slug: "grade-8-9", name: cat("grade89"), count: 30 },
+    { slug: "gce-ol", name: cat("gceOl"), count: 30 },
+    { slug: "gce-al-science", name: cat("gceAlScience"), count: 30 },
+    { slug: "gce-al-tech", name: cat("gceAlTech"), count: 18 },
+    { slug: "gce-al-commerce", name: cat("gceAlCommerce"), count: 23 },
+    { slug: "gce-al-art", name: cat("gceAlArt"), count: 30 },
+    { slug: "gov-exam-past-papers", name: cat("pastPapers"), count: 29 },
+    { slug: "gov-books", name: cat("govBooks"), count: 10 },
+    { slug: "donations", name: cat("donations"), count: 16 },
   ];
 
+  const currentCategoryObj = categories.find((c) => c.slug === currentCategory) || categories[0];
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      {/* Page Header */}
-      <div className="border-b border-maroon-100 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-maroon-900 tracking-tight">
-            පොත් නාමාවලිය (Official Book Catalog)
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* Breadcrumb Navigation */}
+      <nav className="flex items-center gap-2 text-xs text-ink-muted">
+        <Link href="/" className="hover:text-brandRed transition-colors">{nav("home")}</Link>
+        <span>/</span>
+        <span className="text-brandNavy font-bold">{nav("books")}</span>
+        {currentCategory !== "all" && (
+          <>
+            <span>/</span>
+            <span className="text-brandRed font-semibold">{currentCategoryObj.name}</span>
+          </>
+        )}
+      </nav>
+
+      {/* Hero Page Header */}
+      <div className="bg-gradient-to-r from-brandNavy to-maroon-900 text-cream rounded-3xl p-6 sm:p-8 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-6 border border-brandNavy/60">
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brandYellow text-brandNavy text-xs font-black shadow">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{locale === "ta" ? "அதிகாரப்பூர்வ நூல் பட்டியல்" : locale === "en" ? "Official Book Catalog" : "නිල පදනම ප්‍රකාශන ග්‍රන්ථ නාමාවලිය"}</span>
+          </div>
+          <h1 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-tight">
+            {nav("books")}
           </h1>
-          <p className="text-sm text-ink-muted mt-1">
-            ශ්‍රී ලංකා විෂය නිර්දේශයට අනුකූල නිල පදනම ප්‍රකාශන පොත්පත් සහ පසුගිය ප්‍රශ්න පත්‍ර {pagination.total}ක්.
+          <p className="text-xs sm:text-sm text-cream/85 max-w-xl">
+            {locale === "ta"
+              ? `தரம் 1 முதல் உயர்தரம் வரையிலான ${pagination.total} வினாத்தாள்கள் மற்றும் பயிற்சி நூல்கள்.`
+              : locale === "en"
+              ? `Explore our official collection of ${pagination.total} textbooks, workbooks, and past papers.`
+              : `1 වසරේ සිට උසස් පෙළ දක්වා විෂයානුබද්ධ වැඩපොත්, කෙටි සටහන් සහ ප්‍රශ්න පත්‍ර ${pagination.total}ක් ඔබේ තේරීම සඳහා සූදානම්.`}
           </p>
         </div>
 
-        {/* Category Pills on Mobile */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none md:hidden">
-          {categories.map((c) => (
+        {/* Quick Promo Chip */}
+        <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 text-xs space-y-1.5 shrink-0 max-w-xs">
+          <div className="flex items-center gap-1.5 text-brandYellow font-extrabold">
+            <Tag className="w-4 h-4" />
+            <span>{locale === "ta" ? "சிறப்பு தள்ளுபடி" : locale === "en" ? "Special Discounts" : "විශේෂ වට්ටම් දීමනා සහිතයි"}</span>
+          </div>
+          <p className="text-cream/80 text-[11px] leading-relaxed">
+            {locale === "ta"
+              ? "அச்சு விலையில் இருந்து 20% வரை சிறப்பு தள்ளுபடிகள்."
+              : locale === "en"
+              ? "Enjoy up to 20% publisher discounts across our school catalog."
+              : "සියලුම පොත්පත් සඳහා මුද්‍රිත මිලට වඩා 20% කට ආසන්න විශේෂ වට්ටම් දැන් ක්‍රියාත්මකයි."}
+          </p>
+        </div>
+      </div>
+
+      {/* Horizontal Category Slider (Mobile & Tablet) */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none md:hidden">
+        {categories.map((c) => {
+          const isActive = currentCategory === c.slug;
+          return (
             <Link
               key={c.slug}
               href={c.slug === "all" ? "/books" : `/books?category=${c.slug}`}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border ${
-                (resolvedParams.category === c.slug || (!resolvedParams.category && c.slug === "all"))
-                  ? "bg-maroon-500 text-white border-maroon-500"
-                  : "bg-white text-ink border-maroon-200"
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shadow-sm ${
+                isActive
+                  ? "bg-brandRed text-white shadow-md scale-105"
+                  : "bg-white text-brandNavy border border-maroon-100 hover:bg-maroon-50"
               }`}
             >
               {c.name}
             </Link>
-          ))}
-        </div>
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
-        {/* Desktop Filter Sidebar */}
-        <aside className="hidden md:block bg-white p-6 rounded-2xl border border-maroon-100 shadow-sm space-y-6 sticky top-28">
+        {/* Desktop Sidebar: Category Filter */}
+        <aside className="hidden md:block bg-white p-6 rounded-3xl border border-maroon-100 shadow-sm space-y-6 sticky top-28">
           <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-            <h3 className="font-bold text-sm text-maroon-900 flex items-center gap-2">
-              <SlidersHorizontal className="w-4 h-4 text-saffron-500" />
-              <span>පෙරහන් (Categories)</span>
+            <h3 className="font-extrabold text-sm text-brandNavy flex items-center gap-2">
+              <SlidersHorizontal className="w-4 h-4 text-brandRed" />
+              <span>{nav("categories")}</span>
             </h3>
-            <Link href="/books" className="text-xs text-saffron-600 hover:underline">
-              ඉවත් කරන්න
-            </Link>
+            {currentCategory !== "all" && (
+              <Link href="/books" className="text-xs text-brandRed hover:underline font-bold">
+                {locale === "ta" ? "அனைத்தும்" : locale === "en" ? "Reset" : "සියල්ල"}
+              </Link>
+            )}
           </div>
 
-          {/* Categories */}
-          <div className="space-y-1">
-            <h4 className="text-xs font-bold text-ink-muted uppercase tracking-wider mb-2">
-              ශ්‍රේණි සහ විෂය ධාරා
-            </h4>
-            <div className="space-y-1 text-xs font-medium max-h-[480px] overflow-y-auto pr-1">
-              {categories.map((c) => {
-                const isActive = resolvedParams.category === c.slug || (!resolvedParams.category && c.slug === "all");
-                return (
-                  <Link
-                    key={c.slug}
-                    href={c.slug === "all" ? "/books" : `/books?category=${c.slug}`}
-                    className={`block px-3 py-2 rounded-lg transition-colors ${
-                      isActive ? "bg-maroon-50 text-maroon-900 font-bold" : "text-ink hover:bg-gray-50"
-                    }`}
-                  >
-                    {c.name}
-                  </Link>
-                );
-              })}
-            </div>
+          <div className="space-y-1 text-xs font-semibold max-h-[500px] overflow-y-auto pr-1">
+            {categories.map((c) => {
+              const isActive = currentCategory === c.slug;
+              return (
+                <Link
+                  key={c.slug}
+                  href={c.slug === "all" ? "/books" : `/books?category=${c.slug}`}
+                  className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-all ${
+                    isActive
+                      ? "bg-brandRed text-white font-extrabold shadow-sm"
+                      : "text-ink hover:bg-maroon-50 hover:text-brandRed"
+                  }`}
+                >
+                  <span className="truncate pr-2">{c.name}</span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${isActive ? "bg-white/20 text-white" : "bg-gray-100 text-ink-muted"}`}>
+                    {c.count}
+                  </span>
+                </Link>
+              );
+            })}
           </div>
 
-          {/* Promo Box */}
-          <div className="p-4 bg-maroon-50 border border-maroon-100 rounded-xl space-y-2 text-center">
-            <Link href="/library" className="block group">
-              <BookOpen className="w-5 h-5 text-maroon-700 mx-auto" />
-              <span className="text-xs font-bold text-maroon-900 block mt-1">
-                ඩිජිටල් සාම්පල පුස්තකාලය
-              </span>
-              <span className="text-[10px] text-ink-muted block">
-                මිලදී ගැනීමට පෙර නොමිලේ කියවන්න
-              </span>
-            </Link>
+          {/* Islandwide Delivery Trust Badge */}
+          <div className="p-4 rounded-2xl bg-cream border border-brandYellow/60 text-xs space-y-1">
+            <span className="font-bold text-brandNavy block">🚚 {locale === "ta" ? "நாடளாவிய விநியோகம்" : locale === "en" ? "Islandwide Delivery" : "දිවයින පුරා බෙදාහැරීම"}</span>
+            <p className="text-[11px] text-ink-muted">
+              {common("freeDeliveryNotice")}
+            </p>
           </div>
         </aside>
 
-        {/* Books Grid */}
-        <div className="md:col-span-3 space-y-8">
+        {/* Main Books Grid */}
+        <div className="md:col-span-3 space-y-6">
+          {/* Active Filter Bar & Sort Controls */}
+          <div className="bg-white p-4 rounded-2xl border border-maroon-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-ink-muted">{locale === "ta" ? "காட்டப்படும் நூல்கள்:" : locale === "en" ? "Showing:" : "ප්‍රතිඵල:"}</span>
+              <span className="font-extrabold text-brandNavy">{pagination.total} {locale === "ta" ? "நூல்கள்" : locale === "en" ? "Books" : "පොත්"}</span>
+              {currentCategory !== "all" && (
+                <span className="px-2.5 py-0.5 rounded-full bg-brandYellow/30 text-brandNavy font-bold text-[11px]">
+                  {currentCategoryObj.name}
+                </span>
+              )}
+            </div>
+
+            {/* Sort Options */}
+            <div className="flex items-center gap-2 text-xs w-full sm:w-auto justify-end">
+              <ArrowUpDown className="w-3.5 h-3.5 text-brandRed" />
+              <span className="text-ink-muted">{locale === "ta" ? "வரிசைப்படுத்துக:" : locale === "en" ? "Sort by:" : "පිළිවෙල:"}</span>
+              <div className="flex items-center gap-1 font-bold">
+                <Link
+                  href={`/books?category=${currentCategory}&sort=newest`}
+                  className={`px-2 py-1 rounded-lg ${currentSort === "newest" ? "bg-brandNavy text-white font-black" : "text-ink hover:text-brandRed"}`}
+                >
+                  {locale === "ta" ? "புதியவை" : locale === "en" ? "Newest" : "නවතම"}
+                </Link>
+                <Link
+                  href={`/books?category=${currentCategory}&sort=price_asc`}
+                  className={`px-2 py-1 rounded-lg ${currentSort === "price_asc" ? "bg-brandNavy text-white font-black" : "text-ink hover:text-brandRed"}`}
+                >
+                  {locale === "ta" ? "குறைந்த விலை" : locale === "en" ? "Price Low" : "මිල (අඩු)"}
+                </Link>
+                <Link
+                  href={`/books?category=${currentCategory}&sort=price_desc`}
+                  className={`px-2 py-1 rounded-lg ${currentSort === "price_desc" ? "bg-brandNavy text-white font-black" : "text-ink hover:text-brandRed"}`}
+                >
+                  {locale === "ta" ? "கூடிய விலை" : locale === "en" ? "Price High" : "මිල (වැඩි)"}
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Books Cards Grid */}
           {books.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-maroon-200">
-              <p className="text-sm text-ink-muted">මෙම පෙරහනට අදාළ පොත්පත් කිසිවක් හමු නොවීය.</p>
-              <Link href="/books" className="text-xs text-saffron-600 font-bold hover:underline mt-2 inline-block">
-                සියලු පොත් බලන්න
+            <div className="bg-white rounded-3xl border border-dashed border-maroon-200 p-12 text-center space-y-4">
+              <BookOpen className="w-12 h-12 text-maroon-300 mx-auto" />
+              <h3 className="font-extrabold text-lg text-brandNavy">
+                {locale === "ta" ? "நூல்கள் எதுவும் காணப்படவில்லை" : locale === "en" ? "No Books Found" : "පොත්පත් කිසිවක් හමු නොවීය"}
+              </h3>
+              <p className="text-xs text-ink-muted max-w-sm mx-auto">
+                {locale === "ta"
+                  ? "வேறு வகையைத் தேர்ந்தெடுத்து முயற்சிக்கவும்."
+                  : locale === "en"
+                  ? "Please try selecting a different category or search term."
+                  : "වෙනත් ප්‍රවර්ගයක් හෝ නමක් යොදා නැවත සොයා බලන්න."}
+              </p>
+              <Link
+                href="/books"
+                className="inline-block px-5 py-2.5 rounded-xl bg-brandRed text-white text-xs font-bold shadow hover:bg-brandRed-600 transition-colors"
+              >
+                {locale === "ta" ? "அனைத்து நூல்கள்" : locale === "en" ? "View All Books" : "සියලු පොත් බලන්න"}
               </Link>
             </div>
           ) : (
@@ -137,6 +240,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
               {books.map((book: any) => {
                 const primaryEdition = book.editions?.[0] || {};
                 const author = book.authors?.[0]?.author?.nameSi || "පදනම ප්‍රකාශන";
+                const catName = book.categories?.[0]?.category?.nameSi;
 
                 return (
                   <BookCard
@@ -144,10 +248,11 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
                     slug={book.slug}
                     title={book.titleSi}
                     authorName={author}
+                    categoryName={catName}
                     coverUrl={book.coverUrl}
                     priceCents={primaryEdition.priceCents || 75000}
                     salePriceCents={primaryEdition.salePriceCents}
-                    rating={book.averageRating || 4.8}
+                    rating={book.averageRating || 4.9}
                     format={primaryEdition.format || "Paperback"}
                     hasFreeSample={true}
                     isBestSeller={book.isBestSeller}
@@ -159,18 +264,18 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
 
           {/* Pagination Controls */}
           {pagination.totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 pt-6 border-t border-maroon-100">
-              {Array.from({ length: Math.min(8, pagination.totalPages) }, (_, i) => i + 1).map((p) => {
-                const isActive = p === pagination.page;
-                const catParam = resolvedParams.category ? `&category=${resolvedParams.category}` : "";
+            <div className="pt-8 flex items-center justify-center gap-2">
+              {Array.from({ length: pagination.totalPages }).map((_, i) => {
+                const p = i + 1;
+                const isCurrent = p === pagination.page;
                 return (
                   <Link
                     key={p}
-                    href={`/books?page=${p}${catParam}`}
-                    className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold transition-colors ${
-                      isActive
-                        ? "bg-maroon-500 text-white shadow-sm"
-                        : "bg-white text-ink border border-maroon-100 hover:bg-maroon-50"
+                    href={`/books?category=${currentCategory}&sort=${currentSort}&page=${p}`}
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${
+                      isCurrent
+                        ? "bg-brandNavy text-white shadow-md font-black scale-105"
+                        : "bg-white text-ink border border-maroon-100 hover:border-brandRed"
                     }`}
                   >
                     {p}

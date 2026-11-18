@@ -2,14 +2,15 @@
 
 import React, { useState } from "react";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Logo } from "@/components/ui/Logo";
-import { Search, ShoppingBag, BookOpen, User, Phone, Sparkles, Menu, X, Info, Mail } from "lucide-react";
+import { Search, ShoppingBag, BookMarked, User, Phone, Sparkles, Menu, X, Info, Mail } from "lucide-react";
 import { CartBadge } from "./CartBadge";
 
 export function StoreHeader() {
   const t = useTranslations("common");
   const nav = useTranslations("nav");
+  const currentLocale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,9 +24,9 @@ export function StoreHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-cream/95 backdrop-blur border-b border-maroon-100 shadow-sm">
+    <header className="sticky top-0 z-40 bg-cream/95 backdrop-blur border-b border-maroon-100 shadow-sm w-full">
       {/* Top Bar with Contact Us, About Us, Hotline and Languages */}
-      <div className="bg-brandNavy text-cream text-xs py-2 px-4 border-b border-brandNavy/40">
+      <div className="bg-brandNavy text-cream text-xs py-2 px-3 sm:px-6 border-b border-brandNavy/40 w-full">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           {/* Left: Hotline & Free Delivery Notice */}
           <div className="flex items-center gap-4 text-[11px] sm:text-xs">
@@ -51,7 +52,7 @@ export function StoreHeader() {
               className="flex items-center gap-1 text-cream/90 hover:text-brandYellow transition-colors font-medium"
             >
               <Info className="w-3 h-3 text-brandYellow" />
-              <span>අප ගැන (About Us)</span>
+              <span>{nav("about")}</span>
             </Link>
 
             <span className="text-cream/40">|</span>
@@ -61,17 +62,53 @@ export function StoreHeader() {
               className="flex items-center gap-1 text-cream/90 hover:text-brandYellow transition-colors font-medium"
             >
               <Mail className="w-3 h-3 text-brandYellow" />
-              <span>සම්බන්ධ වන්න (Contact Us)</span>
+              <span>{nav("contact")}</span>
             </Link>
 
             <span className="text-cream/40">|</span>
 
-            <div className="flex items-center gap-2 font-semibold">
-              <Link href={pathname} locale="si" className="hover:text-brandYellow">සිංහල</Link>
+            <div className="flex items-center gap-1.5 font-bold">
+              <Link
+                href={pathname}
+                locale="si"
+                lang="si"
+                aria-label="Switch to Sinhala"
+                className={`px-1.5 py-0.5 rounded transition-all ${
+                  currentLocale === "si"
+                    ? "bg-brandYellow text-brandNavy font-extrabold shadow-sm"
+                    : "text-cream/80 hover:text-brandYellow"
+                }`}
+              >
+                සිංහල
+              </Link>
               <span className="opacity-40">/</span>
-              <Link href={pathname} locale="en" className="hover:text-brandYellow">English</Link>
+              <Link
+                href={pathname}
+                locale="en"
+                lang="en"
+                aria-label="Switch to English"
+                className={`px-1.5 py-0.5 rounded transition-all ${
+                  currentLocale === "en"
+                    ? "bg-brandYellow text-brandNavy font-extrabold shadow-sm"
+                    : "text-cream/80 hover:text-brandYellow"
+                }`}
+              >
+                English
+              </Link>
               <span className="opacity-40">/</span>
-              <Link href={pathname} locale="ta" className="hover:text-brandYellow">தமிழ்</Link>
+              <Link
+                href={pathname}
+                locale="ta"
+                lang="ta"
+                aria-label="Switch to Tamil"
+                className={`px-1.5 py-0.5 rounded transition-all ${
+                  currentLocale === "ta"
+                    ? "bg-brandYellow text-brandNavy font-extrabold shadow-sm"
+                    : "text-cream/80 hover:text-brandYellow"
+                }`}
+              >
+                தமிழ்
+              </Link>
             </div>
           </div>
         </div>
@@ -91,7 +128,7 @@ export function StoreHeader() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="පොත් නම, කර්තෘ, විෂය හෝ Singlish මඟින් සොයන්න..."
+              placeholder={t("searchPlaceholder")}
               className="w-full pl-10 pr-4 py-2.5 bg-white border border-maroon-200 rounded-full text-sm text-ink placeholder:text-ink-muted/70 focus:outline-none focus:ring-2 focus:ring-brandRed focus:border-transparent shadow-inner"
             />
             <Search className="w-4 h-4 text-brandRed absolute left-3.5 top-3.5" />
@@ -101,18 +138,18 @@ export function StoreHeader() {
         {/* Primary Navigation Links */}
         <nav className="hidden lg:flex items-center gap-6 text-sm font-bold text-brandNavy">
           <Link
-            href="/products"
+            href="/books"
             className="hover:text-brandRed transition-colors flex items-center gap-1"
           >
-            <span>පොත් සාප්පුව (Book Shop)</span>
+            <span>{nav("shop")}</span>
           </Link>
 
           <Link
             href="/library"
             className="hover:text-brandRed transition-colors flex items-center gap-1.5"
           >
-            <BookOpen className="w-4 h-4 text-brandRed" />
-            <span>ඩිජිටල් පුස්තකාලය (Library)</span>
+            <BookMarked className="w-4 h-4 text-brandRed" />
+            <span>{nav("digitalLibrary")}</span>
           </Link>
 
           <Link
@@ -168,7 +205,7 @@ export function StoreHeader() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="පොත් හෝ විෂයයන් සොයන්න..."
+              placeholder={t("searchPlaceholder")}
               className="w-full pl-9 pr-4 py-2 bg-white border border-maroon-200 rounded-lg text-sm text-ink"
             />
             <Search className="w-4 h-4 text-brandRed absolute left-3 top-2.5" />
@@ -176,11 +213,11 @@ export function StoreHeader() {
 
           <div className="flex flex-col space-y-2 text-sm font-bold text-brandNavy">
             <Link
-              href="/products"
+              href="/books"
               onClick={() => setMobileMenuOpen(false)}
               className="py-2.5 border-b border-maroon-100 flex items-center justify-between"
             >
-              <span>පොත් සාප්පුව (Book Shop / Products)</span>
+              <span>{nav("shop")}</span>
               <span className="text-xs text-brandRed font-normal">320+ Books</span>
             </Link>
             <Link
@@ -188,22 +225,22 @@ export function StoreHeader() {
               onClick={() => setMobileMenuOpen(false)}
               className="py-2.5 border-b border-maroon-100 text-brandRed flex items-center gap-2"
             >
-              <BookOpen className="w-4 h-4" />
-              <span>ඩිජිටල් පුස්තකාලය (Free Sample Reader)</span>
+              <BookMarked className="w-4 h-4" />
+              <span>{nav("digitalLibrary")}</span>
             </Link>
             <Link
               href="/about"
               onClick={() => setMobileMenuOpen(false)}
               className="py-2.5 border-b border-maroon-100"
             >
-              අප ගැන (About Us)
+              {nav("about")}
             </Link>
             <Link
               href="/contact"
               onClick={() => setMobileMenuOpen(false)}
               className="py-2.5 border-b border-maroon-100"
             >
-              සම්බන්ධ වන්න (Contact Us)
+              {nav("contact")}
             </Link>
           </div>
         </div>

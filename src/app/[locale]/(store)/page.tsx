@@ -3,6 +3,8 @@ import { Link } from "@/i18n/routing";
 import { getBooks } from "@/server/catalog/books";
 import { BookCard } from "@/components/ui/BookCard";
 import { HeroSlider } from "@/components/store/HeroSlider";
+import { UserReviewsSection } from "@/components/store/UserReviewsSection";
+import { SocialMediaSection } from "@/components/store/SocialMediaSection";
 import {
   BookOpen,
   ShieldCheck,
@@ -41,34 +43,34 @@ export default async function HomePage() {
       title: "කෙටි සටහන් සහ සූත්‍ර",
       subtitle: "Short Notes & Formulas",
       image: "https://www.padanamapublication.lk/image/others/shortnotes.jpg",
-      link: "/products?category=gce-ol",
+      link: "/books?category=gce-ol",
       tag: "O/L & A/L",
     },
     {
       title: "වාර විභාග ප්‍රශ්න පත්‍ර",
       subtitle: "Term Test Papers",
       image: "https://www.padanamapublication.lk/image/others/termpapers.jpg",
-      link: "/products",
+      link: "/books",
       tag: "සියලු ශ්‍රේණි",
     },
     {
       title: "ආදර්ශ ප්‍රශ්න පත්‍ර",
       subtitle: "Model Examination Papers",
       image: "https://www.padanamapublication.lk/image/others/modelpapers.jpg",
-      link: "/products?category=primary",
+      link: "/books?category=primary",
       tag: "ශිෂ්‍යත්ව පෙරහුරු",
     },
   ];
 
   return (
-    <div className="flex flex-col space-y-14 py-6">
-      {/* 1. Hero Carousel Slider with Genuine padanamapublication.lk Slides */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+    <div className="w-full flex flex-col space-y-16 pb-12">
+      {/* 1. Hero Carousel Slider - Full Screen Height & Full Width */}
+      <section className="w-full">
         <HeroSlider />
       </section>
 
       {/* 2. Three Feature Category Cards (From publisher site) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <section className="w-full px-4 sm:px-8 lg:px-12">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {featureCards.map((card, idx) => (
             <Link
@@ -99,7 +101,7 @@ export default async function HomePage() {
       </section>
 
       {/* 3. Trust & Guarantee Bar with Logo Color Highlights */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <section className="w-full px-4 sm:px-8 lg:px-12">
         <div className="bg-white rounded-3xl border border-maroon-100 p-6 sm:p-8 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-6">
           <div className="flex items-center gap-3.5">
             <div className="w-11 h-11 rounded-2xl bg-brandRed/10 text-brandRed flex items-center justify-center shrink-0">
@@ -144,7 +146,7 @@ export default async function HomePage() {
       </section>
 
       {/* 4. Grade-Wise Explorer Bar */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-6">
+      <section className="w-full px-4 sm:px-8 lg:px-12 space-y-6">
         <div className="flex items-end justify-between border-b border-maroon-100 pb-4">
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brandRed uppercase tracking-wider mb-1">
@@ -156,7 +158,7 @@ export default async function HomePage() {
             </h2>
           </div>
           <Link
-            href="/products"
+            href="/books"
             className="text-xs font-extrabold text-brandRed hover:underline flex items-center gap-1"
           >
             <span>සියලු පොත් බලන්න</span>
@@ -168,7 +170,7 @@ export default async function HomePage() {
           {categories.map((cat) => (
             <Link
               key={cat.slug}
-              href={`/products?category=${cat.slug}`}
+              href={`/books?category=${cat.slug}`}
               className="group p-5 bg-white rounded-2xl border border-maroon-100 hover:border-brandRed hover:shadow-lg transition-all flex flex-col justify-between"
             >
               <div className="flex items-start justify-between">
@@ -189,7 +191,7 @@ export default async function HomePage() {
       </section>
 
       {/* 5. Featured Bestseller Books (Enhanced Cards with Discounts & Instant Cart) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-6">
+      <section className="w-full px-4 sm:px-8 lg:px-12 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-maroon-100 pb-4">
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs font-extrabold text-brandRed uppercase tracking-wider mb-1">
@@ -201,7 +203,7 @@ export default async function HomePage() {
             </h2>
           </div>
           <Link
-            href="/products"
+            href="/books"
             className="px-5 py-2.5 rounded-xl bg-brandRed hover:bg-brandRed-600 text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-1.5 self-start sm:self-auto"
           >
             <span>පොත් සාප්පුවට යන්න (Shop All)</span>
@@ -236,10 +238,10 @@ export default async function HomePage() {
       </section>
 
       {/* 6. Promotional Banner Strip (Publisher Ads from Padanama) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <section className="w-full px-4 sm:px-8 lg:px-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link
-            href="/products?category=gce-ol"
+            href="/books?category=gce-ol"
             className="group relative rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all border border-maroon-100 block"
           >
             <img
@@ -250,7 +252,7 @@ export default async function HomePage() {
           </Link>
 
           <Link
-            href="/products?category=primary"
+            href="/books?category=primary"
             className="group relative rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all border border-maroon-100 block"
           >
             <img
@@ -264,7 +266,7 @@ export default async function HomePage() {
 
       {/* 7. Primary & Scholarship Section */}
       {primaryBooks.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-6">
+        <section className="w-full px-4 sm:px-8 lg:px-12 space-y-6">
           <div className="flex items-end justify-between border-b border-maroon-100 pb-4">
             <div>
               <h2 className="font-display font-extrabold text-2xl text-brandNavy tracking-tight">
@@ -272,7 +274,7 @@ export default async function HomePage() {
               </h2>
               <p className="text-xs text-ink-muted mt-1">ශිෂ්‍යත්ව විභාගයට ඉලක්කගත ආදර්ශ ප්‍රශ්න පත්‍ර සහ පෙරහුරු අභ්‍යාස</p>
             </div>
-            <Link href="/products?category=primary" className="text-xs font-extrabold text-brandRed hover:underline">
+            <Link href="/books?category=primary" className="text-xs font-extrabold text-brandRed hover:underline">
               ප්‍රාථමික සියලු පොත්
             </Link>
           </div>
@@ -306,7 +308,7 @@ export default async function HomePage() {
 
       {/* 8. G.C.E. O/L Section */}
       {olBooks.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-6">
+        <section className="w-full px-4 sm:px-8 lg:px-12 space-y-6">
           <div className="flex items-end justify-between border-b border-maroon-100 pb-4">
             <div>
               <h2 className="font-display font-extrabold text-2xl text-brandNavy tracking-tight">
@@ -314,7 +316,7 @@ export default async function HomePage() {
               </h2>
               <p className="text-xs text-ink-muted mt-1">10 සහ 11 ශ්‍රේණි සඳහා විද්‍යාව, ගණිතය, සිංහල, ඉතිහාසය සහ වාණිජ</p>
             </div>
-            <Link href="/products?category=gce-ol" className="text-xs font-extrabold text-brandRed hover:underline">
+            <Link href="/books?category=gce-ol" className="text-xs font-extrabold text-brandRed hover:underline">
               සා.පෙ. සියලු පොත්
             </Link>
           </div>
@@ -346,8 +348,18 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 9. Official Publisher Direct Callout */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      {/* 9. Verified Customer Reviews & Testimonials Section */}
+      <section className="w-full px-4 sm:px-8 lg:px-12">
+        <UserReviewsSection />
+      </section>
+
+      {/* 10. Social Media Section: Left Facebook, Right YouTube */}
+      <section className="w-full px-4 sm:px-8 lg:px-12">
+        <SocialMediaSection />
+      </section>
+
+      {/* 11. Official Publisher Direct Callout */}
+      <section className="w-full px-4 sm:px-8 lg:px-12">
         <div className="bg-gradient-to-r from-brandNavy via-brandNavy to-maroon-900 text-cream rounded-3xl p-8 md:p-12 border-2 border-brandYellow/60 shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="space-y-3 text-center md:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brandYellow text-brandNavy font-black text-xs">

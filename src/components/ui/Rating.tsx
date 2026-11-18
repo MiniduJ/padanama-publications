@@ -35,17 +35,26 @@ export function Rating({
         const starValue = i + 1;
         const isFilled = starValue <= Math.round(value);
 
+        if (!interactive) {
+          return (
+            <span key={i} aria-hidden="true" className="text-gold-500">
+              <Star
+                className={cn(
+                  sizeClasses[size],
+                  isFilled ? "fill-gold-500 text-gold-500" : "fill-transparent text-gray-300"
+                )}
+              />
+            </span>
+          );
+        }
+
         return (
           <button
             key={i}
             type="button"
-            disabled={!interactive}
-            onClick={() => interactive && onChange?.(starValue)}
-            className={cn(
-              "text-gold-500 transition-transform",
-              interactive && "hover:scale-110 cursor-pointer disabled:cursor-default"
-            )}
-            tabIndex={interactive ? 0 : -1}
+            onClick={() => onChange?.(starValue)}
+            className="text-gold-500 transition-transform hover:scale-110 cursor-pointer"
+            aria-label={`${starValue} star${starValue > 1 ? "s" : ""}`}
           >
             <Star
               className={cn(

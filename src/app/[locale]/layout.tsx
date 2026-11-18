@@ -36,6 +36,13 @@ export default async function LocaleLayout({
         />
       </head>
       <body className="min-h-screen text-ink antialiased bg-paper-texture">
+        <a href="#main-content" className="skip-link">
+          {locale === "ta"
+            ? "பிரதான பகுதிக்குச் செல்க (Skip to Content)"
+            : locale === "en"
+            ? "Skip to Main Content"
+            : "ප්‍රධාන අන්තර්ගතය වෙත යන්න (Skip to Content)"}
+        </a>
         <NextIntlClientProvider messages={messages}>
           {children}
         </NextIntlClientProvider>

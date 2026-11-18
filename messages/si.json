@@ -7,13 +7,23 @@
     "account": "මගේ ගිණුම",
     "readSample": "නොමිලේ කියවන්න",
     "currency": "රු.",
-    "freeDeliveryNotice": "දිවයින පුරා නොමිලේ බෙදාහැරීම රු. 3,500 ට වැඩි ඇණවුම් සඳහා"
+    "freeDeliveryNotice": "දිවයින පුරා නොමිලේ බෙදාහැරීම රු. 3,500 ට වැඩි ඇණවුම් සඳහා",
+    "callUs": "අප අමතන්න",
+    "aboutUs": "අප ගැන",
+    "contactUs": "සම්බන්ධ වන්න",
+    "inStock": "තොග ඇත",
+    "outOfStock": "තොග අවසන්",
+    "savings": "ඉතිරිය",
+    "all": "සියල්ල",
+    "shopNow": "පොත් සාප්පුව"
   },
   "nav": {
     "home": "මුල් පිටුව",
     "books": "සියලු පොත්",
+    "shop": "පොත් සාප්පුව",
     "categories": "ප්‍රවර්ග",
     "digitalLibrary": "ඩිජිටල් පුස්තකාලය",
+    "samples": "සාම්පල",
     "authors": "කතුවරුන්",
     "about": "අප ගැන",
     "contact": "සම්බන්ධ වන්න",
@@ -29,9 +39,25 @@
     "authenticBooks": "නිල ප්‍රකාශන මුද්‍රණය",
     "authenticSub": "100% උසස් ප්‍රමිතිය"
   },
+  "categories": {
+    "all": "සියලු පොත්",
+    "preschoolGrade12": "පෙර පාසල හා 1-2 ශ්‍රේණි",
+    "primary": "ප්‍රාථමික (3, 4, 5 ශිෂ්‍යත්වය)",
+    "grade67": "6 සහ 7 ශ්‍රේණි",
+    "grade89": "8 සහ 9 ශ්‍රේණි",
+    "gceOl": "සාමාන්‍ය පෙළ (O/L 10, 11)",
+    "gceAlScience": "A/L විද්‍යා අංශය",
+    "gceAlTech": "A/L තාක්ෂණවේදය",
+    "gceAlCommerce": "A/L වාණිජ අංශය",
+    "gceAlArt": "A/L කලා අංශය",
+    "pastPapers": "රජයේ විභාග පසුගිය ප්‍රශ්න පත්‍ර",
+    "govBooks": "රජයේ පෙළපොත්",
+    "donations": "ධර්ම දානය සඳහා"
+  },
   "book": {
     "readFreeSample": "නොමිලේ සාම්පලය කියවන්න",
     "addToCart": "බෑගයට එක් කරන්න",
+    "addedToCart": "බෑගයට එක් කරන ලදී!",
     "buyNow": "දැන්ම මිලදී ගන්න",
     "paperback": "සාමාන්‍ය මුද්‍රණය",
     "hardcover": "දෘඩ කවරය",
@@ -44,7 +70,30 @@
     "pages": "පිටු ගණන",
     "isbn": "ISBN අංකය",
     "language": "භාෂාව",
-    "specs": "පොත පිළිබඳ විස්තර"
+    "specs": "තාක්ෂණික තොරතුරු",
+    "synopsis": "පොත පිළිබඳ විස්තරය",
+    "selectFormat": "පොතෙහි මුද්‍රණ වර්ගය",
+    "bestSeller": "ජනප්‍රියම පොතක්",
+    "reviews": "සමාලෝචන",
+    "freeDeliveryNotice": "රු. 3,500 ට වැඩි ඇණවුම් සඳහා දිවයින පුරා බෙදාහැරීම නොමිලේ!"
+  },
+  "cart": {
+    "title": "සාප්පු සවාරි බෑගය",
+    "emptyTitle": "ඔබගේ පොත් බෑගය හිස්ව පවතී",
+    "emptyDesc": "ඔබ මෙතෙක් කිසිදු පොතක් බෑගයට එක් කර නොමැත. පදනම ප්‍රකාශන විශිෂ්ට පොත් එකතුවෙන් ඔබ කැමති පොත් තෝරාගන්න.",
+    "browseCatalog": "පොත් නාමාවලිය වෙත",
+    "clearAll": "බෑගය හිස් කරන්න",
+    "freeDeliveryUnlocked": "🎉 සුබ පැතුම්! ඔබ නොමිලේ දිවයින පුරා බෙදාහැරීම දිනාගත්තා!",
+    "addMoreForFreeDelivery": "නොමිලේ දිවයින පුරා බෙදාහැරීම ලබාගැනීමට තවත් {amount} ක පොත් එක්කරන්න!",
+    "subtotal": "මුළු එකතුව",
+    "discount": "වට්ටම්",
+    "deliveryEstimate": "ඇස්තමේන්තුගත බෙදාහැරීම",
+    "grandTotal": "අවසාන එකතුව",
+    "proceedToCheckout": "ඇණවුම සම්පූර්ණ කරන්න",
+    "applyCoupon": "කූපන් කේතය යොදන්න",
+    "couponPlaceholder": "කූපන් කේතය ඇතුළත් කරන්න (උදා: WELCOME10)",
+    "district": "බෙදාහැරීමේ දිස්ත්‍රික්කය තෝරන්න",
+    "itemsCount": "පොත් {count}ක්"
   },
   "reader": {
     "previewTitle": "නොමිලේ සාම්පල කියවීම",
@@ -53,7 +102,11 @@
     "buyEbookAction": "ඊ-පොත මිලදී ගන්න",
     "buyPaperbackAction": "මුද්‍රිත පොත ඇණවුම් කරන්න",
     "page": "පිටුව",
-    "of": "න්"
+    "of": "න්",
+    "toc": "පටුන",
+    "theme": "තේමාව",
+    "fontSize": "අකුරු ප්‍රමාණය",
+    "fontType": "අකුරු රටාව"
   },
   "checkout": {
     "title": "ඇණවුම සම්පූර්ණ කිරීම",
@@ -64,6 +117,38 @@
     "bankDeposit": "බැංකු තැන්පතු (ස්ලිප් පත උඩුගත කරන්න)",
     "koko": "Koko - කොටස් 3කින් ගෙවන්න",
     "cod": "භාණ්ඩ ලැබුණු පසු මුදල් ගෙවීම (COD)",
-    "uploadSlipNotice": "කරුණාකර ඔබගේ බැංකු තැන්පතු ලදුපතෙහි පැහැදිලි ඡායාරූපයක් උඩුගත කරන්න."
+    "uploadSlipNotice": "කරුණාකර ඔබගේ බැංකු තැන්පතු ලදුපතෙහි පැහැදිලි ඡායාරූපයක් උඩුගත කරන්න.",
+    "placeOrder": "ඇණවුම තහවුරු කරන්න",
+    "processing": "ඇණවුම සකසමින් පවතී..."
+  },
+  "footer": {
+    "aboutTitle": "පදනම ප්‍රකාශන",
+    "aboutDesc": "1 වසරේ සිට 13 වසර දක්වා විෂයානුබද්ධ පාසල් වැඩපොත්, ආදර්ශ ප්‍රශ්න පත්‍ර සහ විශිෂ්ටතම සිංහල සාහිත්‍ය කෘති ප්‍රකාශනය සහ දිවයින පුරා බෙදාහැරීම.",
+    "booksCategories": "පොත් සහ ප්‍රවර්ග",
+    "customerCare": "පාරිභෝගික සේවය",
+    "contactLocation": "ලිපිනය සහ සබඳතා",
+    "acceptedPayments": "පිළිගත් ගෙවීම් සහ කුරියර්",
+    "rightsReserved": "සියලු හිමිකම් ඇවිරිණි. පදනම ප්‍රකාශන (පුද්) සමාගම.",
+    "shippingDelivery": "බෙදාහැරීමේ ගාස්තු සහ දින (25 Districts)",
+    "returnsRefunds": "ආපසු භාරගැනීම් (Returns & Refunds)",
+    "wholesale": "තොග ඇණවුම් (Wholesale Enquiries)",
+    "privacy": "පුද්ගලිකත්ව ප්‍රතිපත්තිය (PDPA)",
+    "terms": "සේවා කොන්දේසි (Terms)"
+  },
+  "home": {
+    "heroBadge": "නිල වෙබ් අඩවිය • padanamapublication.lk",
+    "shortNotes": "කෙටි සටහන් සහ සූත්‍ර",
+    "termPapers": "වාර විභාග ප්‍රශ්න පත්‍ර",
+    "modelPapers": "ආදර්ශ ප්‍රශ්න පත්‍ර",
+    "syllabusExplorer": "ශ්‍රේණි අනුව ග්‍රන්ථ නාමාවලිය",
+    "viewAllBooks": "සියලු පොත් බලන්න",
+    "bestsellers": "ජනප්‍රියම ග්‍රන්ථ (Bestselling Books)",
+    "latestAndDiscounts": "නවතම නිකුත් කිරීම් සහ වට්ටම්",
+    "directPublisherCallout": "පොත් ඇණවුම් සහ විමසීම් සඳහා අප අමතන්න",
+    "hotlineNotice": "පදනම ක්ෂණික පාරිභෝගික සේවය",
+    "shopCatalog": "පොත් සාප්පුව වෙත",
+    "allGrades": "සියලු ශ්‍රේණි",
+    "scholarshipPrep": "ශිෂ්‍යත්ව පෙරහුරු",
+    "olAndAl": "O/L සහ A/L"
   }
 }

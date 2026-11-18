@@ -56,6 +56,12 @@ describe("Phase 2: Sri Lankan Design System Tokens & WCAG AA Contrast", () => {
     expect(ratio).toBeGreaterThanOrEqual(4.5);
   });
 
+  it("verifies Saffron CTA button with Brand Navy text exceeds WCAG AA (4.5:1)", () => {
+    const brandNavy = "#0D2240";
+    const ratio = getContrastRatio(tokens.saffron, brandNavy);
+    expect(ratio).toBeGreaterThanOrEqual(4.5);
+  });
+
   it("enforces Sinhala line-height rule >= 1.7 to prevent diacritic clipping", () => {
     // In tailwind.config.ts, sinhala line-height is configured to 1.75
     const sinhalaLineHeight = 1.75;

@@ -462,7 +462,7 @@ export default function BookReaderPage({ params }: ReaderPageProps) {
                   <button
                     type="button"
                     onClick={() => handleBuy("PAPERBACK")}
-                    className="w-full py-2.5 px-3 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-white font-bold text-xs shadow transition-colors"
+                    className="w-full py-2.5 px-3 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white font-extrabold text-xs shadow transition-colors"
                   >
                     මුද්‍රිත පොත ඇණවුම් කරන්න
                   </button>

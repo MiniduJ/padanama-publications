@@ -339,6 +339,7 @@ export default function CheckoutPage() {
                   <input
                     type="text"
                     required
+                    autoComplete="given-name"
                     value={contact.firstName}
                     onChange={(e) => setContact({ ...contact, firstName: e.target.value })}
                     className="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-saffron-500"
@@ -351,6 +352,7 @@ export default function CheckoutPage() {
                   </label>
                   <input
                     type="text"
+                    autoComplete="family-name"
                     value={contact.lastName}
                     onChange={(e) => setContact({ ...contact, lastName: e.target.value })}
                     className="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-saffron-500"
@@ -367,6 +369,7 @@ export default function CheckoutPage() {
                   <input
                     type="tel"
                     required
+                    autoComplete="tel"
                     value={contact.phone}
                     onChange={(e) => setContact({ ...contact, phone: e.target.value })}
                     className="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-saffron-500"
@@ -379,6 +382,7 @@ export default function CheckoutPage() {
                   </label>
                   <input
                     type="email"
+                    autoComplete="email"
                     value={contact.email}
                     onChange={(e) => setContact({ ...contact, email: e.target.value })}
                     className="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-saffron-500"
@@ -397,6 +401,7 @@ export default function CheckoutPage() {
                       <input
                         type="text"
                         required
+                        autoComplete="address-line1"
                         value={address.street1}
                         onChange={(e) => setAddress({ ...address, street1: e.target.value })}
                         className="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-saffron-500"
@@ -412,6 +417,7 @@ export default function CheckoutPage() {
                         <input
                           type="text"
                           required
+                          autoComplete="address-level2"
                           value={address.city}
                           onChange={(e) => setAddress({ ...address, city: e.target.value })}
                           className="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-saffron-500"

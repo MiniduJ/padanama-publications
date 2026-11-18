@@ -26,7 +26,7 @@ interface BookDetailPageProps {
 }
 
 export default async function BookDetailPage({ params }: BookDetailPageProps) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const book = await getBookBySlug(slug);
 
   if (!book) {
@@ -168,16 +168,16 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
           {/* Pricing Box */}
           <div className="flex items-baseline gap-3">
             <span className="font-display font-extrabold text-3xl sm:text-4xl text-maroon-900">
-              {formatLkr(currentPriceCents, "si")}
+              {formatLkr(currentPriceCents, locale as any)}
             </span>
             {isDiscounted && (
               <span className="text-base text-gray-400 line-through">
-                {formatLkr(primaryEdition.priceCents, "si")}
+                {formatLkr(primaryEdition.priceCents, locale as any)}
               </span>
             )}
           </div>
 
-          {/* Interactive Format Selector, Quantity & Add to Cart */}
+          {/* Interactive Format Selector, Quantity, Add to Cart & Buy Now */}
           <AddToCartButton
             book={{
               id: book.id,
@@ -195,17 +195,9 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
               })) || [],
             }}
             defaultFormat={(primaryEdition.format as any) || "PAPERBACK"}
-            locale="si"
+            locale={locale as any}
+            showBuyNow={true}
           />
-
-          <div className="pt-1">
-            <Link
-              href="/checkout"
-              className="w-full py-3.5 px-6 rounded-xl bg-maroon-900 hover:bg-maroon-950 text-cream font-bold text-sm shadow-md transition-all text-center block"
-            >
-              දැන්ම මිලදී ගන්න (Buy Now)
-            </Link>
-          </div>
 
           {/* Islandwide Delivery Calculator Box */}
           <div className="p-4 rounded-2xl bg-white border border-maroon-200 shadow-sm space-y-3">

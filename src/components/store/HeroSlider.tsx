@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "@/i18n/routing";
-import { ChevronLeft, ChevronRight, BookOpen, ShoppingBag, ArrowRight, Sparkles, ShieldCheck, Truck } from "lucide-react";
+import { ChevronLeft, ChevronRight, BookOpen, ArrowRight, Sparkles, Pause, Play } from "lucide-react";
 
 interface Slide {
   id: number;
@@ -25,7 +25,7 @@ const SLIDES: Slide[] = [
     title: "දැනුමෙන් සන්නද්ධ දරු පරපුරකට",
     highlight: "විශ්වාසනීය පදනම",
     description: "1 වසරේ සිට උසස් පෙළ දක්වා ශ්‍රී ලංකා විෂය නිර්දේශිත සියලුම පාසල් වැඩපොත්, කෙටි සටහන් සහ ආදර්ශ ප්‍රශ්න පත්‍ර දැන් පහසුවෙන් නිවසටම ගෙන්වා ගන්න.",
-    primaryLink: "/products",
+    primaryLink: "/books",
     primaryCta: "පොත් සාප්පුව (Shop Now)",
     secondaryLink: "/library",
     secondaryCta: "නොමිලේ සාම්පල කියවන්න",
@@ -37,7 +37,7 @@ const SLIDES: Slide[] = [
     title: "සාමාන්‍ය පෙළ විභාග ජයග්‍රහණයේ",
     highlight: "කෙටි සටහන් සහ සූත්‍ර සංග්‍රහ",
     description: "විද්‍යාව, ගණිතය, සිංහල, ඉතිහාසය සහ වාණිජ්‍ය විෂයයන්හි සියලු ප්‍රමේය, සූත්‍ර සහ පසුගිය ප්‍රශ්න පත්‍ර විවරණ එකම තැනකින්.",
-    primaryLink: "/products?category=gce-ol",
+    primaryLink: "/books?category=gce-ol",
     primaryCta: "O/L පොත් බලන්න",
     secondaryLink: "/read/pdn-189",
     secondaryCta: "නොමිලේ පෙරදසුන",
@@ -49,7 +49,7 @@ const SLIDES: Slide[] = [
     title: "පුංචි දූ දරුවන්ගේ අනාගතයට",
     highlight: "ශිෂ්‍යත්ව පෙරහුරු ප්‍රශ්න පත්‍ර",
     description: "නව විෂය නිර්දේශයට අනුව සැකසූ ආදර්ශ ප්‍රශ්න පත්‍ර සහ සම්පූර්ණ ලකුණු ලබාදීමේ ක්‍රමවේද අඩංගු අත්‍යවශ්‍ය පුහුණු අත්පොත් පෙළ.",
-    primaryLink: "/products?category=primary",
+    primaryLink: "/books?category=primary",
     primaryCta: "ශිෂ්‍යත්ව පොත් නාමාවලිය",
     secondaryLink: "/library",
     secondaryCta: "සාම්පල පෙරදසුන",
@@ -61,9 +61,9 @@ const SLIDES: Slide[] = [
     title: "විද්‍යා, තාක්ෂණ, වාණිජ සහ කලා",
     highlight: "උසස් පෙළ විෂය ධාරා සහයක කෘති",
     description: "ජීව විද්‍යාව, රසායන විද්‍යාව, භෞතික විද්‍යාව, තාක්ෂණවේදය, ගිණුම්කරණය සහ කලා විෂයයන්හි නවතම විභාග ප්‍රශ්න පත්‍ර සහ විවරණ.",
-    primaryLink: "/products?category=gce-al-science",
+    primaryLink: "/books?category=gce-al-science",
     primaryCta: "A/L පොත් බලන්න",
-    secondaryLink: "/products",
+    secondaryLink: "/books",
     secondaryCta: "සියලු පොත් බලන්න",
   },
   {
@@ -73,7 +73,7 @@ const SLIDES: Slide[] = [
     title: "පොත් ඇණවුම් ඔබේ නිවසටම",
     highlight: "භාණ්ඩ ලැබුණු පසු මුදල් ගෙවන්න (COD)",
     description: "Domex සහ Koombiyo කුරියර් සේවාවන් මඟින් ආරක්ෂිතව දිවයිනේ ඕනෑම තැනකට බෙදාහැරීම. PayHere සහ Koko BNPL පහසුකම් ද සහිතයි.",
-    primaryLink: "/products",
+    primaryLink: "/books",
     primaryCta: "දැන්ම ඇණවුම් කරන්න",
     secondaryLink: "/contact",
     secondaryCta: "අප අමතන්න",
@@ -102,12 +102,12 @@ export function HeroSlider() {
 
   return (
     <div
-      className="relative w-full overflow-hidden rounded-3xl bg-maroon-950 border border-maroon-900 shadow-2xl"
+      className="relative w-full overflow-hidden bg-brandNavy shadow-xl"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Background Slides */}
-      <div className="relative min-h-[460px] sm:min-h-[500px] md:min-h-[540px] flex items-center">
+      {/* Background Slides with Full Screen Height (100vh - 80px navbar) */}
+      <div className="relative h-[calc(100vh-80px)] min-h-[580px] sm:min-h-[640px] md:min-h-[720px] flex items-center">
         {SLIDES.map((s, index) => {
           const isActive = index === current;
           return (
@@ -121,24 +121,24 @@ export function HeroSlider() {
               <img
                 src={s.image}
                 alt={s.title}
-                className="w-full h-full object-cover object-center filter brightness-[0.75] contrast-[1.05]"
+                className="w-full h-full object-cover object-center filter brightness-[0.70] contrast-[1.08]"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-brandNavy/95 via-brandNavy/75 to-transparent md:to-black/30" />
+              <div className="absolute inset-0 bg-gradient-to-r from-brandNavy/95 via-brandNavy/80 to-transparent md:to-black/40" />
             </div>
           );
         })}
 
-        {/* Slide Content Overlay */}
-        <div className="relative z-20 max-w-7xl mx-auto px-6 sm:px-10 lg:px-14 py-12 md:py-20 w-full">
-          <div className="max-w-2xl space-y-5 text-left text-cream">
+        {/* Slide Content Overlay (Full screen width with comfortable padding) */}
+        <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 py-12 md:py-20">
+          <div className="max-w-3xl space-y-6 text-left text-cream">
             {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brandYellow text-brandNavy text-xs font-black tracking-wide shadow-md">
-              <Sparkles className="w-3.5 h-3.5 text-brandNavy" />
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brandYellow text-brandNavy text-xs sm:text-sm font-black tracking-wide shadow-md">
+              <Sparkles className="w-4 h-4 text-brandNavy" />
               <span>{slide.badge}</span>
             </div>
 
             {/* Slide Title */}
-            <h1 className="font-display font-extrabold text-3xl sm:text-5xl text-white tracking-tight leading-[1.18] drop-shadow-md">
+            <h1 className="font-display font-black text-3xl sm:text-5xl md:text-6xl text-white tracking-tight leading-[1.15] drop-shadow-lg">
               {slide.title} <br />
               <span className="text-brandYellow underline decoration-brandRed decoration-wavy decoration-2">
                 {slide.highlight}
@@ -146,22 +146,22 @@ export function HeroSlider() {
             </h1>
 
             {/* Slide Description */}
-            <p className="text-sm sm:text-base text-cream/90 leading-relaxed font-medium drop-shadow-sm max-w-xl">
+            <p className="text-sm sm:text-lg text-cream/95 leading-relaxed font-medium drop-shadow-md max-w-2xl">
               {slide.description}
             </p>
 
             {/* Call to Actions */}
-            <div className="flex flex-wrap items-center gap-3.5 pt-3">
+            <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link
                 href={slide.primaryLink}
-                className="px-6 py-3.5 rounded-xl bg-brandRed hover:bg-brandRed-600 text-white font-extrabold text-sm shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 border border-brandRed-700"
+                className="px-7 py-4 rounded-2xl bg-brandRed hover:bg-brandRed-600 text-white font-extrabold text-sm sm:text-base shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 border border-brandRed-700"
               >
                 <span>{slide.primaryCta}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 href={slide.secondaryLink}
-                className="px-6 py-3.5 rounded-xl bg-white/90 hover:bg-white text-brandNavy font-extrabold text-sm shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-2 backdrop-blur-sm"
+                className="px-7 py-4 rounded-2xl bg-white/95 hover:bg-white text-brandNavy font-extrabold text-sm sm:text-base shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 backdrop-blur-sm"
               >
                 <BookOpen className="w-4 h-4 text-brandRed" />
                 <span>{slide.secondaryCta}</span>
@@ -190,19 +190,33 @@ export function HeroSlider() {
         <ChevronRight className="w-6 h-6" />
       </button>
 
-      {/* Dot Indicators */}
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md">
-        {SLIDES.map((_, i) => (
-          <button
-            key={i}
-            type="button"
-            onClick={() => setCurrent(i)}
-            className={`transition-all duration-300 rounded-full ${
-              i === current ? "w-8 h-2.5 bg-brandYellow" : "w-2.5 h-2.5 bg-white/60 hover:bg-white"
-            }`}
-            aria-label={`Go to slide ${i + 1}`}
-          />
-        ))}
+      {/* Dot Indicators & WCAG Pause/Play Control */}
+      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md">
+        <button
+          type="button"
+          onClick={() => setIsPaused(!isPaused)}
+          className="text-white hover:text-brandYellow transition-colors p-1"
+          aria-label={isPaused ? "Play slide rotation" : "Pause slide rotation"}
+          title={isPaused ? "Play" : "Pause"}
+        >
+          {isPaused ? <Play className="w-3.5 h-3.5 fill-current" /> : <Pause className="w-3.5 h-3.5 fill-current" />}
+        </button>
+
+        <div className="w-px h-3 bg-white/30" />
+
+        <div className="flex items-center gap-2">
+          {SLIDES.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setCurrent(i)}
+              className={`transition-all duration-300 rounded-full ${
+                i === current ? "w-7 h-2 bg-brandYellow" : "w-2 h-2 bg-white/60 hover:bg-white"
+              }`}
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

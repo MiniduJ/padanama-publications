@@ -7,13 +7,23 @@
     "account": "My Account",
     "readSample": "Read Free Sample",
     "currency": "Rs.",
-    "freeDeliveryNotice": "Free islandwide delivery on orders over Rs. 3,500"
+    "freeDeliveryNotice": "Free islandwide delivery on orders over Rs. 3,500",
+    "callUs": "Call Us",
+    "aboutUs": "About Us",
+    "contactUs": "Contact Us",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "savings": "Savings",
+    "all": "All",
+    "shopNow": "Shop Now"
   },
   "nav": {
     "home": "Home",
     "books": "All Books",
+    "shop": "Book Shop",
     "categories": "Categories",
     "digitalLibrary": "Digital Library",
+    "samples": "Free Samples",
     "authors": "Authors",
     "about": "About Us",
     "contact": "Contact",
@@ -29,9 +39,25 @@
     "authenticBooks": "Official Publisher Edition",
     "authenticSub": "100% Quality Guaranteed"
   },
+  "categories": {
+    "all": "All Books",
+    "preschoolGrade12": "Preschool & Grades 1-2",
+    "primary": "Primary (Grade 3-5 Scholarship)",
+    "grade67": "Grades 6 and 7",
+    "grade89": "Grades 8 and 9",
+    "gceOl": "G.C.E. O/L (Grades 10, 11)",
+    "gceAlScience": "A/L Science Division",
+    "gceAlTech": "A/L Technology Division",
+    "gceAlCommerce": "A/L Commerce Division",
+    "gceAlArt": "A/L Arts Division",
+    "pastPapers": "Past Examination Papers",
+    "govBooks": "Government Textbooks",
+    "donations": "Dhamma Books / Donations"
+  },
   "book": {
     "readFreeSample": "Read Free Sample",
     "addToCart": "Add to Cart",
+    "addedToCart": "Added to Cart!",
     "buyNow": "Buy Now",
     "paperback": "Paperback",
     "hardcover": "Hardcover",
@@ -44,7 +70,30 @@
     "pages": "Pages",
     "isbn": "ISBN",
     "language": "Language",
-    "specs": "Specifications"
+    "specs": "Specifications",
+    "synopsis": "Synopsis",
+    "selectFormat": "Select Book Format",
+    "bestSeller": "Best Seller",
+    "reviews": "Reviews",
+    "freeDeliveryNotice": "Free islandwide delivery on orders over Rs. 3,500!"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "emptyTitle": "Your Cart is Empty",
+    "emptyDesc": "You have not added any books to your cart yet. Explore our publications to find books you love.",
+    "browseCatalog": "Browse Book Catalog",
+    "clearAll": "Clear All",
+    "freeDeliveryUnlocked": "🎉 Congratulations! Free Islandwide Delivery Unlocked!",
+    "addMoreForFreeDelivery": "Add {amount} more for Free Islandwide Delivery!",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "deliveryEstimate": "Estimated Delivery",
+    "grandTotal": "Grand Total",
+    "proceedToCheckout": "Proceed to Checkout",
+    "applyCoupon": "Apply Coupon",
+    "couponPlaceholder": "Enter coupon code (e.g. WELCOME10)",
+    "district": "Select Delivery District",
+    "itemsCount": "{count} {count, plural, one {item} other {items}}"
   },
   "reader": {
     "previewTitle": "Free Sample Preview",
@@ -53,7 +102,11 @@
     "buyEbookAction": "Buy E-Book",
     "buyPaperbackAction": "Buy Paperback",
     "page": "Page",
-    "of": "of"
+    "of": "of",
+    "toc": "Table of Contents",
+    "theme": "Theme",
+    "fontSize": "Font Size",
+    "fontType": "Font Type"
   },
   "checkout": {
     "title": "Checkout",
@@ -64,6 +117,38 @@
     "bankDeposit": "Bank Transfer (Upload Payment Slip)",
     "koko": "Koko - 3 Interest-Free Installments",
     "cod": "Cash on Delivery (COD)",
-    "uploadSlipNotice": "Please upload a clear photo or screenshot of your bank transfer receipt."
+    "uploadSlipNotice": "Please upload a clear photo or screenshot of your bank transfer receipt.",
+    "placeOrder": "Place Order",
+    "processing": "Processing Order..."
+  },
+  "footer": {
+    "aboutTitle": "Padanama Publications",
+    "aboutDesc": "Publishing and islandwide distribution of school curriculum workbooks, model papers, and outstanding literature from Grade 1 to Grade 13.",
+    "booksCategories": "Books & Categories",
+    "customerCare": "Customer Care",
+    "contactLocation": "Address & Contacts",
+    "acceptedPayments": "Accepted Payments & Couriers",
+    "rightsReserved": "All Rights Reserved. Padanama Publications (Pvt) Ltd.",
+    "shippingDelivery": "Shipping & Delivery (25 Districts)",
+    "returnsRefunds": "Returns & Refunds",
+    "wholesale": "Wholesale Inquiries",
+    "privacy": "Privacy Policy (PDPA)",
+    "terms": "Terms of Service"
+  },
+  "home": {
+    "heroBadge": "Official Website • padanamapublication.lk",
+    "shortNotes": "Short Notes & Formulas",
+    "termPapers": "Term Test Papers",
+    "modelPapers": "Model Examination Papers",
+    "syllabusExplorer": "School Syllabus by Grade",
+    "viewAllBooks": "View All Books",
+    "bestsellers": "Bestselling Books",
+    "latestAndDiscounts": "Latest Releases & Discounts",
+    "directPublisherCallout": "Contact Us for Orders & Inquiries",
+    "hotlineNotice": "Padanama Instant Customer Support",
+    "shopCatalog": "Go to Book Shop",
+    "allGrades": "All Grades",
+    "scholarshipPrep": "Scholarship Prep",
+    "olAndAl": "O/L & A/L"
   }
 }

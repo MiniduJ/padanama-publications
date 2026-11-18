@@ -29,7 +29,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       default:
         "bg-maroon-500 hover:bg-maroon-700 text-cream focus-visible:ring-maroon-500 shadow-sm hover:shadow",
       saffron:
-        "bg-saffron-500 hover:bg-saffron-700 text-white focus-visible:ring-saffron-500 shadow-md hover:shadow-lg",
+        "bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white font-bold focus-visible:ring-saffron-500 shadow-md hover:shadow-lg",
       gold:
         "bg-gold-500 hover:bg-gold-600 text-ink focus-visible:ring-gold-500 shadow-sm",
       green:

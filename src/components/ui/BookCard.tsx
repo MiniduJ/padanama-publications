@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import { Link } from "@/i18n/routing";
+import { useLocale, useTranslations } from "next-intl";
 import { formatLkr } from "@/lib/money";
 import { Rating } from "./Rating";
-import { BookOpen, ShoppingBag, Sparkles, Check, Tag } from "lucide-react";
+import { BookMarked, ShoppingBag, Sparkles, Check, Tag } from "lucide-react";
 import { Badge } from "./Badge";
 import { cartActions } from "@/lib/cart-store";
 
@@ -38,6 +39,9 @@ export function BookCard({
   onAddToCart,
 }: BookCardProps) {
   const [justAdded, setJustAdded] = React.useState(false);
+  const locale = useLocale();
+  const b = useTranslations("book");
+  const c = useTranslations("common");
 
   const currentPrice = salePriceCents ?? priceCents;
   const isDiscounted = salePriceCents !== null && salePriceCents !== undefined && salePriceCents < priceCents;
@@ -60,7 +64,7 @@ export function BookCard({
         format: "PAPERBACK",
         priceCents: currentPrice,
         originalPriceCents: priceCents,
-        coverImage: coverUrl,
+        coverImage: coverUrl || "/images/books/placeholder.svg",
         weightGrams: 300,
       });
     }
@@ -70,7 +74,7 @@ export function BookCard({
   };
 
   return (
-    <div className="group relative flex flex-col bg-white rounded-2xl border border-maroon-100/80 hover:border-brandRed-500/50 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden text-left hover:-translate-y-1">
+    <div className="group relative flex flex-col bg-white rounded-2xl border border-maroon-100/80 hover:border-brandRed-500/50 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden text-left hover:-translate-y-1 focus-within:ring-2 focus-within:ring-brandNavy focus-within:ring-offset-2">
       {/* Book Cover Area */}
       <div className="relative aspect-[1/1.38] bg-gradient-to-tr from-maroon-50 via-cream to-white flex items-center justify-center p-3.5 overflow-hidden border-b border-gray-100">
         {coverUrl ? (
@@ -101,7 +105,7 @@ export function BookCard({
           )}
           {isBestSeller && (
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-brandYellow text-brandNavy shadow-sm border border-brandYellow-600">
-              <Sparkles className="w-3 h-3 mr-1 text-brandNavy" /> Best Seller
+              <Sparkles className="w-3 h-3 mr-1 text-brandNavy" /> {b("bestSeller")}
             </span>
           )}
         </div>
@@ -111,10 +115,10 @@ export function BookCard({
           <Link
             href={`/read/${slug}`}
             className="absolute bottom-2.5 right-2.5 px-2.5 py-1 bg-white/95 hover:bg-brandYellow hover:text-brandNavy text-brandNavy border border-brandYellow/80 rounded-lg text-xs font-bold shadow-md flex items-center gap-1.5 backdrop-blur-sm opacity-90 group-hover:opacity-100 transition-all"
-            title="නොමිලේ පෙරදසුන කියවන්න"
+            title={b("readFreeSample")}
           >
-            <BookOpen className="w-3.5 h-3.5 text-brandRed" />
-            <span>සාම්පලය</span>
+            <BookMarked className="w-3.5 h-3.5 text-brandRed" />
+            <span>{b("readFreeSample")}</span>
           </Link>
         )}
       </div>
@@ -129,7 +133,7 @@ export function BookCard({
             </span>
             <div className="flex items-center gap-1 text-green-700 font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-[10px]">තොග ඇත</span>
+              <span className="text-[10px]">{b("inStock")}</span>
             </div>
           </div>
 
@@ -155,17 +159,17 @@ export function BookCard({
           <div className="flex flex-col">
             <div className="flex items-baseline gap-1.5">
               <span className="font-extrabold text-base text-brandNavy leading-none">
-                {formatLkr(currentPrice, "si")}
+                {formatLkr(currentPrice, locale as any)}
               </span>
               {isDiscounted && (
                 <span className="text-xs text-ink-muted/70 line-through">
-                  {formatLkr(priceCents, "si")}
+                  {formatLkr(priceCents, locale as any)}
                 </span>
               )}
             </div>
             {isDiscounted && savingsCents > 0 && (
               <span className="text-[10px] text-green-700 font-bold mt-0.5">
-                ඉතිරිය: {formatLkr(savingsCents, "si")}
+                {c("savings")}: {formatLkr(savingsCents, locale as any)}
               </span>
             )}
           </div>
@@ -180,13 +184,13 @@ export function BookCard({
                 ? "bg-green-600 text-white px-3 shadow-md scale-105"
                 : "bg-brandRed hover:bg-brandRed-600 text-white hover:shadow-md hover:scale-105 active:scale-95"
             }`}
-            aria-label="Add to cart"
-            title="කරත්තයට එක් කරන්න"
+            aria-label={justAdded ? b("addedToCart") : b("addToCart")}
+            title={b("addToCart")}
           >
             {justAdded ? (
               <>
                 <Check className="w-4 h-4 stroke-[3]" />
-                <span className="text-[11px]">එක් කළා!</span>
+                <span className="text-[11px]">{b("addedToCart")}</span>
               </>
             ) : (
               <ShoppingBag className="w-4 h-4" />

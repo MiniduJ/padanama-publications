@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Link } from "@/i18n/routing";
+import { Link, useRouter } from "@/i18n/routing";
 import { useCart, VALID_COUPONS } from "@/lib/cart-store";
 import { formatLkr } from "@/lib/money";
 import { Badge } from "@/components/ui/Badge";
@@ -21,20 +21,35 @@ import {
 } from "lucide-react";
 
 const SRI_LANKA_DISTRICTS = [
-  { id: "colombo", name: "Colombo (කොළඹ)", rate: 20000 },
-  { id: "gampaha", name: "Gampaha (ගම්පහ)", rate: 25000 },
-  { id: "kalutara", name: "Kalutara (කළුතර)", rate: 25000 },
-  { id: "kandy", name: "Kandy (මහනුවර)", rate: 30000 },
-  { id: "galle", name: "Galle (ගාල්ල)", rate: 30000 },
-  { id: "matara", name: "Matara (මාතර)", rate: 30000 },
-  { id: "kurunegala", name: "Kurunegala (කුරුණෑගල)", rate: 30000 },
-  { id: "ratnapura", name: "Ratnapura (රත්නපුර)", rate: 30000 },
-  { id: "anuradhapura", name: "Anuradhapura (අනුරාධපුරය)", rate: 35000 },
-  { id: "jaffna", name: "Jaffna (යාපනය)", rate: 35000 },
-  { id: "badulla", name: "Badulla (බදුල්ල)", rate: 35000 },
+  { id: "colombo", name: "Colombo (කොළඹ / கொழும்பு)", rate: 20000 },
+  { id: "gampaha", name: "Gampaha (ගම්පහ / கம்பஹா)", rate: 25000 },
+  { id: "kalutara", name: "Kalutara (කළුතර / களுத்துறை)", rate: 25000 },
+  { id: "kandy", name: "Kandy (මහනුවර / கண்டி)", rate: 30000 },
+  { id: "matale", name: "Matale (මාතලේ / மாத்தளை)", rate: 30000 },
+  { id: "nuwara-eliya", name: "Nuwara Eliya (නුවරඑළිය / நுவரெலியா)", rate: 30000 },
+  { id: "galle", name: "Galle (ගාල්ල / காலி)", rate: 30000 },
+  { id: "matara", name: "Matara (මාතර / மாத்தறை)", rate: 30000 },
+  { id: "hambantota", name: "Hambantota (හම්බන්තොට / அம்பாந்தோட்டை)", rate: 30000 },
+  { id: "jaffna", name: "Jaffna (යාපනය / யாழ்ப்பாணம்)", rate: 35000 },
+  { id: "kilinochchi", name: "Kilinochchi (කිලිනොච්චිය / கிளிநொச்சி)", rate: 35000 },
+  { id: "mannar", name: "Mannar (මන්නාරම / மன்னார்)", rate: 35000 },
+  { id: "vavuniya", name: "Vavuniya (වවුනියාව / வவுனியா)", rate: 35000 },
+  { id: "mullaitivu", name: "Mullaitivu (මුලතිව් / முல்லைத்தீவு)", rate: 35000 },
+  { id: "batticaloa", name: "Batticaloa (මඩකලපුව / மட்டக்களப்பு)", rate: 35000 },
+  { id: "ampara", name: "Ampara (අම්පාර / அம்பாறை)", rate: 35000 },
+  { id: "trincomalee", name: "Trincomalee (ත්‍රිකුණාමලය / திருகோணமலை)", rate: 35000 },
+  { id: "kurunegala", name: "Kurunegala (කුරුණෑගල / குருநாகல்)", rate: 30000 },
+  { id: "puttalam", name: "Puttalam (පුත්තලම / புத்தளம்)", rate: 30000 },
+  { id: "anuradhapura", name: "Anuradhapura (අනුරාධපුරය / அனுராதபுரம்)", rate: 35000 },
+  { id: "polonnaruwa", name: "Polonnaruwa (පොළොන්නරුව / பொலன்னறுவை)", rate: 35000 },
+  { id: "badulla", name: "Badulla (බදුල්ල / பதுளை)", rate: 35000 },
+  { id: "monaragala", name: "Monaragala (මොනරාගල / மொனராகலை)", rate: 35000 },
+  { id: "ratnapura", name: "Ratnapura (රත්නපුර / இரத்தினபுரி)", rate: 30000 },
+  { id: "kegalle", name: "Kegalle (කෑගල්ල / கேகாலை)", rate: 30000 },
 ];
 
 export default function CartPage() {
+  const router = useRouter();
   const {
     items,
     itemCount,
@@ -99,7 +114,7 @@ export default function CartPage() {
           icon={ShoppingBag}
           actionLabel="පොත් නාමාවලිය වෙත (Browse Catalog)"
           onAction={() => {
-            window.location.href = "/books";
+            router.push("/books");
           }}
         />
       </div>
