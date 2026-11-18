@@ -3,7 +3,7 @@ import { useTx } from "@/lib/tx";
 import { BankAccounts } from "@/components/store/BankAccounts";
 import { COURIER_OPTIONS, shippingCents as calcShipping, type Courier } from "@/lib/shipping";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useRouter } from "@/i18n/routing";
 import { useCart } from "@/lib/cart-store";
 import { formatLkr } from "@/lib/money";
@@ -96,6 +96,16 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<
     "PAYHERE" | "BANK_TRANSFER" | "CASH_ON_DELIVERY" | "KOKO"
   >("PAYHERE");
+
+  // Which online gateways have API keys (from /api/site-settings); unconfigured ones are disabled.
+  const [gateways, setGateways] = useState({ PAYHERE: true, KOKO: true });
+  useEffect(() => {
+    fetch("/api/site-settings").then((r) => r.json()).then((s) => {
+      const g = { PAYHERE: !!s["payments.payhere"], KOKO: !!s["payments.koko"] };
+      setGateways(g);
+      setPaymentMethod((m) => ((m === "PAYHERE" || m === "KOKO") && !g[m] ? "CASH_ON_DELIVERY" : m));
+    }).catch(() => {});
+  }, []);
 
   const [bankSlipFile, setBankSlipFile] = useState<string | null>(null);
   const [bankSlipPreview, setBankSlipPreview] = useState<string | null>(null);
@@ -210,30 +220,26 @@ export default function CheckoutPage() {
         // ignore
       }
 
-      // If PayHere selected, handle checkout form submission or redirect
-      if (paymentMethod === "PAYHERE" && data.payhere) {
-        // Clear cart before redirect
+      // Card (PayHere) or Koko: post the signed form to the gateway; it returns to /checkout/success.
+      const gateway = paymentMethod === "PAYHERE" ? data.payhere : paymentMethod === "KOKO" ? data.koko : null;
+      if (gateway) {
         clearCart();
-
-        // Create and auto-submit PayHere POST form
         const form = document.createElement("form");
         form.method = "POST";
-        form.action = data.payhere.actionUrl;
-
-        for (const [key, value] of Object.entries(data.payhere.fields)) {
+        form.action = gateway.actionUrl;
+        for (const [key, value] of Object.entries(gateway.fields)) {
           const input = document.createElement("input");
           input.type = "hidden";
           input.name = key;
           input.value = String(value);
           form.appendChild(input);
         }
-
         document.body.appendChild(form);
         form.submit();
         return;
       }
 
-      // For Bank Transfer, COD, or Koko:
+      // Bank Transfer or COD:
       clearCart();
       router.push(`/checkout/success?order=${data.orderNumber}&method=${paymentMethod}`);
     } catch (err: any) {
@@ -657,9 +663,11 @@ export default function CheckoutPage() {
                     value="PAYHERE"
                     checked={paymentMethod === "PAYHERE"}
                     onChange={() => setPaymentMethod("PAYHERE")}
+                    disabled={!gateways.PAYHERE}
                     className="mt-1 text-maroon-900 focus:ring-maroon-500"
                   />
                   <div className="flex-1 space-y-1">
+                    {!gateways.PAYHERE && <span className="inline-block px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-bold">{tx("ළඟදීම (Coming soon)")}</span>}
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-sm text-maroon-900 flex items-center gap-2">
                         <CreditCard className="w-4 h-4 text-saffron-500" />
@@ -774,9 +782,11 @@ export default function CheckoutPage() {
                     value="KOKO"
                     checked={paymentMethod === "KOKO"}
                     onChange={() => setPaymentMethod("KOKO")}
+                    disabled={!gateways.KOKO}
                     className="mt-1 text-maroon-900 focus:ring-maroon-500"
                   />
                   <div className="flex-1 space-y-1">
+                    {!gateways.KOKO && <span className="inline-block px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-bold">{tx("ළඟදීම (Coming soon)")}</span>}
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-sm text-maroon-900 flex items-center gap-2.5">
                         <KokoIcon className="h-6 w-auto" />
@@ -879,6 +889,20 @@ export default function CheckoutPage() {
                 </div>
               )}
 
+              <div className="flex justify-between text-ink">
+                <span>{tx("ගෙවීමේ ක්‍රමය (Payment):")}</span>
+                <span className="font-semibold text-right">
+                  {paymentMethod === "PAYHERE" ? tx("කාඩ්පත / PayHere (Card)") : paymentMethod === "KOKO" ? "Koko" : paymentMethod === "BANK_TRANSFER" ? tx("බැංකු තැන්පතු (Bank transfer)") : tx("භාණ්ඩ ලැබුණු පසු (Cash on delivery)")}
+                </span>
+              </div>
+
+              {paymentMethod === "KOKO" && (
+                <div className="p-3 rounded-lg bg-[#0a0a0a] text-white text-xs space-y-1">
+                  <div className="flex justify-between"><span>{tx("අද ගෙවන්න (Pay today):")}</span><b>{formatLkr(Math.ceil(grandTotalCents / 3), "si")}</b></div>
+                  <div className="flex justify-between opacity-80"><span>{tx("ඉතිරි වාරික 2 (2 more monthly):")}</span><span>2 × {formatLkr(Math.ceil(grandTotalCents / 3), "si")}</span></div>
+                </div>
+              )}
+
               <div className="pt-3 border-t-2 border-dashed border-gray-200 flex justify-between items-baseline">
                 <div>
                   <span className="font-display font-black text-base text-maroon-900 block">
@@ -908,7 +932,9 @@ export default function CheckoutPage() {
                 {submitting
                   ? tx("ඇණවුම සකස් කරමින්... (Processing)")
                   : paymentMethod === "PAYHERE"
-                  ? tx("PayHere හරහා ගෙවන්න (Pay Now)")
+                  ? tx("කාඩ්පතෙන් ගෙවන්න (Pay by card)")
+                  : paymentMethod === "KOKO"
+                  ? tx("Koko වෙත යන්න (Continue to Koko)")
                   : tx("ඇණවුම තහවුරු කරන්න (Place Order)")}
               </span>
             </button>

@@ -35,7 +35,25 @@ export async function POST(req: NextRequest) {
     // DB unreachable: fall through to bootstrap account
   }
 
-  // 2. Bootstrap super admin from environment (no hardcoded fallback)
+  // 2. Supabase Auth: password checked by Supabase, but only allow-listed emails get admin access
+  //    (ADMIN_EMAIL / ADMIN_EMAILS env, or a non-customer staff user). Customers in Supabase never become admins.
+  const sbUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const sbKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!session && sbUrl && sbKey && normalizedEmail && pwd) {
+    const allowed = [process.env.ADMIN_EMAIL, ...(process.env.ADMIN_EMAILS || "").split(",")].map((e) => e?.trim().toLowerCase()).filter(Boolean);
+    const staff = await db.user.findUnique({ where: { email: normalizedEmail } }).catch(() => null);
+    const staffRole = staff && staff.isActive && !staff.isDeleted && staff.role !== "CUSTOMER" ? (staff.role as AdminRole) : null;
+    if (allowed.includes(normalizedEmail) || staffRole) {
+      const r = await fetch(`${sbUrl}/auth/v1/token?grant_type=password`, {
+        method: "POST",
+        headers: { apikey: sbKey, "Content-Type": "application/json" },
+        body: JSON.stringify({ email: normalizedEmail, password: pwd }),
+      }).catch(() => null);
+      if (r?.ok) session = { uid: staff?.id || `env-sb-${normalizedEmail}`, email: normalizedEmail, role: staffRole || "SUPER_ADMIN" };
+    }
+  }
+
+  // 3. Bootstrap super admin from environment (no hardcoded fallback)
   const envEmail = process.env.ADMIN_EMAIL?.toLowerCase();
   const envPwd = process.env.ADMIN_PASSWORD;
   if (!session && envEmail && envPwd && normalizedEmail === envEmail && safeEq(pwd, envPwd)) {

@@ -428,7 +428,9 @@ async function main() {
   const cats = new Map<string, string>();
   const authors = new Map<string, string>();
   const isbns = new Set((await prisma.bookEdition.findMany({ where: { isbn: { not: null } }, select: { isbn: true } })).map((e) => e.isbn));
-  for (const b of REAL_PUBLISHER_BOOKS) {
+  // Fast path for repeat deploys: catalogue already loaded and no refresh requested.
+  const catalogueLoaded = !refresh && (await prisma.book.count({ where: { id: { startsWith: "pdn-" } } })) >= REAL_PUBLISHER_BOOKS.length;
+  for (const b of catalogueLoaded ? [] : REAL_PUBLISHER_BOOKS) {
     if (!cats.has(b.categorySlug)) {
       const c = await prisma.category.upsert({ where: { slug: b.categorySlug }, update: {}, create: { slug: b.categorySlug, nameSi: b.categoryNameSi, nameEn: b.categoryNameSi } });
       cats.set(b.categorySlug, c.id);

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PayHereProvider } from "@/server/payments/payhere";
+import { KokoProvider } from "@/server/payments/koko";
 import { SmsLenzProvider } from "@/server/sms/smslenz";
 import { db } from "@/server/db";
 import { formatLkr } from "@/lib/money";
@@ -24,6 +25,10 @@ export async function POST(request: NextRequest) {
   if (!Array.isArray(items) || items.length === 0 || items.length > 50) return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
   if (!contact?.firstName || !/^(\+94|0)?7\d{8}$/.test(String(contact.phone || "").replace(/[\s-]/g, ""))) {
     return NextResponse.json({ error: "Name and a valid Sri Lankan mobile number are required" }, { status: 400 });
+  }
+  // Online gateways must be configured before we accept an order that needs them.
+  if ((paymentMethod === "PAYHERE" && !PayHereProvider.isConfigured()) || (paymentMethod === "KOKO" && !KokoProvider.isConfigured())) {
+    return NextResponse.json({ error: "This payment option is not available yet. Please choose Cash on Delivery or Bank Transfer." }, { status: 503 });
   }
   if (deliveryMethod === "COURIER" && !courier) return NextResponse.json({ error: "Please choose Koombiyo or Domex" }, { status: 400 });
   if (bankSlipUrl && (typeof bankSlipUrl !== "string" || bankSlipUrl.length > MAX_SLIP_CHARS)) {
@@ -107,7 +112,19 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  return NextResponse.json({ success: true, orderNumber, status, totalCents, paymentMethod, payhere, redirectUrl: `/checkout/success?order=${orderNumber}` });
+  let koko = null;
+  if (paymentMethod === "KOKO") {
+    const origin = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
+    koko = new KokoProvider().createCheckout({
+      orderNumber, amountCents: totalCents, firstName: contact.firstName, lastName: contact.lastName || "",
+      email: contact.email || "orders@padanamapublication.lk", description: lines.map((l) => l.title).join(", "),
+      returnUrl: `${origin}/checkout/success?order=${orderNumber}&payment=koko`,
+      cancelUrl: `${origin}/checkout?canceled=true&order=${orderNumber}`,
+      responseUrl: `${origin}/api/webhooks/koko`,
+    });
+  }
+
+  return NextResponse.json({ success: true, orderNumber, status, totalCents, paymentMethod, payhere, koko, redirectUrl: `/checkout/success?order=${orderNumber}` });
 }
 
 // Public order lookup: status only, no personal data.

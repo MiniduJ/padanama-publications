@@ -22,47 +22,52 @@ function thumb(item: SocialItem) {
   return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "/favicon.png";
 }
 
-/** Edge-to-edge grid of posts and videos. Items managed in Admin → Social Feed; each tile opens the original post. */
+function Tile({ it }: { it: SocialItem }) {
+  return (
+    <a
+      href={it.url}
+      target="_blank"
+      rel="noreferrer"
+      aria-label={`${it.kind === "VIDEO" ? "Watch video" : "View post"}: ${it.caption || ""}`.trim()}
+      className="group relative block overflow-hidden bg-brandNavy aspect-square"
+    >
+      <img src={thumb(it)} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
+      {it.kind === "VIDEO" && (
+        <span className="absolute inset-0 m-auto w-11 h-11 rounded-full bg-[#FF0000]/90 text-white flex items-center justify-center shadow-lg">
+          <Play className="w-5 h-5 fill-current ml-0.5" />
+        </span>
+      )}
+      {it.caption && <p className="absolute bottom-2 left-2 right-2 text-white text-[11px] font-bold line-clamp-2">{it.caption}</p>}
+    </a>
+  );
+}
+
+function Channel({ name, href, color, icon, cta, items }: { name: string; href: string; color: string; icon: React.ReactNode; cta: string; items: SocialItem[] }) {
+  return (
+    <article className="bg-white rounded-3xl border border-maroon-100 shadow-sm overflow-hidden flex flex-col">
+      <header className="flex items-center justify-between gap-3 px-5 py-4 text-white" style={{ backgroundColor: color }}>
+        <span className="flex items-center gap-2 font-extrabold">{icon} {name}</span>
+        <a href={href} target="_blank" rel="noreferrer" className="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-xs font-extrabold">{cta}</a>
+      </header>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 p-1 flex-1">
+        {items.slice(0, 6).map((it) => <Tile key={it.id} it={it} />)}
+      </div>
+    </article>
+  );
+}
+
+/** Facebook and YouTube as two cards in one section. Items managed in Admin → Social Feed; each tile opens the original post. */
 export function SocialMediaSection({ items, title, subtitle }: { items: SocialItem[]; title: string; subtitle: string }) {
   return (
     <div className="space-y-5">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-        <div>
-          <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-brandNavy tracking-tight">{title}</h2>
-          <p className="text-sm text-ink-muted mt-1">{subtitle}</p>
-        </div>
-        <div className="flex gap-2">
-          <a href={FACEBOOK_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1877F2] text-white text-xs font-extrabold">
-            <FacebookIcon className="w-4 h-4" /> Facebook
-          </a>
-          <a href={YOUTUBE_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FF0000] text-white text-xs font-extrabold">
-            <YouTubeIcon className="w-4 h-4" /> YouTube
-          </a>
-        </div>
+      <div>
+        <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-brandNavy tracking-tight">{title}</h2>
+        <p className="text-sm text-ink-muted mt-1">{subtitle}</p>
       </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-2 rounded-2xl overflow-hidden">
-        {items.map((it, i) => (
-          <a
-            key={it.id}
-            href={it.url}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={`${it.kind === "VIDEO" ? "Watch video" : "View post"}: ${it.caption || ""}`.trim()}
-            className={`group relative block overflow-hidden bg-brandNavy ${i === 0 ? "col-span-2 row-span-2" : ""} aspect-square`}
-          >
-            <img src={thumb(it)} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
-            {it.kind === "VIDEO" ? (
-              <span className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-[#FF0000]/90 text-white flex items-center justify-center shadow-lg">
-                <Play className="w-5 h-5 fill-current ml-0.5" />
-              </span>
-            ) : (
-              <FacebookIcon className="absolute top-2 right-2 w-5 h-5 text-white drop-shadow" />
-            )}
-            {it.caption && <p className="absolute bottom-2 left-2 right-2 text-white text-[11px] sm:text-xs font-bold line-clamp-2">{it.caption}</p>}
-          </a>
-        ))}
+      <div className="grid md:grid-cols-2 gap-6">
+        <Channel name="Facebook" href={FACEBOOK_URL} color="#1877F2" icon={<FacebookIcon className="w-5 h-5" />} cta="Follow" items={items.filter((i) => i.kind === "POST")} />
+        <Channel name="YouTube" href={YOUTUBE_URL} color="#FF0000" icon={<YouTubeIcon className="w-5 h-5" />} cta="Subscribe" items={items.filter((i) => i.kind === "VIDEO")} />
       </div>
     </div>
   );

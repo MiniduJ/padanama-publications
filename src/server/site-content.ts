@@ -30,7 +30,7 @@ export async function getTestimonials(): Promise<Review[] | undefined> {
 }
 
 export async function getSocialItems(): Promise<SocialItem[]> {
-  const rows = await safe(() => db.socialPost.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" }, take: 13 }), [] as any[]);
+  const rows = await safe(() => db.socialPost.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" }, take: 24 }), [] as any[]);
   if (rows.length) return rows.map((r) => ({ id: r.id, kind: r.kind === "VIDEO" ? "VIDEO" : "POST", url: r.url, thumbnailUrl: r.thumbnailUrl, caption: r.caption }));
   // Fallback: link tiles to the real page/channel (no invented likes or views).
   return DEFAULT_SOCIAL;

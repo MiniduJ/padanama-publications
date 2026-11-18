@@ -50,3 +50,6 @@ Thumbs.db
 # Local copies of scraped book images (uploaded to Supabase Storage by scripts/upload-book-images.mjs)
 public/images/books/
 scrape.log
+
+.vercel
+.env*

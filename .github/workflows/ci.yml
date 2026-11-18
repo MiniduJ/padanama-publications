@@ -33,56 +33,21 @@ jobs:
           AUTH_SECRET: ci-only-secret-at-least-32-characters-long
 
   deploy:
-    name: Deploy to Firebase
+    name: Deploy to Vercel
     needs: validate
     runs-on: ubuntu-latest
-    # Live on main; preview channel for PRs from this repo (forks have no secrets)
+    # Production on main; preview URL for PRs from this repo (forks have no secrets)
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     environment: ${{ github.event_name == 'pull_request' && 'preview' || 'production' }}
+    env:
+      VERCEL_ORG_ID: team_8LvTTDVjrQFo779ij9g6Axsx
+      VERCEL_PROJECT_ID: prj_qLicNZy1KKNm4HkgVANeOx9Rumb3
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
 
-      # Firebase web-frameworks bundles .env.production into the SSR function.
-      - name: Write runtime env
-        run: |
-          cat > .env.production <<'EOF'
-          DATABASE_URL=${{ secrets.DATABASE_URL }}
-          AUTH_SECRET=${{ secrets.AUTH_SECRET }}
-          ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
-          ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
-          NEXT_PUBLIC_APP_URL=${{ vars.NEXT_PUBLIC_APP_URL }}
-          NEXT_PUBLIC_SUPABASE_URL=${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${{ vars.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          PAYHERE_MODE=${{ vars.PAYHERE_MODE }}
-          PAYHERE_MERCHANT_ID=${{ secrets.PAYHERE_MERCHANT_ID }}
-          PAYHERE_MERCHANT_SECRET=${{ secrets.PAYHERE_MERCHANT_SECRET }}
-          SMSLENZ_API_KEY=${{ secrets.SMSLENZ_API_KEY }}
-          SMSLENZ_SENDER_ID=${{ vars.SMSLENZ_SENDER_ID }}
-          KOOMBIYO_API_KEY=${{ secrets.KOOMBIYO_API_KEY }}
-          DOMEX_API_KEY=${{ secrets.DOMEX_API_KEY }}
-          EOF
-
-      # Non-destructive schema sync (fails instead of dropping data)
-      - name: Sync database schema
-        if: github.event_name != 'pull_request'
-        run: |
-          if [ -z "$DATABASE_URL" ]; then
-            echo "::warning::DATABASE_URL secret not set - skipping schema sync (site will use built-in catalogue)"
-            exit 0
-          fi
-          npx prisma db push --skip-generate
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          projectId: padanama-publications-lk
-          channelId: ${{ github.event_name == 'pull_request' && '' || 'live' }}
+      # Vercel builds remotely with its own env vars (DATABASE_URL is sensitive and cannot be pulled).
+      # The `vercel-build` script syncs the schema and seeds the catalogue on first deploy.
+      - name: Deploy
+        id: deploy
+        run: echo "url=$(npx vercel@latest deploy ${{ github.event_name != 'pull_request' && '--prod' || '' }} --yes --token=${{ secrets.VERCEL_TOKEN }})" >> "$GITHUB_OUTPUT"
+      - run: echo "Deployed ${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"

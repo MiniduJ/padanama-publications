@@ -14,10 +14,15 @@ export class PayHereProvider implements PaymentProvider {
     mode?: "sandbox" | "live";
     notifyUrl?: string;
   }) {
-    this.merchantId = config?.merchantId ?? process.env.PAYHERE_MERCHANT_ID ?? "1211111";
-    this.merchantSecret = config?.merchantSecret ?? process.env.PAYHERE_MERCHANT_SECRET ?? "sandbox_secret";
+    // No fallback secret: a guessable default would let anyone forge "paid" webhooks.
+    this.merchantId = config?.merchantId ?? process.env.PAYHERE_MERCHANT_ID ?? "";
+    this.merchantSecret = config?.merchantSecret ?? process.env.PAYHERE_MERCHANT_SECRET ?? "";
     this.mode = (config?.mode ?? process.env.PAYHERE_MODE ?? "sandbox") as "sandbox" | "live";
-    this.notifyUrl = config?.notifyUrl ?? process.env.PAYHERE_NOTIFY_URL ?? "http://localhost:3000/api/webhooks/payhere";
+    this.notifyUrl = config?.notifyUrl ?? process.env.PAYHERE_NOTIFY_URL ?? `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/webhooks/payhere`;
+  }
+
+  static isConfigured() {
+    return Boolean(process.env.PAYHERE_MERCHANT_ID && process.env.PAYHERE_MERCHANT_SECRET);
   }
 
   /**
@@ -99,7 +104,7 @@ export class PayHereProvider implements PaymentProvider {
       md5sig,
     } = payload;
 
-    if (!merchant_id || !order_id || !payhere_amount || !payhere_currency || !status_code || !md5sig) {
+    if (!this.merchantSecret || !merchant_id || !order_id || !payhere_amount || !payhere_currency || !status_code || !md5sig) {
       return {
         isValid: false,
         orderId: order_id || "unknown",

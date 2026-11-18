@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+public/images/books
+public_html
+.next
+.next-build
+node_modules
+scrape.log
+firebase-key.json
+*key*.json
+coverage

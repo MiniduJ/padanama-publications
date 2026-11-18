@@ -307,25 +307,38 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
 
           {/* Pagination Controls */}
           {pagination.totalPages > 1 && (
-            <div className="pt-8 flex items-center justify-center gap-2">
-              {Array.from({ length: pagination.totalPages }).map((_, i) => {
-                const p = i + 1;
-                const isCurrent = p === pagination.page;
+            <nav aria-label="Pagination" className="pt-8 flex flex-wrap items-center justify-center gap-2">
+              {(() => {
+                const { page, totalPages } = pagination;
+                const href = (p: number) => `/books?category=${currentCategory}&sort=${currentSort}&page=${p}`;
+                // Window: first, last, current ±2, with ellipses for gaps.
+                const nums = [...new Set([1, totalPages, ...[-2, -1, 0, 1, 2].map((d) => page + d)])]
+                  .filter((p) => p >= 1 && p <= totalPages)
+                  .sort((a, b) => a - b);
+                const btn = "min-w-10 h-10 px-3 rounded-xl flex items-center justify-center text-xs font-bold transition-all";
+                const idle = `${btn} bg-white text-ink border border-maroon-100 hover:border-brandRed`;
+                const prevLabel = locale === "ta" ? "முந்தைய" : locale === "en" ? "Previous" : "පෙර";
+                const nextLabel = locale === "ta" ? "அடுத்த" : locale === "en" ? "Next" : "ඊළඟ";
                 return (
-                  <Link
-                    key={p}
-                    href={`/books?category=${currentCategory}&sort=${currentSort}&page=${p}`}
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${
-                      isCurrent
-                        ? "bg-brandNavy text-white shadow-md font-black scale-105"
-                        : "bg-white text-ink border border-maroon-100 hover:border-brandRed"
-                    }`}
-                  >
-                    {p}
-                  </Link>
+                  <>
+                    {page > 1 && <Link href={href(page - 1)} className={idle} rel="prev">‹ {prevLabel}</Link>}
+                    {nums.map((p, i) => (
+                      <React.Fragment key={p}>
+                        {i > 0 && p - nums[i - 1] > 1 && <span className="px-1 text-ink-muted" aria-hidden>…</span>}
+                        <Link
+                          href={href(p)}
+                          aria-current={p === page ? "page" : undefined}
+                          className={p === page ? `${btn} bg-brandNavy text-white shadow-md font-black` : idle}
+                        >
+                          {p}
+                        </Link>
+                      </React.Fragment>
+                    ))}
+                    {page < totalPages && <Link href={href(page + 1)} className={idle} rel="next">{nextLabel} ›</Link>}
+                  </>
                 );
-              })}
-            </div>
+              })()}
+            </nav>
           )}
         </div>
       </div>
