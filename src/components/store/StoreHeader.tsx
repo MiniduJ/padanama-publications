@@ -5,6 +5,7 @@ import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { Logo } from "@/components/ui/Logo";
 import { Search, ShoppingBag, BookOpen, User, Phone, Sparkles, Menu, X } from "lucide-react";
+import { CartBadge } from "./CartBadge";
 
 export function StoreHeader() {
   const t = useTranslations("common");
@@ -88,9 +89,7 @@ export function StoreHeader() {
             aria-label="Cart"
           >
             <ShoppingBag className="w-5 h-5 text-maroon-700" />
-            <span className="absolute -top-1 -right-1 bg-saffron-500 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-cream">
-              0
-            </span>
+            <CartBadge />
           </Link>
 
           <Link

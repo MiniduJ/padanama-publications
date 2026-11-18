@@ -4,15 +4,22 @@ import React from "react";
 import { Link, usePathname } from "@/i18n/routing";
 import { Home, BookOpen, Library, ShoppingBag, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/lib/cart-store";
 
 export function MobileBottomNav() {
   const pathname = usePathname();
+  const { itemCount, isHydrated } = useCart();
 
   const tabs = [
     { label: "මුල් පිටුව", href: "/", icon: Home },
     { label: "පොත්", href: "/books", icon: BookOpen },
     { label: "සාම්පල", href: "/library", icon: Library },
-    { label: "බෑගය", href: "/cart", icon: ShoppingBag, badge: "0" },
+    {
+      label: "බෑගය",
+      href: "/cart",
+      icon: ShoppingBag,
+      badge: isHydrated && itemCount > 0 ? (itemCount > 99 ? "99+" : String(itemCount)) : undefined,
+    },
     { label: "ගිණුම", href: "/account", icon: User },
   ];
 
