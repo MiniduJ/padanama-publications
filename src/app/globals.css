@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #FFF8EC; /* Warm cream paper */
+  --foreground: #1E1A17; /* Deep ink */
+
+  /* Sri Lankan Cultural Brand Tokens */
+  --maroon: #8D153A;     /* Flag maroon - Primary brand */
+  --saffron: #EB7400;    /* Festive saffron - CTA & Highlights */
+  --gold: #FFBE29;       /* Temple gold - Accents & ratings */
+  --green: #00534E;      /* Emerald green - Success & in-stock */
+  --lotus-pink: #E85D8C; /* Lotus pink - Playful highlights */
+  --ocean: #0E7C9B;      /* Indian Ocean turquoise */
+  --palm: #2E8B57;       /* Palm green */
+}
+
+.dark {
+  --background: #12100E;
+  --foreground: #F5EFEB;
+  --maroon: #A61C45;
+  --saffron: #FF8514;
+}
+
+body {
+  color: var(--foreground);
+  background-color: var(--background);
+  font-feature-settings: "rlig" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Ensure Sinhala & Tamil diacritics are never clipped */
+.sinhala-text, [lang="si"], [lang="ta"] {
+  line-height: 1.75 !important;
+}
+
+/* Subtle Liyawela & Kandyan pattern accents */
+.bg-paper-texture {
+  background-color: #FFF8EC;
+  background-image: radial-gradient(#E8DFC8 0.75px, transparent 0.75px);
+  background-size: 16px 16px;
+}
