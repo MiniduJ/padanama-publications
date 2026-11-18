@@ -17,10 +17,32 @@ export default function RegisterPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    try {
+      const newMember = {
+        id: `usr-${Date.now()}`,
+        name: name.trim() || "සාමාජිකයා (Member)",
+        phone: phone.trim(),
+        email: email.trim(),
+        memberSince: new Date().toLocaleDateString("si-LK", { year: "numeric", month: "short" }),
+        role: "MEMBER",
+      };
+
+      // Store in current user session
+      localStorage.setItem("padanama_user", JSON.stringify(newMember));
+
+      // Append to members registry
+      const existingMembers = JSON.parse(localStorage.getItem("padanama_members") || "[]");
+      existingMembers.push(newMember);
+      localStorage.setItem("padanama_members", JSON.stringify(existingMembers));
+    } catch {
+      // ignore
+    }
+
     setTimeout(() => {
       setLoading(false);
       router.push("/account");
-    }, 600);
+    }, 500);
   };
 
   return (

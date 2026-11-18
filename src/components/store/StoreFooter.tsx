@@ -4,7 +4,8 @@ import React from "react";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { Logo } from "@/components/ui/Logo";
-import { Phone, Mail, MapPin, Facebook, Instagram, ShieldCheck, Truck, CreditCard, CheckCircle2 } from "lucide-react";
+import { Phone, Mail, MapPin, Instagram, ShieldCheck, Truck, CreditCard, CheckCircle2 } from "lucide-react";
+import { FacebookIcon, YouTubeIcon, WhatsAppIcon } from "@/components/ui/BrandIcons";
 
 export function StoreFooter() {
   const f = useTranslations("footer");
@@ -26,22 +27,31 @@ export function StoreFooter() {
             </p>
             <div className="flex items-center gap-3 pt-2">
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/padanama07/"
                 target="_blank"
                 rel="noreferrer"
-                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-brandYellow hover:text-brandNavy flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-full bg-[#1877F2] text-white flex items-center justify-center hover:scale-110 transition-transform shadow"
                 aria-label="Facebook"
               >
-                <Facebook className="w-4 h-4" />
+                <FacebookIcon className="w-4.5 h-4.5 fill-current" />
               </a>
               <a
-                href="https://instagram.com"
+                href="https://www.youtube.com/@padanamapublication"
                 target="_blank"
                 rel="noreferrer"
-                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-brandYellow hover:text-brandNavy flex items-center justify-center transition-colors"
-                aria-label="Instagram"
+                className="w-9 h-9 rounded-full bg-[#FF0000] text-white flex items-center justify-center hover:scale-110 transition-transform shadow"
+                aria-label="YouTube"
               >
-                <Instagram className="w-4 h-4" />
+                <YouTubeIcon className="w-4.5 h-4.5 fill-current" />
+              </a>
+              <a
+                href="https://wa.me/94718008533"
+                target="_blank"
+                rel="noreferrer"
+                className="w-9 h-9 rounded-full bg-[#25D366] text-white flex items-center justify-center hover:scale-110 transition-transform shadow"
+                aria-label="WhatsApp"
+              >
+                <WhatsAppIcon className="w-5 h-5 fill-current" />
               </a>
             </div>
           </div>

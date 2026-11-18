@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PayHereProvider } from "@/server/payments/payhere";
 import { db } from "@/server/db";
 import { SmsLenzProvider } from "@/server/sms/smslenz";
+import { ordersRepository } from "@/server/orders/orders-repository";
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,6 +30,9 @@ export async function POST(request: NextRequest) {
     console.log(`[PAYHERE_WEBHOOK_SUCCESS] Order: ${orderId}, Status: ${statusCode}, Amount: ${amountCents}`);
 
     if (isSuccess) {
+      // Synchronize in-memory admin orders repository
+      ordersRepository.updateOrderStatus(orderId, "PAID");
+
       try {
         // Find existing order
         const order = await db.order.findUnique({

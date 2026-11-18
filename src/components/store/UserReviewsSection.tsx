@@ -148,12 +148,12 @@ export function UserReviewsSection() {
         </div>
       </div>
 
-      {/* 6 Reviews Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Reviews: Mobile Horizontal Snap Swipe Carousel & Desktop 3-Column Grid */}
+      <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-none gap-4 pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6">
         {REVIEWS.map((rev) => (
           <div
             key={rev.id}
-            className="bg-white rounded-3xl p-6 border border-maroon-100 shadow-sm hover:shadow-xl hover:border-brandRed/30 transition-all duration-300 flex flex-col justify-between group"
+            className="w-[85vw] sm:w-[380px] md:w-auto shrink-0 snap-center bg-white rounded-3xl p-5 sm:p-6 border border-maroon-100 shadow-sm hover:shadow-xl hover:border-brandRed/30 transition-all duration-300 flex flex-col justify-between group"
           >
             <div className="space-y-3.5">
               {/* Top Row: Stars, Badge, Date */}
@@ -214,6 +214,11 @@ export function UserReviewsSection() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Mobile Swipe Hint */}
+      <div className="flex md:hidden items-center justify-center gap-1.5 text-xs text-ink-muted">
+        <span>← අදහස් කියවීමට ස්වයිප් කරන්න (Swipe) →</span>
       </div>
 
       {/* Trust Highlights Strip */}

@@ -66,19 +66,19 @@ export default function AdminDashboardPage() {
   ];
 
   return (
-    <div className="p-8 space-y-8 max-w-7xl mx-auto w-full">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 max-w-7xl mx-auto w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Admin Dashboard</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Admin Dashboard</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
             Real-time overview of catalog, orders, and fulfillment operations.
           </p>
         </div>
         <div className="flex items-center gap-3">
           <Link
             href="/admin/slips"
-            className="px-4 py-2 bg-saffron-500 hover:bg-saffron-600 text-white font-semibold text-sm rounded-lg shadow-sm transition-colors flex items-center gap-2"
+            className="w-full sm:w-auto px-4 py-2.5 bg-brandRed hover:bg-brandRed-600 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
           >
             <FileCheck className="w-4 h-4" />
             <span>Verify Bank Slips (3)</span>
@@ -86,35 +86,35 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* KPI Cards: 2 Columns on Mobile, 4 Columns on Desktop */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {stats.map((stat, i) => {
           const Icon = stat.icon;
           return (
             <div
               key={i}
-              className={`p-6 bg-white rounded-xl border shadow-sm flex flex-col justify-between ${
-                stat.alert ? "border-saffron-300 bg-saffron-50/20" : "border-gray-200"
+              className={`p-4 sm:p-6 bg-white rounded-2xl border shadow-sm flex flex-col justify-between ${
+                stat.alert ? "border-amber-300 bg-amber-50/20" : "border-gray-200"
               }`}
             >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider line-clamp-1">
                   {stat.title}
                 </span>
-                <div className={`p-2 rounded-lg ${stat.alert ? "bg-saffron-100 text-saffron-700" : "bg-gray-100 text-gray-700"}`}>
-                  <Icon className="w-5 h-5" />
+                <div className={`p-1.5 sm:p-2 rounded-xl shrink-0 ${stat.alert ? "bg-amber-100 text-amber-800" : "bg-gray-100 text-gray-700"}`}>
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
               </div>
-              <div className="mt-4">
-                <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+              <div className="mt-3">
+                <div className="text-lg sm:text-2xl font-black text-gray-900 tracking-tight">{stat.value}</div>
                 {stat.change && (
-                  <span className="text-xs font-semibold text-green-600 inline-flex items-center gap-0.5 mt-1">
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                    {stat.change} from yesterday
+                  <span className="text-[10px] sm:text-xs font-bold text-green-600 inline-flex items-center gap-0.5 mt-0.5">
+                    <ArrowUpRight className="w-3 h-3" />
+                    {stat.change}
                   </span>
                 )}
                 {stat.subtext && (
-                  <span className="text-xs text-gray-500 block mt-1">{stat.subtext}</span>
+                  <span className="text-[10px] sm:text-xs text-gray-500 block mt-0.5 truncate">{stat.subtext}</span>
                 )}
               </div>
             </div>

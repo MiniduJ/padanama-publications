@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [authMethod, setAuthMethod] = useState<"phone" | "email">("phone");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otpSent, setOtpSent] = useState(false);
-  const [otpCode, setOtpCode] = useState("");
+  const [otpCode, setOtpCode] = useState("8492");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,25 +24,60 @@ export default function LoginPage() {
     setTimeout(() => {
       setLoading(false);
       setOtpSent(true);
-    }, 600);
+      setOtpCode("8492");
+    }, 400);
   };
 
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    try {
+      const existingMembers = JSON.parse(localStorage.getItem("padanama_members") || "[]");
+      const found = existingMembers.find((m: any) => m.phone === phoneNumber.trim());
+      const user = found || {
+        id: `usr-${Date.now()}`,
+        name: "දිල්රුක්ෂි ජයවර්ධන",
+        phone: phoneNumber.trim(),
+        email: "dilrukshi@example.com",
+        memberSince: "නොවැම්බර් 2026",
+        role: "MEMBER",
+      };
+      localStorage.setItem("padanama_user", JSON.stringify(user));
+    } catch {
+      // ignore
+    }
+
     setTimeout(() => {
       setLoading(false);
       router.push("/account");
-    }, 600);
+    }, 400);
   };
 
   const handleEmailLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    try {
+      const existingMembers = JSON.parse(localStorage.getItem("padanama_members") || "[]");
+      const found = existingMembers.find((m: any) => m.email === email.trim());
+      const user = found || {
+        id: `usr-${Date.now()}`,
+        name: email.split("@")[0] || "සාමාජිකයා",
+        phone: "071 800 8533",
+        email: email.trim(),
+        memberSince: "නොවැම්බර් 2026",
+        role: "MEMBER",
+      };
+      localStorage.setItem("padanama_user", JSON.stringify(user));
+    } catch {
+      // ignore
+    }
+
     setTimeout(() => {
       setLoading(false);
       router.push("/account");
-    }, 600);
+    }, 400);
   };
 
   return (
@@ -99,9 +134,14 @@ export default function LoginPage() {
             </form>
           ) : (
             <form onSubmit={handleVerifyOtp} className="space-y-4">
-              <div className="p-3 bg-green-50 border border-green-200 rounded-xl text-xs text-green-900 flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-green-700 shrink-0" />
-                <span>{phoneNumber} වෙත SMS OTP කේතය එවන ලදී.</span>
+              <div className="p-3 bg-green-50 border border-green-200 rounded-xl text-xs text-green-900 space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-green-700 shrink-0" />
+                  <span>{phoneNumber} වෙත SMS OTP කේතය සාර්ථකව එවන ලදී.</span>
+                </div>
+                <div className="text-[11px] text-green-900 bg-white/80 border border-green-200 px-2.5 py-1.5 rounded-lg font-mono font-bold">
+                  [SMS Lenz]: Verification code is: <span className="text-brandRed text-sm tracking-wider">8492</span>
+                </div>
               </div>
 
               <Input

@@ -3,6 +3,7 @@ import { PayHereProvider } from "@/server/payments/payhere";
 import { SmsLenzProvider } from "@/server/sms/smslenz";
 import { db } from "@/server/db";
 import { formatLkr } from "@/lib/money";
+import { ordersRepository } from "@/server/orders/orders-repository";
 
 // In-memory order fallback registry for high resilience
 const orderRegistry = new Map<string, any>();
@@ -98,6 +99,24 @@ export async function POST(request: NextRequest) {
 
     // Store in-memory registry
     orderRegistry.set(orderNumber, orderRecord);
+
+    // Register into Admin Orders Repository
+    ordersRepository.addOrder({
+      id: `ord-${Date.now()}`,
+      orderNumber,
+      date: new Date().toLocaleDateString("en-CA") + " " + new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+      customerName: `${contact.firstName} ${contact.lastName || ""}`.trim(),
+      phone: contact.phone,
+      city: shippingAddress?.city || "Colombo",
+      district: shippingAddress?.district || "Colombo",
+      paymentMethod: paymentMethod as any,
+      status: initialStatus as any,
+      totalCents,
+      itemsCount: items.reduce((s: number, i: any) => s + (Number(i.quantity) || 1), 0),
+      itemsList: items.map((i: any) => `${i.title} (${i.format}) × ${i.quantity || 1}`),
+      bankSlipUrl: bankSlipUrl || null,
+      customerNote: customerNote || null,
+    });
 
     // Attempt persistent Prisma DB insert
     try {

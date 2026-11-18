@@ -5,6 +5,7 @@ import { Link, useRouter } from "@/i18n/routing";
 import { useCart } from "@/lib/cart-store";
 import { formatLkr } from "@/lib/money";
 import { Badge } from "@/components/ui/Badge";
+import { KokoIcon } from "@/components/ui/BrandIcons";
 import {
   ShieldCheck,
   Truck,
@@ -183,6 +184,36 @@ export default function CheckoutPage() {
 
       if (!res.ok) {
         throw new Error(data.error || "Order placement failed");
+      }
+
+      // Persist local order snapshot for immediate cross-tab Admin & Account visibility
+      try {
+        const storedOrders = JSON.parse(localStorage.getItem("padanama_placed_orders") || "[]");
+        storedOrders.unshift({
+          id: `ord-${Date.now()}`,
+          orderNumber: data.orderNumber,
+          date: new Date().toLocaleDateString("en-CA") + " " + new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+          customerName: `${contact.firstName} ${contact.lastName || ""}`.trim(),
+          phone: contact.phone,
+          city: address.city || "Colombo",
+          district: address.district || "Colombo",
+          paymentMethod,
+          status:
+            paymentMethod === "CASH_ON_DELIVERY"
+              ? "COD_CONFIRMED"
+              : paymentMethod === "PAYHERE"
+              ? "PAID"
+              : bankSlipFile
+              ? "PENDING_SLIP_VERIFICATION"
+              : "PENDING_PAYMENT",
+          totalCents: grandTotalCents,
+          itemsCount: items.reduce((s, i) => s + i.quantity, 0),
+          itemsList: items.map((i) => `${i.title} (${i.format}) × ${i.quantity}`),
+          bankSlipUrl: bankSlipFile || null,
+        });
+        localStorage.setItem("padanama_placed_orders", JSON.stringify(storedOrders));
+      } catch {
+        // ignore
       }
 
       // If PayHere selected, handle checkout form submission or redirect
@@ -368,6 +399,7 @@ export default function CheckoutPage() {
                   </label>
                   <input
                     type="tel"
+                    inputMode="tel"
                     required
                     autoComplete="tel"
                     value={contact.phone}
@@ -749,8 +781,8 @@ export default function CheckoutPage() {
                   />
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-sm text-maroon-900 flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-saffron-500" />
+                      <span className="font-bold text-sm text-maroon-900 flex items-center gap-2.5">
+                        <KokoIcon className="h-6 w-auto" />
                         <span>Koko — පොලී රහිත වාරික 3කින් (3 Installments)</span>
                       </span>
                       <span className="text-xs font-bold text-maroon-800">

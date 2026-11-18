@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { formatLkr } from "@/lib/money";
 import {
   ShoppingBag,
@@ -13,6 +13,7 @@ import {
   FileText,
   Eye,
   Check,
+  RefreshCw,
 } from "lucide-react";
 
 interface AdminOrder {
@@ -94,6 +95,51 @@ export default function AdminOrdersPage() {
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [activeLabelOrder, setActiveLabelOrder] = useState<AdminOrder | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Synchronize orders with backend repository and local checkout orders
+  const loadOrders = async () => {
+    setIsRefreshing(true);
+    try {
+      let combined: AdminOrder[] = [...INITIAL_ORDERS];
+
+      // 1. Fetch from server repository
+      try {
+        const res = await fetch("/api/admin/orders");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.orders && Array.isArray(data.orders)) {
+            combined = data.orders;
+          }
+        }
+      } catch {
+        // ignore
+      }
+
+      // 2. Merge with locally placed checkout orders
+      try {
+        const local = JSON.parse(localStorage.getItem("padanama_placed_orders") || "[]");
+        if (Array.isArray(local) && local.length > 0) {
+          const map = new Map<string, AdminOrder>();
+          local.forEach((o: any) => map.set(o.orderNumber, o));
+          combined.forEach((o) => {
+            if (!map.has(o.orderNumber)) map.set(o.orderNumber, o);
+          });
+          combined = Array.from(map.values());
+        }
+      } catch {
+        // ignore
+      }
+
+      setOrders(combined);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    loadOrders();
+  }, []);
 
   const filteredOrders = orders.filter((o) => {
     const matchesSearch =
@@ -104,8 +150,10 @@ export default function AdminOrdersPage() {
     return matchesSearch && matchesStatus;
   });
 
-  const handleDispatchCourier = (orderId: string) => {
+  const handleDispatchCourier = async (orderId: string) => {
     const waybill = `DMX-LK-${Math.floor(1000000 + Math.random() * 9000000)}`;
+    const targetOrder = orders.find((o) => o.id === orderId);
+
     setOrders(
       orders.map((o) =>
         o.id === orderId
@@ -113,12 +161,30 @@ export default function AdminOrdersPage() {
           : o
       )
     );
+
+    if (targetOrder) {
+      try {
+        await fetch("/api/admin/orders", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderNumber: targetOrder.orderNumber,
+            status: "SHIPPED",
+            courier: "Domex Courier",
+            waybillNumber: waybill,
+          }),
+        });
+      } catch {
+        // ignore
+      }
+    }
+
     setToastMessage(`ඇණවුම Domex කුරියර් වෙත භාරදුන් බව සටහන් විය. Tracking Ref: ${waybill}`);
     setTimeout(() => setToastMessage(null), 3500);
   };
 
   return (
-    <div className="p-6 sm:p-8 space-y-6 max-w-7xl mx-auto w-full">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-5 sm:space-y-6 max-w-7xl mx-auto w-full">
       {toastMessage && (
         <div className="fixed top-6 right-6 z-50 bg-green-800 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-bold flex items-center gap-2">
           <Check className="w-4 h-4" />
@@ -127,21 +193,31 @@ export default function AdminOrdersPage() {
       )}
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-200 pb-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
-            <ShoppingBag className="w-6 h-6 text-saffron-500" />
+          <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+            <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-brandRed" />
             <span>Orders & Courier Fulfillment</span>
           </h1>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 mt-0.5">
             Track orders, generate Domex shipping labels, and manage courier dispatch status.
           </p>
         </div>
+
+        <button
+          type="button"
+          onClick={loadOrders}
+          disabled={isRefreshing}
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-gray-200 hover:border-brandRed text-xs font-bold text-gray-700 shadow-sm transition-all hover:bg-gray-50 self-start sm:self-auto"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 text-brandRed ${isRefreshing ? "animate-spin" : ""}`} />
+          <span>{isRefreshing ? "යාවත්කාලීන වෙමින්..." : "යාවත්කාලීන කරන්න (Refresh)"}</span>
+        </button>
       </div>
 
       {/* Filter Tabs & Search */}
       <div className="space-y-3">
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
           {[
             { id: "ALL", label: "All Orders (සියල්ල)" },
             { id: "PAID", label: "Paid (ගෙවා ඇත)" },
@@ -153,9 +229,9 @@ export default function AdminOrdersPage() {
               key={tab.id}
               type="button"
               onClick={() => setStatusFilter(tab.id)}
-              className={`px-3.5 py-1.5 rounded-xl font-bold transition-colors whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap text-xs ${
                 statusFilter === tab.id
-                  ? "bg-maroon-900 text-white shadow-xs"
+                  ? "bg-brandNavy text-white shadow-xs"
                   : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
               }`}
             >
@@ -170,15 +246,16 @@ export default function AdminOrdersPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by Order #, Customer Name, or Phone..."
-            className="w-full text-xs pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-saffron-500"
+            className="w-full text-xs pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brandRed shadow-xs"
           />
           <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
         </div>
       </div>
 
-      {/* Orders Table */}
+      {/* Orders Container: Desktop Table vs Mobile Stacked Cards */}
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Desktop Data Table (>=768px) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs text-gray-700">
             <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[10px] font-bold border-b border-gray-200">
               <tr>
@@ -200,9 +277,9 @@ export default function AdminOrdersPage() {
                   <td className="py-3.5 px-4 text-gray-500 text-[11px]">{order.date}</td>
                   <td className="py-3.5 px-4">
                     <span className="font-semibold text-gray-900 block">{order.customerName}</span>
-                    <span className="text-[11px] text-gray-400 font-mono">
+                    <a href={`tel:${order.phone}`} className="text-[11px] text-gray-500 font-mono hover:text-brandRed">
                       {order.phone} • {order.city} ({order.district})
-                    </span>
+                    </a>
                   </td>
                   <td className="py-3.5 px-4">
                     <span className="font-medium text-[11px]">
@@ -228,7 +305,7 @@ export default function AdminOrdersPage() {
                       {order.status}
                     </span>
                   </td>
-                  <td className="py-3.5 px-4 font-bold text-maroon-900">
+                  <td className="py-3.5 px-4 font-bold text-brandNavy">
                     {formatLkr(order.totalCents, "en")}
                   </td>
                   <td className="py-3.5 px-4 text-right space-x-2">
@@ -236,7 +313,7 @@ export default function AdminOrdersPage() {
                       <button
                         type="button"
                         onClick={() => handleDispatchCourier(order.id)}
-                        className="px-2.5 py-1 bg-saffron-500 hover:bg-saffron-600 text-white font-bold rounded-lg text-[11px] shadow-xs inline-flex items-center gap-1"
+                        className="px-2.5 py-1 bg-brandRed hover:bg-brandRed-600 text-white font-bold rounded-lg text-[11px] shadow-xs inline-flex items-center gap-1 transition-all"
                       >
                         <Truck className="w-3 h-3" />
                         <span>Dispatch Domex</span>
@@ -260,6 +337,96 @@ export default function AdminOrdersPage() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Stacked Order Cards (<768px) */}
+        <div className="md:hidden divide-y divide-gray-100">
+          {filteredOrders.length === 0 ? (
+            <div className="p-8 text-center text-xs text-gray-500">
+              ඇණවුම් කිසිවක් හමු නොවීය.
+            </div>
+          ) : (
+            filteredOrders.map((order) => (
+              <div key={order.id} className="p-4 space-y-3 hover:bg-gray-50/50 transition-colors">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono font-black text-xs text-brandNavy">
+                    {order.orderNumber}
+                  </span>
+                  <span
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                      order.status === "PAID"
+                        ? "bg-green-100 text-green-800"
+                        : order.status === "COD_CONFIRMED"
+                        ? "bg-amber-100 text-amber-800"
+                        : order.status === "SHIPPED"
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-gray-100 text-gray-700"
+                    }`}
+                  >
+                    {order.status}
+                  </span>
+                </div>
+
+                <div className="flex items-start justify-between text-xs">
+                  <div>
+                    <h4 className="font-bold text-gray-900">{order.customerName}</h4>
+                    <a
+                      href={`tel:${order.phone}`}
+                      className="text-[11px] text-brandRed font-mono font-semibold block mt-0.5"
+                    >
+                      📞 {order.phone}
+                    </a>
+                    <p className="text-[11px] text-gray-500 mt-0.5">
+                      {order.city}, {order.district} • {order.itemsCount} Items
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-black text-sm text-brandNavy block">
+                      {formatLkr(order.totalCents, "en")}
+                    </span>
+                    <span className="text-[10px] text-gray-400 block mt-0.5">
+                      {order.paymentMethod === "PAYHERE"
+                        ? "PayHere (Online)"
+                        : order.paymentMethod === "BANK_TRANSFER"
+                        ? "Bank Transfer"
+                        : "COD"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Mobile Action Buttons Bar */}
+                <div className="pt-2 border-t border-gray-100 flex items-center justify-between gap-2">
+                  <span className="text-[10px] text-gray-400">{order.date}</span>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setActiveLabelOrder(order)}
+                      className="px-2.5 py-1.5 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-100 text-[11px] font-bold flex items-center gap-1"
+                    >
+                      <Printer className="w-3.5 h-3.5" />
+                      <span>Label</span>
+                    </button>
+
+                    {order.status === "PAID" || order.status === "COD_CONFIRMED" ? (
+                      <button
+                        type="button"
+                        onClick={() => handleDispatchCourier(order.id)}
+                        className="px-3 py-1.5 bg-brandRed hover:bg-brandRed-600 text-white font-bold rounded-lg text-[11px] shadow-sm flex items-center gap-1 transition-all"
+                      >
+                        <Truck className="w-3.5 h-3.5" />
+                        <span>Dispatch Domex</span>
+                      </button>
+                    ) : order.waybillNumber ? (
+                      <span className="text-[10px] font-mono font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                        {order.waybillNumber}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 

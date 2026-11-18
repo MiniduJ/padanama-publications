@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { MessageCircle } from "lucide-react";
+import { WhatsAppIcon } from "@/components/ui/BrandIcons";
 
 export function WhatsAppFloatingButton() {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -22,10 +22,10 @@ export function WhatsAppFloatingButton() {
         target="_blank"
         rel="noreferrer"
         aria-label="Chat with Padanama Publications on WhatsApp (+94 71 800 8533)"
-        title="WhatsApp Support"
-        className="p-3.5 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center border-2 border-white ring-4 ring-green-600/20"
+        title="WhatsApp Support (+94 71 800 8533)"
+        className="w-14 h-14 bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center border-2 border-white ring-4 ring-[#25D366]/25 group"
       >
-        <MessageCircle className="w-6 h-6 stroke-[2.2]" />
+        <WhatsAppIcon className="w-8 h-8 fill-current drop-shadow-sm group-hover:rotate-6 transition-transform" />
       </a>
     </div>
   );

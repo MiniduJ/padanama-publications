@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
 import { Logo } from "@/components/ui/Logo";
@@ -15,27 +15,42 @@ export function StoreHeader() {
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ name?: string } | null>(null);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("padanama_user");
+      if (stored) {
+        setCurrentUser(JSON.parse(stored));
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setMobileSearchOpen(false);
+      setMobileMenuOpen(false);
     }
   };
 
   return (
     <header className="sticky top-0 z-40 bg-cream/95 backdrop-blur border-b border-maroon-100 shadow-sm w-full">
-      {/* Top Bar with Contact Us, About Us, Hotline and Languages */}
-      <div className="bg-brandNavy text-cream text-xs py-2 px-3 sm:px-6 border-b border-brandNavy/40 w-full">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      {/* Top Bar with Contact Us, About Us, Hotline and Languages (Full Width) */}
+      <div className="bg-brandNavy text-cream text-xs py-1.5 sm:py-2 px-3 sm:px-6 border-b border-brandNavy/40 w-full">
+        <div className="w-full flex items-center justify-between gap-2">
           {/* Left: Hotline & Free Delivery Notice */}
-          <div className="flex items-center gap-4 text-[11px] sm:text-xs">
+          <div className="flex items-center gap-3 text-[11px] sm:text-xs">
             <a
               href="tel:+94718008533"
-              className="flex items-center gap-1.5 text-brandYellow hover:underline font-bold"
+              className="flex items-center gap-1.5 text-brandYellow hover:underline font-extrabold tracking-tight"
               title="Call Padanama Publications"
             >
-              <Phone className="w-3.5 h-3.5" />
+              <Phone className="w-3.5 h-3.5 shrink-0" />
               <span>+94 71 800 8533</span>
             </a>
             <span className="hidden md:inline text-cream/40">•</span>
@@ -45,27 +60,27 @@ export function StoreHeader() {
             </div>
           </div>
 
-          {/* Right: Quick Links (About Us, Contact Us) & Language Switcher */}
-          <div className="flex items-center gap-3 sm:gap-4 text-[11px] sm:text-xs">
+          {/* Right: Quick Links & Language Switcher */}
+          <div className="flex items-center gap-2 sm:gap-4 text-[11px] sm:text-xs">
             <Link
               href="/about"
-              className="flex items-center gap-1 text-cream/90 hover:text-brandYellow transition-colors font-medium"
+              className="hidden sm:flex items-center gap-1 text-cream/90 hover:text-brandYellow transition-colors font-medium"
             >
               <Info className="w-3 h-3 text-brandYellow" />
               <span>{nav("about")}</span>
             </Link>
 
-            <span className="text-cream/40">|</span>
+            <span className="hidden sm:inline text-cream/40">|</span>
 
             <Link
               href="/contact"
-              className="flex items-center gap-1 text-cream/90 hover:text-brandYellow transition-colors font-medium"
+              className="hidden sm:flex items-center gap-1 text-cream/90 hover:text-brandYellow transition-colors font-medium"
             >
               <Mail className="w-3 h-3 text-brandYellow" />
               <span>{nav("contact")}</span>
             </Link>
 
-            <span className="text-cream/40">|</span>
+            <span className="hidden sm:inline text-cream/40">|</span>
 
             <div className="flex items-center gap-1.5 font-bold">
               <Link
@@ -115,13 +130,13 @@ export function StoreHeader() {
       </div>
 
       {/* Main Navbar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <div className="w-full px-3 sm:px-6 h-18 sm:h-20 flex items-center justify-between gap-3 sm:gap-4">
         {/* Brand Logo with exact official image */}
         <Link href="/" className="shrink-0 flex items-center py-1">
           <Logo size="md" />
         </Link>
 
-        {/* Global Search Bar */}
+        {/* Global Search Bar (Desktop) */}
         <form onSubmit={handleSearchSubmit} className="flex-1 max-w-lg hidden md:block">
           <div className="relative">
             <input
@@ -138,7 +153,7 @@ export function StoreHeader() {
         {/* Primary Navigation Links */}
         <nav className="hidden lg:flex items-center gap-6 text-sm font-bold text-brandNavy">
           <Link
-            href="/books"
+            href="/products"
             className="hover:text-brandRed transition-colors flex items-center gap-1"
           >
             <span>{nav("shop")}</span>
@@ -151,27 +166,23 @@ export function StoreHeader() {
             <BookMarked className="w-4 h-4 text-brandRed" />
             <span>{nav("digitalLibrary")}</span>
           </Link>
-
-          <Link
-            href="/about"
-            className="hover:text-brandRed transition-colors"
-          >
-            {nav("about")}
-          </Link>
-
-          <Link
-            href="/contact"
-            className="hover:text-brandRed transition-colors"
-          >
-            {nav("contact")}
-          </Link>
         </nav>
 
-        {/* Right Actions: Cart & Account */}
-        <div className="flex items-center gap-3">
+        {/* Right Actions: Mobile Search Toggle, Cart & Account */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Mobile Instant Search Button (<768px) */}
+          <button
+            type="button"
+            onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+            className="md:hidden p-2 rounded-full bg-white border border-maroon-100 hover:border-brandRed text-brandRed shadow-sm active:scale-95 transition-all"
+            aria-label="Toggle mobile search"
+          >
+            <Search className="w-5 h-5" />
+          </button>
+
           <Link
             href="/cart"
-            className="relative p-2.5 rounded-full bg-white border border-maroon-100 hover:border-brandRed text-brandNavy transition-all shadow-sm hover:scale-105 active:scale-95"
+            className="relative p-2 sm:p-2.5 rounded-full bg-white border border-maroon-100 hover:border-brandRed text-brandNavy transition-all shadow-sm hover:scale-105 active:scale-95"
             aria-label="Shopping Cart"
           >
             <ShoppingBag className="w-5 h-5 text-brandRed" />
@@ -179,11 +190,15 @@ export function StoreHeader() {
           </Link>
 
           <Link
-            href="/login"
-            className="p-2.5 rounded-full bg-white border border-maroon-100 hover:border-brandRed text-brandNavy transition-all shadow-sm hover:scale-105 active:scale-95"
-            aria-label="User Account"
+            href={currentUser ? "/account" : "/login"}
+            className="p-2 sm:p-2.5 rounded-full bg-white border border-maroon-100 hover:border-brandRed text-brandNavy transition-all shadow-sm hover:scale-105 active:scale-95 relative"
+            aria-label={currentUser ? `User Account: ${currentUser.name}` : "User Account"}
+            title={currentUser ? `Logged in as ${currentUser.name}` : "Sign In / Register"}
           >
             <User className="w-5 h-5 text-brandNavy" />
+            {currentUser && (
+              <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 border-2 border-white" />
+            )}
           </Link>
 
           <button
@@ -197,27 +212,40 @@ export function StoreHeader() {
         </div>
       </div>
 
+      {/* Mobile Search Overlay Bar */}
+      {mobileSearchOpen && (
+        <div className="md:hidden px-4 py-2.5 bg-cream border-t border-maroon-100 shadow-inner animate-in slide-in-from-top-1">
+          <form onSubmit={handleSearchSubmit} className="relative">
+            <input
+              type="text"
+              autoFocus
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="පොත් නම, කර්තෘ හෝ Singlish මඟින්..."
+              className="w-full pl-10 pr-10 py-2.5 bg-white border border-brandRed rounded-xl text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brandRed shadow-sm"
+            />
+            <Search className="w-4 h-4 text-brandRed absolute left-3.5 top-3.5" />
+            <button
+              type="button"
+              onClick={() => setMobileSearchOpen(false)}
+              className="absolute right-3 top-3 text-xs text-gray-400 hover:text-gray-700"
+            >
+              ✕
+            </button>
+          </form>
+        </div>
+      )}
+
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-cream border-b border-maroon-200 px-4 py-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
-          <form onSubmit={handleSearchSubmit} className="relative pb-2">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t("searchPlaceholder")}
-              className="w-full pl-9 pr-4 py-2 bg-white border border-maroon-200 rounded-lg text-sm text-ink"
-            />
-            <Search className="w-4 h-4 text-brandRed absolute left-3 top-2.5" />
-          </form>
-
           <div className="flex flex-col space-y-2 text-sm font-bold text-brandNavy">
             <Link
-              href="/books"
+              href="/products"
               onClick={() => setMobileMenuOpen(false)}
               className="py-2.5 border-b border-maroon-100 flex items-center justify-between"
             >
-              <span>{nav("shop")}</span>
+              <span>{nav("shop")} (Book Shop)</span>
               <span className="text-xs text-brandRed font-normal">320+ Books</span>
             </Link>
             <Link

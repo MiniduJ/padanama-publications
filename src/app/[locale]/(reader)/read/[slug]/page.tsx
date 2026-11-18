@@ -78,6 +78,47 @@ export default function BookReaderPage({ params }: ReaderPageProps) {
   const [showPaywall, setShowPaywall] = useState(false);
   const [showToc, setShowToc] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [isTurning, setIsTurning] = useState(false);
+  const [turnDirection, setTurnDirection] = useState<"next" | "prev" | null>(null);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchEndX, setTouchEndX] = useState<number | null>(null);
+
+  // Synthesized realistic paper page rustle sound via Web Audio API (100% offline, zero latency)
+  const playPageTurnSound = () => {
+    try {
+      if (typeof window === "undefined") return;
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const filter = ctx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(1400, ctx.currentTime);
+      filter.frequency.exponentialRampToValueAtTime(250, ctx.currentTime + 0.14);
+
+      const bufferSize = ctx.sampleRate * 0.14;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const output = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+
+      const whiteNoise = ctx.createBufferSource();
+      whiteNoise.buffer = buffer;
+      whiteNoise.connect(filter);
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.06, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.14);
+
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+
+      whiteNoise.start();
+      whiteNoise.stop(ctx.currentTime + 0.14);
+    } catch {
+      // Audio playback silently skipped if browser permissions restrict
+    }
+  };
 
   // Load content
   useEffect(() => {
@@ -133,7 +174,13 @@ export default function BookReaderPage({ params }: ReaderPageProps) {
 
   const handleNextPage = () => {
     if (currentPage < totalSamplePages) {
-      setCurrentPage((prev) => prev + 1);
+      playPageTurnSound();
+      setTurnDirection("next");
+      setIsTurning(true);
+      setTimeout(() => {
+        setCurrentPage((prev) => prev + 1);
+        setIsTurning(false);
+      }, 190);
     } else {
       setShowPaywall(true);
     }
@@ -141,7 +188,13 @@ export default function BookReaderPage({ params }: ReaderPageProps) {
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
+      playPageTurnSound();
+      setTurnDirection("prev");
+      setIsTurning(true);
+      setTimeout(() => {
+        setCurrentPage((prev) => prev - 1);
+        setIsTurning(false);
+      }, 190);
       setShowPaywall(false);
     }
   };
@@ -172,10 +225,38 @@ export default function BookReaderPage({ params }: ReaderPageProps) {
     router.push("/checkout");
   };
 
+  // Touch Swipe Page Turn Handlers for Mobile Devices
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.targetTouches[0].clientX);
+    setTouchEndX(null);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEndX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX || !touchEndX) return;
+    const distance = touchStartX - touchEndX;
+    const minSwipeDistance = 45; // 45px swipe threshold
+
+    if (distance > minSwipeDistance) {
+      handleNextPage();
+    } else if (distance < -minSwipeDistance) {
+      handlePrevPage();
+    }
+
+    setTouchStartX(null);
+    setTouchEndX(null);
+  };
+
   return (
     <div
       className={`min-h-screen flex flex-col justify-between select-none relative ${themeClass.bg} ${themeClass.text} transition-colors duration-200`}
       onContextMenu={(e) => e.preventDefault()}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Top Reading Navigation Bar */}
       <header
@@ -263,72 +344,113 @@ export default function BookReaderPage({ params }: ReaderPageProps) {
         </div>
       </header>
 
-      {/* Main Page Canvas */}
-      <main className="flex-1 max-w-3xl w-full mx-auto px-6 sm:px-12 py-8 sm:py-12 flex flex-col justify-between relative">
-        {/* Dynamic Translucent Watermark Overlay */}
-        <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden opacity-5 z-0 select-none">
-          <p className="text-3xl sm:text-5xl font-black rotate-[-25deg] text-center leading-relaxed">
-            {bookData.watermark}
-          </p>
-        </div>
+      {/* Main Page Canvas: Physical Book Simulation with 3D Page Turn */}
+      <main className="flex-1 max-w-4xl w-full mx-auto px-3 sm:px-8 py-6 sm:py-10 flex flex-col justify-between relative perspective-[1400px]">
+        {/* Physical Book Leaf Container */}
+        <div
+          className={`relative w-full flex-1 rounded-2xl p-6 sm:p-12 shadow-[0_15px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.08)] border border-black/10 flex flex-col justify-between transition-all duration-300 ${
+            isTurning
+              ? turnDirection === "next"
+                ? "animate-page-turn-next"
+                : "animate-page-turn-prev"
+              : ""
+          }`}
+          style={{
+            backgroundColor: theme === "cream" ? "#FFFDF7" : theme === "sepia" ? "#F5EEDC" : theme === "night" ? "#1E1C1A" : "#FFFFFF",
+          }}
+        >
+          {/* Left Spine Binding Shadow (Inner Gutter) */}
+          <div className="absolute top-0 bottom-0 left-0 w-6 sm:w-10 bg-gradient-to-r from-black/20 via-black/5 to-transparent pointer-events-none rounded-l-2xl z-20" />
 
-        {/* Page Content */}
-        <article className="relative z-10 space-y-6">
-          <header className="border-b border-black/10 pb-4">
-            <span className="text-[11px] font-bold uppercase tracking-wider opacity-60 block">
-              {activePage.chapterTitle}
-            </span>
-            {activePage.subTitle && (
-              <h1 className="font-display font-black text-xl sm:text-2xl mt-1 leading-snug">
-                {activePage.subTitle}
-              </h1>
-            )}
-          </header>
+          {/* Right Stacked Pages Depth Effect */}
+          <div className="absolute top-2 bottom-2 -right-2.5 w-2.5 bg-gradient-to-r from-[#EDE2CA] via-[#E2D4BA] to-[#C9BA9E] rounded-r-sm shadow-sm pointer-events-none hidden sm:block border-y border-r border-[#C4B495]" />
 
-          <div
-            className="space-y-5 leading-[1.85] font-normal"
-            style={{ fontSize: `${fontSize}px` }}
-          >
-            {activePage.content.map((paragraph, idx) => (
-              <p key={idx} className="indent-4 sm:indent-8">
-                {paragraph}
-              </p>
-            ))}
+          {/* Dynamic Translucent Watermark Overlay */}
+          <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden opacity-5 z-0 select-none">
+            <p className="text-3xl sm:text-5xl font-black rotate-[-25deg] text-center leading-relaxed">
+              {bookData.watermark}
+            </p>
           </div>
 
-          {activePage.notes && (
-            <footer className="pt-6 border-t border-black/10 text-xs italic opacity-70">
-              {activePage.notes}
-            </footer>
+          {/* Page Content */}
+          <article className="relative z-10 space-y-6">
+            {/* Running Header */}
+            <div className="text-[11px] font-serif uppercase tracking-widest text-center opacity-60 pb-3 border-b border-black/10 flex items-center justify-between text-ink-muted">
+              <span className="truncate max-w-[200px]">{bookData.titleSi}</span>
+              <span className="text-[9px] opacity-40">•</span>
+              <span className="truncate max-w-[200px]">{activePage.chapterTitle}</span>
+            </div>
+
+            <header className="pb-2">
+              {activePage.subTitle && (
+                <h1 className="font-display font-black text-xl sm:text-2xl mt-1 leading-snug">
+                  {activePage.subTitle}
+                </h1>
+              )}
+            </header>
+
+            <div
+              className="space-y-5 leading-[1.9] font-normal"
+              style={{ fontSize: `${fontSize}px` }}
+            >
+              {activePage.content.map((paragraph, idx) => (
+                <p key={idx} className="indent-4 sm:indent-8 text-justify">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+
+            {activePage.notes && (
+              <footer className="pt-6 border-t border-black/10 text-xs italic opacity-70">
+                {activePage.notes}
+              </footer>
+            )}
+
+            {/* Centered Page Number */}
+            <div className="text-center font-serif text-xs opacity-60 pt-4">
+              — {currentPage} —
+            </div>
+          </article>
+
+          {/* Corner Page Curl Button for Next Page */}
+          {currentPage < totalSamplePages && (
+            <button
+              type="button"
+              onClick={handleNextPage}
+              className="absolute bottom-0 right-0 w-12 h-12 overflow-hidden cursor-pointer group z-30"
+              title="ඊළඟ පිටුවට පෙරලන්න (Flip Page)"
+            >
+              <div className="absolute bottom-0 right-0 w-0 h-0 border-solid border-b-[24px] border-l-[24px] border-b-amber-300/80 border-l-transparent group-hover:border-b-amber-500 group-hover:scale-110 transition-all shadow" />
+            </button>
           )}
-        </article>
 
-        {/* Bottom Page Navigation Controls */}
-        <div className="relative z-10 pt-10 flex items-center justify-between border-t border-black/10 mt-12">
-          <button
-            type="button"
-            disabled={currentPage === 1}
-            onClick={handlePrevPage}
-            className="py-2 px-4 rounded-xl border border-black/10 hover:bg-black/5 disabled:opacity-30 disabled:pointer-events-none flex items-center gap-1.5 text-xs font-bold transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            <span>පෙර පිටුව (Prev)</span>
-          </button>
+          {/* Bottom Page Navigation Controls */}
+          <div className="relative z-10 pt-6 flex items-center justify-between border-t border-black/10 mt-8">
+            <button
+              type="button"
+              disabled={currentPage === 1}
+              onClick={handlePrevPage}
+              className="py-2 px-4 rounded-xl border border-black/10 hover:bg-black/5 disabled:opacity-30 disabled:pointer-events-none flex items-center gap-1.5 text-xs font-bold transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span>පෙර පිටුව (Prev)</span>
+            </button>
 
-          <span className="text-xs font-mono font-bold opacity-80">
-            පිටුව {currentPage} / {totalSamplePages}
-          </span>
-
-          <button
-            type="button"
-            onClick={handleNextPage}
-            className="py-2 px-4 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white flex items-center gap-1.5 text-xs font-extrabold shadow transition-colors"
-          >
-            <span>
-              {currentPage === totalSamplePages ? "සාම්පලය අවසන් (Finish)" : "ඊළඟ පිටුව (Next)"}
+            <span className="text-xs font-mono font-bold opacity-80">
+              පිටුව {currentPage} / {totalSamplePages}
             </span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
+
+            <button
+              type="button"
+              onClick={handleNextPage}
+              className="py-2 px-4 rounded-xl bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white flex items-center gap-1.5 text-xs font-extrabold shadow transition-colors"
+            >
+              <span>
+                {currentPage === totalSamplePages ? "සාම්පලය අවසන් (Finish)" : "ඊළඟ පිටුව (Next ↷)"}
+              </span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </main>
 

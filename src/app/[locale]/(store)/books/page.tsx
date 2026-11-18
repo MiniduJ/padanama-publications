@@ -58,7 +58,7 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
   const currentCategoryObj = categories.find((c) => c.slug === currentCategory) || categories[0];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="w-full max-w-[1600px] mx-auto px-2 sm:px-4 lg:px-6 py-6 space-y-6">
       {/* Breadcrumb Navigation */}
       <nav className="flex items-center gap-2 text-xs text-ink-muted">
         <Link href="/" className="hover:text-brandRed transition-colors">{nav("home")}</Link>
@@ -175,9 +175,10 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
 
         {/* Main Books Grid */}
         <div className="md:col-span-3 space-y-6">
-          {/* Active Filter Bar & Sort Controls */}
-          <div className="bg-white p-4 rounded-2xl border border-maroon-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-xs">
+          {/* Active Filter Bar & Integrated Search Controls */}
+          <div className="bg-white p-4 rounded-2xl border border-maroon-100 shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+            {/* Left: Results Count & Active Category */}
+            <div className="flex items-center gap-2 text-xs flex-wrap">
               <span className="text-ink-muted">{locale === "ta" ? "காட்டப்படும் நூல்கள்:" : locale === "en" ? "Showing:" : "ප්‍රතිඵල:"}</span>
               <span className="font-extrabold text-brandNavy">{pagination.total} {locale === "ta" ? "நூல்கள்" : locale === "en" ? "Books" : "පොත්"}</span>
               {currentCategory !== "all" && (
@@ -185,28 +186,70 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
                   {currentCategoryObj.name}
                 </span>
               )}
+              {currentQuery && (
+                <Link
+                  href={`/books?category=${currentCategory}&sort=${currentSort}`}
+                  className="px-2.5 py-0.5 rounded-full bg-red-100 hover:bg-red-200 text-brandRed font-bold text-[11px] flex items-center gap-1 transition-colors"
+                  title="Clear search query"
+                >
+                  <span>"{currentQuery}"</span>
+                  <span className="font-black">✕</span>
+                </Link>
+              )}
             </div>
 
-            {/* Sort Options */}
+            {/* Center: Integrated Search Bar in Filter Bar */}
+            <form
+              method="GET"
+              action={`/${locale}/books`}
+              className="flex-1 max-w-md w-full"
+            >
+              <input type="hidden" name="category" value={currentCategory} />
+              <input type="hidden" name="sort" value={currentSort} />
+              <div className="relative flex items-center">
+                <input
+                  type="text"
+                  name="query"
+                  defaultValue={currentQuery}
+                  placeholder={
+                    locale === "ta"
+                      ? "நூல்கள், ஆசிரியர்களைத் தேடுங்கள்..."
+                      : locale === "en"
+                      ? "Search titles, authors, or Singlish..."
+                      : "පොත්, කතුවරුන් හෝ විෂයයන් සොයන්න..."
+                  }
+                  className="w-full pl-9 pr-18 py-2 bg-slate-50 border border-maroon-200 rounded-xl text-xs text-ink placeholder:text-ink-muted/70 focus:outline-none focus:ring-2 focus:ring-brandRed focus:bg-white transition-all shadow-inner"
+                />
+                <Search className="w-4 h-4 text-brandRed absolute left-3 pointer-events-none" />
+                <button
+                  type="submit"
+                  className="absolute right-1 px-3 py-1 bg-brandNavy hover:bg-brandRed text-white text-[11px] font-extrabold rounded-lg transition-colors"
+                >
+                  {locale === "ta" ? "தேடு" : locale === "en" ? "Search" : "සොයන්න"}
+                </button>
+              </div>
+            </form>
+
+            {/* Right: Sort Options */}
             <div className="flex items-center gap-2 text-xs w-full sm:w-auto justify-end">
-              <ArrowUpDown className="w-3.5 h-3.5 text-brandRed" />
-              <span className="text-ink-muted">{locale === "ta" ? "வரிசைப்படுத்துக:" : locale === "en" ? "Sort by:" : "පිළිවෙල:"}</span>
+              <ArrowUpDown className="w-3.5 h-3.5 text-brandRed shrink-0" />
+              <span className="text-ink-muted shrink-0">{locale === "ta" ? "வரிசைப்படுத்துக:" : locale === "en" ? "Sort by:" : "පිළිවෙල:"}</span>
               <div className="flex items-center gap-1 font-bold">
                 <Link
-                  href={`/books?category=${currentCategory}&sort=newest`}
-                  className={`px-2 py-1 rounded-lg ${currentSort === "newest" ? "bg-brandNavy text-white font-black" : "text-ink hover:text-brandRed"}`}
+                  href={`/books?category=${currentCategory}&sort=newest${currentQuery ? `&query=${encodeURIComponent(currentQuery)}` : ""}`}
+                  className={`px-2 py-1 rounded-lg transition-all ${currentSort === "newest" ? "bg-brandNavy text-white font-black" : "text-ink hover:text-brandRed"}`}
                 >
                   {locale === "ta" ? "புதியவை" : locale === "en" ? "Newest" : "නවතම"}
                 </Link>
                 <Link
-                  href={`/books?category=${currentCategory}&sort=price_asc`}
-                  className={`px-2 py-1 rounded-lg ${currentSort === "price_asc" ? "bg-brandNavy text-white font-black" : "text-ink hover:text-brandRed"}`}
+                  href={`/books?category=${currentCategory}&sort=price_asc${currentQuery ? `&query=${encodeURIComponent(currentQuery)}` : ""}`}
+                  className={`px-2 py-1 rounded-lg transition-all ${currentSort === "price_asc" ? "bg-brandNavy text-white font-black" : "text-ink hover:text-brandRed"}`}
                 >
                   {locale === "ta" ? "குறைந்த விலை" : locale === "en" ? "Price Low" : "මිල (අඩු)"}
                 </Link>
                 <Link
-                  href={`/books?category=${currentCategory}&sort=price_desc`}
-                  className={`px-2 py-1 rounded-lg ${currentSort === "price_desc" ? "bg-brandNavy text-white font-black" : "text-ink hover:text-brandRed"}`}
+                  href={`/books?category=${currentCategory}&sort=price_desc${currentQuery ? `&query=${encodeURIComponent(currentQuery)}` : ""}`}
+                  className={`px-2 py-1 rounded-lg transition-all ${currentSort === "price_desc" ? "bg-brandNavy text-white font-black" : "text-ink hover:text-brandRed"}`}
                 >
                   {locale === "ta" ? "கூடிய விலை" : locale === "en" ? "Price High" : "මිල (වැඩි)"}
                 </Link>
@@ -236,7 +279,7 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               {books.map((book: any) => {
                 const primaryEdition = book.editions?.[0] || {};
                 const author = book.authors?.[0]?.author?.nameSi || "පදනම ප්‍රකාශන";

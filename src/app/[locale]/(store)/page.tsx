@@ -211,7 +211,7 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
           {featuredBooks.map((book: any) => {
             const primaryEdition = book.editions?.[0] || {};
             const author = book.authors?.[0]?.author?.nameSi || "පදනම ප්‍රකාශන";
@@ -279,7 +279,7 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {primaryBooks.map((book: any) => {
               const primaryEdition = book.editions?.[0] || {};
               const author = book.authors?.[0]?.author?.nameSi || "පදනම ප්‍රකාශන";
@@ -321,7 +321,7 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {olBooks.map((book: any) => {
               const primaryEdition = book.editions?.[0] || {};
               const author = book.authors?.[0]?.author?.nameSi || "පදනම ප්‍රකාශන";

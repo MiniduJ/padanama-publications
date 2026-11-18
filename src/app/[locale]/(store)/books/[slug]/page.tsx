@@ -8,6 +8,7 @@ import { AddToCartButton } from "@/components/store/AddToCartButton";
 import { Link } from "@/i18n/routing";
 import {
   BookOpen,
+  BookMarked,
   ShoppingBag,
   Truck,
   ShieldCheck,
@@ -70,7 +71,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-24 md:py-10 space-y-10 sm:space-y-12">
       {/* Inject JSON-LD */}
       <script
         type="application/ld+json"
@@ -122,23 +123,23 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
             )}
           </div>
 
-          {/* Free Sample Strip */}
+          {/* Free Sample Interactive Book Reader Invitation */}
           {book.sampleConfig && (
-            <div className="mt-6 w-full max-w-sm p-4 bg-white rounded-2xl border-2 border-saffron-300 shadow-sm flex items-center justify-between gap-3">
+            <div className="mt-6 w-full max-w-sm p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border-2 border-saffron-300 shadow-md flex items-center justify-between gap-3 relative overflow-hidden group">
               <div className="space-y-0.5">
-                <span className="text-xs font-bold text-maroon-900 block">
-                  නොමිලේ සාම්පල පෙරදසුන
+                <span className="text-xs font-black text-brandNavy flex items-center gap-1.5">
+                  <BookMarked className="w-4 h-4 text-brandRed" />
+                  <span>නොමිලේ සාම්පලය පෙරලන්න</span>
                 </span>
                 <span className="text-[11px] text-ink-muted block">
-                  පළමු පිටු {book.sampleConfig.maxPages || 20} දැන්ම කියවන්න
+                  පළමු පිටු {book.sampleConfig.maxPages || 20} පොතක් මෙන් කියවන්න (Interactive 3D Reader)
                 </span>
               </div>
               <Link
                 href={`/read/${book.slug}`}
-                className="px-4 py-2 bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white font-extrabold text-xs rounded-xl shadow transition-colors flex items-center gap-1.5 shrink-0"
+                className="px-4 py-2.5 bg-saffron-500 hover:bg-saffron-700 text-brandNavy hover:text-white font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 shrink-0 hover:scale-105"
               >
-                <BookOpen className="w-3.5 h-3.5" />
-                <span>කියවන්න</span>
+                <span>කියවන්න ↷</span>
               </Link>
             </div>
           )}

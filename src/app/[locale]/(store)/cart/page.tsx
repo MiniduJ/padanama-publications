@@ -122,7 +122,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-28 sm:py-12">
       {/* Page Title & Milestone Bar */}
       <div className="space-y-4 mb-8">
         <div className="flex items-center justify-between">
@@ -234,21 +234,21 @@ export default function CartPage() {
                     1 ඩිජිටල් පිටපතකි
                   </span>
                 ) : (
-                  <div className="flex items-center border border-gray-300 rounded-lg bg-gray-50 px-2 py-1">
+                  <div className="flex items-center border border-gray-300 rounded-xl bg-gray-50 px-1 py-0.5">
                     <button
                       type="button"
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="p-1 text-gray-500 hover:text-maroon-900 transition-colors"
-                      aria-label="Decrease"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-600 hover:text-maroon-900 hover:bg-gray-200 active:scale-95 transition-all"
+                      aria-label="Decrease quantity"
                     >
                       <Minus className="w-3.5 h-3.5" />
                     </button>
-                    <span className="font-bold text-xs text-ink px-2">{item.quantity}</span>
+                    <span className="font-bold text-xs text-ink px-2 min-w-[24px] text-center">{item.quantity}</span>
                     <button
                       type="button"
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="p-1 text-gray-500 hover:text-maroon-900 transition-colors"
-                      aria-label="Increase"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-600 hover:text-maroon-900 hover:bg-gray-200 active:scale-95 transition-all"
+                      aria-label="Increase quantity"
                     >
                       <Plus className="w-3.5 h-3.5" />
                     </button>
@@ -427,6 +427,23 @@ export default function CartPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Mobile Sticky Checkout Bar (Always accessible when reviewing cart on phone) */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-maroon-100 px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] lg:hidden flex items-center justify-between gap-3 safe-area-inset-bottom">
+        <div>
+          <span className="text-[10px] text-ink-muted block leading-none">මුළු එකතුව (Total)</span>
+          <span className="font-display font-black text-lg text-brandNavy leading-tight">
+            {formatLkr(grandTotalCents, "si")}
+          </span>
+        </div>
+        <Link
+          href="/checkout"
+          className="px-5 py-3 rounded-xl bg-brandRed hover:bg-brandRed-600 text-white font-extrabold text-xs shadow-md flex items-center gap-2 shrink-0 active:scale-95 transition-all"
+        >
+          <span>ගෙවීම් පිටුවට (Checkout)</span>
+          <ArrowRight className="w-4 h-4" />
+        </Link>
       </div>
     </div>
   );

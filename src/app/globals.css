@@ -76,3 +76,45 @@ body {
   background-image: radial-gradient(#E8DFC8 0.75px, transparent 0.75px);
   background-size: 16px 16px;
 }
+
+
+/* Realistic Book Reader 3D Page Turn Keyframes & Book Spine Effects */
+@keyframes book-page-flip-next {
+  0% {
+    transform: rotateY(0deg);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+  50% {
+    transform: rotateY(-18deg) scale(0.98);
+    box-shadow: -25px 25px 45px rgba(0, 0, 0, 0.28);
+  }
+  100% {
+    transform: rotateY(0deg) scale(1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+}
+
+@keyframes book-page-flip-prev {
+  0% {
+    transform: rotateY(0deg);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+  50% {
+    transform: rotateY(18deg) scale(0.98);
+    box-shadow: 25px 25px 45px rgba(0, 0, 0, 0.28);
+  }
+  100% {
+    transform: rotateY(0deg) scale(1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.animate-page-turn-next {
+  transform-origin: left center;
+  animation: book-page-flip-next 0.38s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.animate-page-turn-prev {
+  transform-origin: right center;
+  animation: book-page-flip-prev 0.38s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}

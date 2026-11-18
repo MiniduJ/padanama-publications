@@ -83,6 +83,8 @@ const SLIDES: Slide[] = [
 export function HeroSlider() {
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchEndX, setTouchEndX] = useState<number | null>(null);
 
   const nextSlide = useCallback(() => {
     setCurrent((prev) => (prev + 1) % SLIDES.length);
@@ -98,16 +100,46 @@ export function HeroSlider() {
     return () => clearInterval(interval);
   }, [isPaused, nextSlide]);
 
+  // Touch Swipe Gesture Handlers for Mobile Devices
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.targetTouches[0].clientX);
+    setTouchEndX(null);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEndX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX || !touchEndX) return;
+    const distance = touchStartX - touchEndX;
+    const minSwipeDistance = 50; // 50px threshold
+
+    if (distance > minSwipeDistance) {
+      // Swiped left -> Next slide
+      nextSlide();
+    } else if (distance < -minSwipeDistance) {
+      // Swiped right -> Previous slide
+      prevSlide();
+    }
+
+    setTouchStartX(null);
+    setTouchEndX(null);
+  };
+
   const slide = SLIDES[current];
 
   return (
     <div
-      className="relative w-full overflow-hidden bg-brandNavy shadow-xl"
+      className="relative w-full overflow-hidden bg-brandNavy shadow-xl select-none"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
-      {/* Background Slides with Full Screen Height (100vh - 80px navbar) */}
-      <div className="relative h-[calc(100vh-80px)] min-h-[580px] sm:min-h-[640px] md:min-h-[720px] flex items-center">
+      {/* Background Slides with Full Screen Height (100svh - navbar) */}
+      <div className="relative h-[calc(100svh-72px)] sm:h-[calc(100vh-80px)] min-h-[520px] sm:min-h-[640px] md:min-h-[720px] flex items-center">
         {SLIDES.map((s, index) => {
           const isActive = index === current;
           return (
@@ -128,40 +160,40 @@ export function HeroSlider() {
           );
         })}
 
-        {/* Slide Content Overlay (Full screen width with comfortable padding) */}
-        <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 py-12 md:py-20">
-          <div className="max-w-3xl space-y-6 text-left text-cream">
+        {/* Slide Content Overlay (Full screen width with comfortable mobile padding) */}
+        <div className="relative z-20 w-full px-4 sm:px-12 lg:px-20 py-8 sm:py-16 md:py-20">
+          <div className="max-w-3xl space-y-4 sm:space-y-6 text-left text-cream">
             {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brandYellow text-brandNavy text-xs sm:text-sm font-black tracking-wide shadow-md">
-              <Sparkles className="w-4 h-4 text-brandNavy" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-brandYellow text-brandNavy text-[11px] sm:text-sm font-black tracking-wide shadow-md">
+              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brandNavy" />
               <span>{slide.badge}</span>
             </div>
 
-            {/* Slide Title */}
-            <h1 className="font-display font-black text-3xl sm:text-5xl md:text-6xl text-white tracking-tight leading-[1.15] drop-shadow-lg">
-              {slide.title} <br />
+            {/* Slide Title - Fluid scaling for mobile */}
+            <h1 className="font-display font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-white tracking-tight leading-[1.2] drop-shadow-lg">
+              {slide.title} <br className="hidden sm:inline" />
               <span className="text-brandYellow underline decoration-brandRed decoration-wavy decoration-2">
                 {slide.highlight}
               </span>
             </h1>
 
             {/* Slide Description */}
-            <p className="text-sm sm:text-lg text-cream/95 leading-relaxed font-medium drop-shadow-md max-w-2xl">
+            <p className="text-xs sm:text-base md:text-lg text-cream/95 leading-relaxed font-medium drop-shadow-md max-w-2xl line-clamp-3 sm:line-clamp-none">
               {slide.description}
             </p>
 
-            {/* Call to Actions */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
+            {/* Call to Actions - Stack on mobile, row on tablet/desktop */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <Link
                 href={slide.primaryLink}
-                className="px-7 py-4 rounded-2xl bg-brandRed hover:bg-brandRed-600 text-white font-extrabold text-sm sm:text-base shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 border border-brandRed-700"
+                className="w-full sm:w-auto px-6 py-3.5 sm:px-7 sm:py-4 rounded-xl sm:rounded-2xl bg-brandRed hover:bg-brandRed-600 text-white font-extrabold text-xs sm:text-base shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 border border-brandRed-700 text-center"
               >
                 <span>{slide.primaryCta}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 href={slide.secondaryLink}
-                className="px-7 py-4 rounded-2xl bg-white/95 hover:bg-white text-brandNavy font-extrabold text-sm sm:text-base shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 backdrop-blur-sm"
+                className="w-full sm:w-auto px-6 py-3 sm:px-7 sm:py-4 rounded-xl sm:rounded-2xl bg-white/95 hover:bg-white text-brandNavy font-extrabold text-xs sm:text-base shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 backdrop-blur-sm text-center"
               >
                 <BookOpen className="w-4 h-4 text-brandRed" />
                 <span>{slide.secondaryCta}</span>
@@ -171,11 +203,11 @@ export function HeroSlider() {
         </div>
       </div>
 
-      {/* Navigation Arrow Controls */}
+      {/* Navigation Arrow Controls - Desktop only to keep mobile touch clean */}
       <button
         type="button"
         onClick={prevSlide}
-        className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/80 hover:bg-brandYellow text-brandNavy hover:scale-110 shadow-lg flex items-center justify-center transition-all backdrop-blur-sm"
+        className="hidden sm:flex absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/80 hover:bg-brandYellow text-brandNavy hover:scale-110 shadow-lg items-center justify-center transition-all backdrop-blur-sm"
         aria-label="Previous slide"
       >
         <ChevronLeft className="w-6 h-6" />
@@ -184,14 +216,14 @@ export function HeroSlider() {
       <button
         type="button"
         onClick={nextSlide}
-        className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/80 hover:bg-brandYellow text-brandNavy hover:scale-110 shadow-lg flex items-center justify-center transition-all backdrop-blur-sm"
+        className="hidden sm:flex absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/80 hover:bg-brandYellow text-brandNavy hover:scale-110 shadow-lg items-center justify-center transition-all backdrop-blur-sm"
         aria-label="Next slide"
       >
         <ChevronRight className="w-6 h-6" />
       </button>
 
       {/* Dot Indicators & WCAG Pause/Play Control */}
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md">
+      <div className="absolute bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md">
         <button
           type="button"
           onClick={() => setIsPaused(!isPaused)}
@@ -211,7 +243,7 @@ export function HeroSlider() {
               type="button"
               onClick={() => setCurrent(i)}
               className={`transition-all duration-300 rounded-full ${
-                i === current ? "w-7 h-2 bg-brandYellow" : "w-2 h-2 bg-white/60 hover:bg-white"
+                i === current ? "w-6 sm:w-7 h-2 bg-brandYellow" : "w-2 h-2 bg-white/60 hover:bg-white"
               }`}
               aria-label={`Go to slide ${i + 1}`}
             />
