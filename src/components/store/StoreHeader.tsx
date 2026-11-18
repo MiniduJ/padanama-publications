@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
 import { Logo } from "@/components/ui/Logo";
-import { Search, ShoppingBag, BookMarked, User, Phone, Sparkles, Menu, X, Info, Mail, Home } from "lucide-react";
+import { Search, ShoppingBag, User, Phone, Menu, X, Info, Mail, Sparkles } from "lucide-react";
 import { CartBadge } from "./CartBadge";
 
 export function StoreHeader() {
@@ -150,36 +150,33 @@ export function StoreHeader() {
           </div>
         </form>
 
-        {/* Primary Navigation Links */}
+        {/* Primary Navigation Links without distracting icons */}
         <nav className="hidden lg:flex items-center gap-5 xl:gap-6 text-sm font-bold text-brandNavy">
           <Link
             href="/"
-            className="hover:text-brandRed transition-colors flex items-center gap-1.5"
+            className="hover:text-brandRed transition-colors"
           >
-            <Home className="w-4 h-4 text-brandRed" />
             <span>{nav("home")}</span>
           </Link>
 
           <Link
             href="/books"
-            className="hover:text-brandRed transition-colors flex items-center gap-1"
+            className="hover:text-brandRed transition-colors"
           >
             <span>{nav("shop")}</span>
           </Link>
 
           <Link
             href="/library"
-            className="hover:text-brandRed transition-colors flex items-center gap-1.5"
+            className="hover:text-brandRed transition-colors"
           >
-            <BookMarked className="w-4 h-4 text-brandRed" />
             <span>{nav("digitalLibrary")}</span>
           </Link>
 
           <Link
             href="/book-fair"
-            className="hover:text-brandRed transition-colors flex items-center gap-1.5 px-3 py-1 rounded-full bg-brandYellow/30 text-brandNavy font-extrabold border border-brandYellow/60 hover:bg-brandYellow/50 shadow-xs"
+            className="hover:text-brandRed transition-colors px-3 py-1.5 rounded-full bg-brandYellow/30 text-brandNavy font-extrabold border border-brandYellow/60 hover:bg-brandYellow/50 shadow-xs"
           >
-            <Sparkles className="w-3.5 h-3.5 text-brandRed" />
             <span>{currentLocale === "ta" ? "புத்தக கண்காட்சி" : currentLocale === "en" ? "Book Fair" : "පොත් ප්‍රදර්ශනය"}</span>
           </Link>
         </nav>
@@ -259,9 +256,8 @@ export function StoreHeader() {
             <Link
               href="/"
               onClick={() => setMobileMenuOpen(false)}
-              className="py-2.5 border-b border-maroon-100 flex items-center gap-2"
+              className="py-2.5 border-b border-maroon-100 flex items-center justify-between"
             >
-              <Home className="w-4 h-4 text-brandRed" />
               <span>{nav("home")}</span>
             </Link>
             <Link
@@ -275,18 +271,17 @@ export function StoreHeader() {
             <Link
               href="/library"
               onClick={() => setMobileMenuOpen(false)}
-              className="py-2.5 border-b border-maroon-100 text-brandRed flex items-center gap-2"
+              className="py-2.5 border-b border-maroon-100 flex items-center justify-between text-brandRed"
             >
-              <BookMarked className="w-4 h-4" />
               <span>{nav("digitalLibrary")}</span>
             </Link>
             <Link
               href="/book-fair"
               onClick={() => setMobileMenuOpen(false)}
-              className="py-2.5 border-b border-maroon-100 flex items-center gap-2 text-brandRed"
+              className="py-2.5 border-b border-maroon-100 flex items-center justify-between text-brandNavy"
             >
-              <Sparkles className="w-4 h-4 text-brandRed" />
               <span>{currentLocale === "ta" ? "புத்தக கண்காட்சி (Book Fair)" : currentLocale === "en" ? "Book Fair (CIBF)" : "පොත් ප්‍රදර්ශනය (Book Fair)"}</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-brandYellow font-extrabold text-brandNavy">Hall D</span>
             </Link>
             <Link
               href="/about"

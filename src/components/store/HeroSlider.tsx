@@ -138,69 +138,27 @@ export function HeroSlider() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Background Slides with Full Screen Height (100svh - navbar) */}
-      <div className="relative h-[calc(100svh-72px)] sm:h-[calc(100vh-80px)] min-h-[520px] sm:min-h-[640px] md:min-h-[720px] flex items-center">
+      {/* Pure Image Banner Slides (Wordings removed, full artwork clarity) */}
+      <div className="relative w-full h-[240px] xs:h-[280px] sm:h-[380px] md:h-[460px] lg:h-[540px] xl:h-[600px] overflow-hidden">
         {SLIDES.map((s, index) => {
           const isActive = index === current;
           return (
-            <div
+            <Link
               key={s.id}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+              href={s.primaryLink}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out cursor-pointer block ${
+                isActive ? "opacity-100 z-10 pointer-events-auto" : "opacity-0 z-0 pointer-events-none"
               }`}
             >
-              {/* Background Image with optimized dark gradient overlay */}
+              {/* Crisp Official Banner Graphic without Dark Gradient or Text Overlays */}
               <img
                 src={s.image}
                 alt={s.title}
-                className="w-full h-full object-cover object-center filter brightness-[0.70] contrast-[1.08]"
+                className="w-full h-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-brandNavy/95 via-brandNavy/80 to-transparent md:to-black/40" />
-            </div>
+            </Link>
           );
         })}
-
-        {/* Slide Content Overlay (Full screen width with comfortable mobile padding) */}
-        <div className="relative z-20 w-full px-4 sm:px-12 lg:px-20 py-8 sm:py-16 md:py-20">
-          <div className="max-w-3xl space-y-4 sm:space-y-6 text-left text-cream">
-            {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-brandYellow text-brandNavy text-[11px] sm:text-sm font-black tracking-wide shadow-md">
-              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brandNavy" />
-              <span>{slide.badge}</span>
-            </div>
-
-            {/* Slide Title - Fluid scaling for mobile */}
-            <h1 className="font-display font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-white tracking-tight leading-[1.2] drop-shadow-lg">
-              {slide.title} <br className="hidden sm:inline" />
-              <span className="text-brandYellow underline decoration-brandRed decoration-wavy decoration-2">
-                {slide.highlight}
-              </span>
-            </h1>
-
-            {/* Slide Description */}
-            <p className="text-xs sm:text-base md:text-lg text-cream/95 leading-relaxed font-medium drop-shadow-md max-w-2xl line-clamp-3 sm:line-clamp-none">
-              {slide.description}
-            </p>
-
-            {/* Call to Actions - Stack on mobile, row on tablet/desktop */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
-              <Link
-                href={slide.primaryLink}
-                className="w-full sm:w-auto px-6 py-3.5 sm:px-7 sm:py-4 rounded-xl sm:rounded-2xl bg-brandRed hover:bg-brandRed-600 text-white font-extrabold text-xs sm:text-base shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 border border-brandRed-700 text-center"
-              >
-                <span>{slide.primaryCta}</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href={slide.secondaryLink}
-                className="w-full sm:w-auto px-6 py-3 sm:px-7 sm:py-4 rounded-xl sm:rounded-2xl bg-white/95 hover:bg-white text-brandNavy font-extrabold text-xs sm:text-base shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 backdrop-blur-sm text-center"
-              >
-                <BookOpen className="w-4 h-4 text-brandRed" />
-                <span>{slide.secondaryCta}</span>
-              </Link>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Navigation Arrow Controls - Desktop only to keep mobile touch clean */}

@@ -4,6 +4,11 @@ import { AdminLayoutShell } from "@/components/admin/AdminLayoutShell";
 
 export const metadata = {
   title: "Padanama Admin Console",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.png",
+  },
   robots: {
     index: false,
     follow: false,

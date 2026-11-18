@@ -112,6 +112,103 @@ export default function BookFairPage() {
         </div>
       </div>
 
+      {/* Book Fair Photo Gallery & Highlights */}
+      <div className="space-y-6 pt-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-maroon-100 pb-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase text-saffron-700 tracking-wider mb-1">
+              <Sparkles className="w-4 h-4 text-saffron-500" />
+              <span>ප්‍රදර්ශන මතක සටහන් • Photo Gallery</span>
+            </div>
+            <h3 className="font-display font-black text-2xl sm:text-3xl text-maroon-900 tracking-tight">
+              කොළඹ ජාත්‍යන්තර පොත් ප්‍රදර්ශන විශේෂ අවස්ථා
+            </h3>
+            <p className="text-xs text-ink-muted mt-1 max-w-2xl">
+              BMICH හි සිරිමාවෝ බණ්ඩාරනායක ශාලාවේ පදනම ප්‍රකාශන කුටිය (Hall D, 142 & 143) වෙත පැමිණි දහස් සංඛ්‍යාත සිසු දරු දැරියන්, ගුරුභවතුන් සහ දෙමාපියන්ගේ ප්‍රීතිමත් අවස්ථා.
+            </p>
+          </div>
+          <span className="px-3.5 py-1.5 rounded-full bg-saffron-500/20 text-maroon-900 font-extrabold text-xs border border-saffron-500/40 self-start sm:self-auto">
+            BMICH Hall D • Stall 142 & 143
+          </span>
+        </div>
+
+        {/* Gallery Image Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            {
+              title: "පදනම ප්‍රකාශන නිල කුටිය (Hall D - Stall 142 & 143)",
+              category: "ප්‍රදර්ශන කුටිය",
+              desc: "BMICH හි පැවැත්වෙන ප්‍රධාන පොත් ප්‍රදර්ශනයේ පදනම නිල ප්‍රදර්ශන කුටිය වෙත පැමිණෙන පාඨක ජනතාව.",
+              image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=800&q=80",
+              tag: "Hall D • Stall 142",
+            },
+            {
+              title: "ශිෂ්‍යත්ව සහ O/L ආදර්ශ ප්‍රශ්න පත්‍ර කට්ටල නිකුතුව",
+              category: "නව මුද්‍රණ",
+              desc: "2026 විභාග සඳහා අලුතෙන්ම සම්පාදනය කළ පෙරහුරු හා ආදර්ශ ප්‍රශ්න පත්‍ර පොත් පෙළ එළිදැක්වීම.",
+              image: "https://www.padanamapublication.lk/image/bg-images/mainslide1.jpg",
+              tag: "නව නිකුත් කිරීම්",
+            },
+            {
+              title: "පාසල් සිසු දරු දැරියන් පොත් තෝරාගැනීමේ අවස්ථාව",
+              category: "පාඨක හමුව",
+              desc: "සාමාන්‍ය පෙළ සහ උසස් පෙළ කෙටි සටහන් පොත් පරිශීලනය කරන සිසු සිසුවියන්.",
+              image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=800&q=80",
+              tag: "ශිෂ්‍ය සහභාගීත්වය",
+            },
+            {
+              title: "ප්‍රවීණ කර්තෘවරුන් සහ ගුරුභවතුන් සමඟ සුහද කතාබහ",
+              category: "කර්තෘ හමුව",
+              desc: "පදනම ප්‍රකාශන මණ්ඩලයේ විද්වත් ආචාර්යවරුන් සහ පාසල් ගුරුවරුන් අතර අධ්‍යාපනික සාකච්ඡා.",
+              image: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=800&q=80",
+              tag: "කර්තෘ හමුව",
+            },
+            {
+              title: "5 ශ්‍රේණිය ශිෂ්‍යත්ව විශේෂ පුහුණු පොත් පෙළ ප්‍රදර්ශනය",
+              category: "ප්‍රාථමික අංශය",
+              desc: "කුඩා දරු දැරියන් සඳහා විභාග පෙරහුරු සහ IQ ප්‍රශ්න විවරණ ග්‍රන්ථ ප්‍රදර්ශනය කෙරෙන අයුරු.",
+              image: "https://www.padanamapublication.lk/image/bg-images/mainslide3.jpg",
+              tag: "ශිෂ්‍යත්ව අංශය",
+            },
+            {
+              title: "පොත් ප්‍රදර්ශන විශේෂ 20% වට්ටම් සහ තිළිණ ලබාදීම",
+              category: "විශේෂ දීමනා",
+              desc: "BMICH හිදී මෙන්ම padanamapublication.lk වෙබ් අඩවිය ඔස්සේ ඇණවුම් කරන පාඨකයින්ට විශේෂ දීමනා.",
+              image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=800&q=80",
+              tag: "20% OFF දීමනා",
+            },
+          ].map((item, idx) => (
+            <div
+              key={idx}
+              className="group bg-white rounded-3xl border border-maroon-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+            >
+              <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+                <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-saffron-500 text-maroon-950 font-black text-[10px] shadow">
+                  {item.tag}
+                </span>
+                <span className="absolute bottom-3 left-3 text-[11px] font-bold text-gold-300">
+                  {item.category}
+                </span>
+              </div>
+              <div className="p-5 space-y-2">
+                <h4 className="font-display font-extrabold text-sm sm:text-base text-maroon-900 group-hover:text-brandRed transition-colors leading-snug">
+                  {item.title}
+                </h4>
+                <p className="text-xs text-ink-muted leading-relaxed">
+                  {item.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Special Online Bundles with Free Delivery */}
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

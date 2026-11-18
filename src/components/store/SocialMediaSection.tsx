@@ -127,13 +127,13 @@ export function SocialMediaSection() {
       <div className="text-center space-y-3 max-w-3xl mx-auto">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-brandYellow text-brandNavy font-black text-xs shadow-sm">
           <Sparkles className="w-3.5 h-3.5 text-brandNavy" />
-          <span>සමාජ මාධ්‍ය ජාලයන් සමඟ එක්වන්න • Social Communities</span>
+          <span>CONNECT ON SOCIAL MEDIA • OFFICIAL CHANNELS</span>
         </div>
         <h2 className="font-display font-black text-2xl sm:text-4xl text-brandNavy tracking-tight">
-          පදනම සමාජ මාධ්‍ය ජාලය (Connect with Us)
+          Connect With Us on Social Media
         </h2>
         <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
-          නවතම පොත් නිකුත් කිරීම්, විභාග ප්‍රශ්න පත්‍ර විවරණ, කෙටි සටහන් සහ නොමිලේ අධ්‍යාපනික වීඩියෝ පාඩම් සඳහා අපගේ නිල Facebook පිටුව සහ YouTube නාලිකාව සමඟ දැන්ම එක්වන්න.
+          Follow our official Facebook page and YouTube channel for the latest book releases, model papers, past paper revisions, and free educational lessons.
         </p>
       </div>
 
@@ -154,14 +154,14 @@ export function SocialMediaSection() {
                 <div>
                   <div className="flex items-center gap-1.5">
                     <h3 className="font-display font-extrabold text-lg sm:text-xl text-brandNavy">
-                      පදනම ප්‍රකාශන
+                      Padanama Publication
                     </h3>
                     <CheckCircle className="w-4 h-4 text-[#1877F2] fill-[#1877F2] text-white" />
                   </div>
-                  <p className="text-xs text-ink-muted font-medium">@padanama07 • නිල Facebook පිටුව</p>
+                  <p className="text-xs text-ink-muted font-medium">@padanama07 • Official Facebook Page</p>
                   <div className="flex items-center gap-2 mt-1 text-[11px] font-bold text-[#1877F2]">
                     <Users className="w-3.5 h-3.5" />
-                    <span>45,000+ අනුගාමිකයින් (Followers)</span>
+                    <span>45,000+ Followers</span>
                   </div>
                 </div>
               </div>
@@ -180,7 +180,7 @@ export function SocialMediaSection() {
             {/* 4-Post Switcher Tabs */}
             <div className="space-y-1.5">
               <span className="text-[11px] font-extrabold text-brandNavy block">
-                මෑත පළකිරීම් 4ක් (Select from 4 Posts):
+                Select from 4 Recent Posts:
               </span>
               <div className="grid grid-cols-4 gap-2">
                 {FACEBOOK_POSTS.map((post, idx) => (
@@ -188,13 +188,13 @@ export function SocialMediaSection() {
                     key={post.id}
                     type="button"
                     onClick={() => setSelectedFbIndex(idx)}
-                    className={`p-2 rounded-xl border text-center transition-all ${
+                    className={`p-2 rounded-xl border text-center transition-all cursor-pointer ${
                       selectedFbIndex === idx
                         ? "border-[#1877F2] bg-[#1877F2]/10 font-black text-[#1877F2] shadow-sm scale-102"
                         : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 font-semibold"
                     }`}
                   >
-                    <span className="text-[11px] block truncate">පළකිරීම {idx + 1}</span>
+                    <span className="text-[11px] block truncate">Post {idx + 1}</span>
                     <span className="text-[9px] text-ink-muted block truncate">{post.time}</span>
                   </button>
                 ))}
@@ -288,7 +288,7 @@ export function SocialMediaSection() {
               className="w-full py-3.5 px-6 rounded-2xl bg-[#1877F2] hover:bg-[#1565C0] text-white font-extrabold text-sm shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 group-hover:scale-[1.01]"
             >
               <FacebookIcon className="w-5 h-5 fill-current shrink-0" size={20} />
-              <span>Facebook පිටුවට පිවිසෙන්න (Visit Facebook Page)</span>
+              <span>Visit Facebook Page</span>
               <ExternalLink className="w-4 h-4 shrink-0" />
             </a>
           </div>
@@ -309,14 +309,14 @@ export function SocialMediaSection() {
                 <div>
                   <div className="flex items-center gap-1.5">
                     <h3 className="font-display font-extrabold text-lg sm:text-xl text-brandNavy">
-                      පදනම YouTube නාලිකාව
+                      Padanama YouTube Channel
                     </h3>
                     <CheckCircle className="w-4 h-4 text-slate-500 fill-slate-500 text-white" />
                   </div>
-                  <p className="text-xs text-ink-muted font-medium">@padanamapublication • නිල නාලිකාව</p>
+                  <p className="text-xs text-ink-muted font-medium">@padanamapublication • Official Channel</p>
                   <div className="flex items-center gap-2 mt-1 text-[11px] font-bold text-[#FF0000]">
                     <Video className="w-3.5 h-3.5" />
-                    <span>28,000+ ග්‍රාහකයින් (Subscribers) • 180+ වීඩියෝ</span>
+                    <span>28,000+ Subscribers • 180+ Videos</span>
                   </div>
                 </div>
               </div>
@@ -335,7 +335,7 @@ export function SocialMediaSection() {
             {/* 4-Video Switcher Tabs */}
             <div className="space-y-1.5">
               <span className="text-[11px] font-extrabold text-brandNavy block">
-                අධ්‍යාපනික වීඩියෝ 4ක් (Select from 4 Videos):
+                Select from 4 Featured Educational Videos:
               </span>
               <div className="grid grid-cols-4 gap-2">
                 {YOUTUBE_VIDEOS.map((vid, idx) => (
@@ -343,13 +343,13 @@ export function SocialMediaSection() {
                     key={vid.id}
                     type="button"
                     onClick={() => setSelectedYtIndex(idx)}
-                    className={`p-2 rounded-xl border text-center transition-all ${
+                    className={`p-2 rounded-xl border text-center transition-all cursor-pointer ${
                       selectedYtIndex === idx
                         ? "border-[#FF0000] bg-[#FF0000]/10 font-black text-[#FF0000] shadow-sm scale-102"
                         : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 font-semibold"
                     }`}
                   >
-                    <span className="text-[11px] block truncate">වීඩියෝ {idx + 1}</span>
+                    <span className="text-[11px] block truncate">Video {idx + 1}</span>
                     <span className="text-[9px] text-ink-muted block truncate">{vid.duration}</span>
                   </button>
                 ))}
@@ -405,7 +405,7 @@ export function SocialMediaSection() {
               {/* 3 Secondary Mini Video Chips */}
               <div className="space-y-2 pt-2 border-t border-slate-200">
                 <span className="text-[11px] font-extrabold text-brandNavy block">
-                  තවත් අධ්‍යාපනික වීඩියෝ මාලාවන්:
+                  More Educational Video Lessons:
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
                   {YOUTUBE_VIDEOS.filter((_, idx) => idx !== selectedYtIndex).slice(0, 3).map((vid) => (
@@ -436,7 +436,7 @@ export function SocialMediaSection() {
               className="w-full py-3.5 px-6 rounded-2xl bg-[#FF0000] hover:bg-[#CC0000] text-white font-extrabold text-sm shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 group-hover:scale-[1.01]"
             >
               <YouTubeIcon className="w-5 h-5 fill-current shrink-0" size={20} />
-              <span>YouTube නාලිකාවට පිවිසෙන්න (Visit YouTube Channel)</span>
+              <span>Visit YouTube Channel</span>
               <ExternalLink className="w-4 h-4 shrink-0" />
             </a>
           </div>
