@@ -38,6 +38,20 @@ export function AdminLayoutShell({ children }: AdminLayoutShellProps) {
   const pathname = usePathname();
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
+  // If on admin login page, render clean full-screen standalone page without the admin sidebar or shell
+  if (pathname === "/admin/login") {
+    return <main className="w-full min-h-screen">{children}</main>;
+  }
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/admin/login", { method: "DELETE" });
+      window.location.href = "/admin/login";
+    } catch {
+      window.location.href = "/admin/login";
+    }
+  };
+
   return (
     <div className="min-h-screen w-full bg-gray-50 text-gray-900 font-sans flex flex-col lg:flex-row">
       {/* ================= MOBILE ADMIN APP BAR (<1024px) ================= */}
@@ -205,15 +219,23 @@ export function AdminLayoutShell({ children }: AdminLayoutShellProps) {
           })}
         </nav>
 
-        <div className="p-4 border-t border-white/10">
+        <div className="p-4 border-t border-white/10 space-y-2">
           <Link
             href="/"
             className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
           >
-            <LogOut className="w-3.5 h-3.5 text-brandYellow" />
+            <Store className="w-3.5 h-3.5 text-brandYellow" />
             <span>Back to Storefront</span>
             <ExternalLink className="w-3 h-3 ml-auto opacity-60" />
           </Link>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-red-300 hover:text-white hover:bg-red-500/20 transition-colors cursor-pointer text-left"
+          >
+            <LogOut className="w-3.5 h-3.5 text-red-400" />
+            <span>Sign Out (පිටවීම)</span>
+          </button>
         </div>
       </aside>
 

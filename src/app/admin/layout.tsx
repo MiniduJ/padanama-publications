@@ -17,8 +17,8 @@ export const metadata = {
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-gray-50 text-gray-900 font-sans antialiased">
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-screen bg-gray-50 text-gray-900 font-sans antialiased" suppressHydrationWarning>
         <AdminLayoutShell>{children}</AdminLayoutShell>
       </body>
     </html>
