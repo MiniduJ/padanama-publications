@@ -49,5 +49,8 @@ jobs:
       # The `vercel-build` script syncs the schema and seeds the catalogue on first deploy.
       - name: Deploy
         id: deploy
-        run: echo "url=$(npx vercel@latest deploy ${{ github.event_name != 'pull_request' && '--prod' || '' }} --yes --token=${{ secrets.VERCEL_TOKEN }})" >> "$GITHUB_OUTPUT"
+        # Assign first: bash -e fails the step if vercel exits non-zero (inside echo it would be masked).
+        run: |
+          url=$(npx vercel@latest deploy ${{ github.event_name != 'pull_request' && '--prod' || '' }} --yes --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$url" >> "$GITHUB_OUTPUT"
       - run: echo "Deployed ${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
