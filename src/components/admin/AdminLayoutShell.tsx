@@ -25,6 +25,7 @@ import {
   Users,
   UserCheck,
   PencilRuler,
+  Ticket,
 } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 
@@ -39,6 +40,7 @@ const NAV_ITEMS: { href: string; label: string; icon: any; badge?: number }[] = 
   { href: "/admin/books", label: "Books", icon: BookOpen },
   { href: "/admin/materials", label: "School Materials", icon: PencilRuler },
   { href: "/admin/categories", label: "Categories", icon: Library },
+  { href: "/admin/coupons", label: "Coupons", icon: Ticket },
   { href: "/admin/banners", label: "Hero Slides", icon: Images },
   { href: "/admin/testimonials", label: "Reviews", icon: Star },
   { href: "/admin/social", label: "Social Feed", icon: Share2 },

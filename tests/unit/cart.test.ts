@@ -1,5 +1,9 @@
-import { describe, it, expect } from "vitest";
-import { VALID_COUPONS, FREE_DELIVERY_THRESHOLD_CENTS } from "@/lib/cart-store";
+import { describe, it, expect, vi } from "vitest";
+
+vi.mock("@/server/db", () => ({ db: {} }));
+
+import { FREE_DELIVERY_THRESHOLD_CENTS } from "@/lib/cart-store";
+import { discountFor } from "@/server/catalog/coupons";
 import { formatLkr, centsToLkr, lkrToCents } from "@/lib/money";
 
 describe("Phase 5: Cart & Checkout Calculations Engine", () => {
@@ -8,14 +12,10 @@ describe("Phase 5: Cart & Checkout Calculations Engine", () => {
     expect(formatLkr(FREE_DELIVERY_THRESHOLD_CENTS, "si")).toBe("රු. 3,500.00");
   });
 
-  it("validates available promo coupons properly", () => {
-    expect(VALID_COUPONS.WELCOME10.type).toBe("PERCENT");
-    expect(VALID_COUPONS.WELCOME10.value).toBe(10);
-
-    expect(VALID_COUPONS.PADANAMA500.type).toBe("FIXED");
-    expect(VALID_COUPONS.PADANAMA500.value).toBe(50000); // Rs. 500
-
-    expect(VALID_COUPONS.CIBF2026.value).toBe(20); // 20% Colombo Book Fair
+  it("computes coupon discounts (admin-managed coupons) and never exceeds the subtotal", () => {
+    expect(discountFor({ discountType: "PERCENTAGE", discountValue: 10 }, 240000)).toBe(24000);
+    expect(discountFor({ discountType: "FIXED_AMOUNT", discountValue: 50000 }, 300000)).toBe(50000);
+    expect(discountFor({ discountType: "FIXED_AMOUNT", discountValue: 50000 }, 30000)).toBe(30000);
   });
 
   it("calculates percentage and fixed discounts correctly without floating point errors", () => {

@@ -1,9 +1,9 @@
 "use client";
 import { useTx } from "@/lib/tx";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useRouter } from "@/i18n/routing";
-import { useCart, VALID_COUPONS } from "@/lib/cart-store";
+import { useCart, type AppliedCoupon } from "@/lib/cart-store";
 import { formatLkr } from "@/lib/money";
 import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -83,16 +83,19 @@ export default function CartPage() {
 
   const grandTotalCents = netSubtotalCents + deliveryCents;
 
-  const handleApplyCoupon = (e: React.FormEvent) => {
+  const [promoCoupons, setPromoCoupons] = useState<Omit<AppliedCoupon, "discountCents">[]>([]);
+  useEffect(() => { fetch("/api/coupons").then((r) => r.json()).then((d) => setPromoCoupons(d.coupons || [])).catch(() => {}); }, []);
+
+  const handleApplyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!couponCode.trim()) return;
-    const res = applyCoupon(couponCode);
+    const res = await applyCoupon(couponCode);
     setCouponFeedback({ text: res.message, isError: !res.success });
     if (res.success) setCouponCode("");
   };
 
-  const handleQuickCoupon = (code: string) => {
-    const res = applyCoupon(code);
+  const handleQuickCoupon = async (code: string) => {
+    const res = await applyCoupon(code);
     setCouponFeedback({ text: res.message, isError: !res.success });
   };
 
@@ -274,14 +277,14 @@ export default function CartPage() {
             </div>
           ))}
 
-          {/* Quick Coupons Suggestion */}
-          <div className="p-4 rounded-2xl bg-cream/70 border border-gold-500/20 text-xs space-y-2">
+          {/* Quick Coupons Suggestion (public coupons from Admin → Coupons) */}
+          {promoCoupons.length > 0 && <div className="p-4 rounded-2xl bg-cream/70 border border-gold-500/20 text-xs space-y-2">
             <span className="font-bold text-maroon-900 flex items-center gap-1.5">
               <Tag className="w-3.5 h-3.5 text-saffron-500" />
               {tx("ලබාගත හැකි විශේෂ වට්ටම් කේත (Available Promo Coupons):")}
             </span>
             <div className="flex flex-wrap gap-2 pt-1">
-              {Object.entries(VALID_COUPONS).map(([code, def]) => (
+              {promoCoupons.map(({ code, ...def }) => (
                 <button
                   key={code}
                   type="button"
@@ -293,7 +296,7 @@ export default function CartPage() {
                 </button>
               ))}
             </div>
-          </div>
+          </div>}
         </div>
 
         {/* Right Column: Order Summary Card */}

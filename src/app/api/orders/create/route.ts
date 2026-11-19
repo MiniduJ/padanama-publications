@@ -8,6 +8,7 @@ import { COD_FEE_CENTS, COURIER_OPTIONS, shippingCents, type Courier, type Deliv
 import { bookCourier } from "@/server/delivery/couriers";
 import { randomInt } from "crypto";
 import { currentCustomer } from "@/server/account/customer";
+import { evaluateCoupon } from "@/server/catalog/coupons";
 
 const PAYMENT_METHODS = ["PAYHERE", "BANK_TRANSFER", "CASH_ON_DELIVERY", "KOKO"];
 const DELIVERY_METHODS: DeliveryMethod[] = ["COURIER", "EXPRESS", "PICKUP"];
@@ -52,10 +53,10 @@ export async function POST(request: NextRequest) {
   }
 
   const subtotalCents = lines.reduce((s, l) => s + l.unitPriceCents * l.quantity, 0);
-  let discountCents = 0;
-  if (couponCode === "WELCOME10") discountCents = Math.round(subtotalCents / 10);
-  else if (couponCode === "PADANAMA500" && subtotalCents >= 250000) discountCents = 50000;
-  else if (couponCode === "CIBF2026") discountCents = Math.round(subtotalCents / 5);
+  // Coupons are managed in Admin → Coupons; an invalid/expired code simply gives no discount.
+  const applied = couponCode ? await evaluateCoupon(String(couponCode), subtotalCents) : null;
+  const discountCents = applied?.ok ? applied.discountCents : 0;
+  const couponId = applied?.ok ? applied.id : null;
 
   const digitalOnly = lines.every((l) => l.isDigital);
   const ship = shippingCents({ district: shippingAddress.district || "", method: deliveryMethod, subtotalCents, digitalOnly });
@@ -73,13 +74,14 @@ export async function POST(request: NextRequest) {
         customerName, guestEmail: contact.email || null, guestPhone: String(contact.phone),
         shippingLine: [shippingAddress.street1, shippingAddress.street2, shippingAddress.landmark].filter(Boolean).join(", ") || null,
         shippingCity: shippingAddress.city || null, shippingDistrict: shippingAddress.district || null,
-        subtotalCents, discountCents, shippingCents: ship, taxCents: 0, totalCents,
+        subtotalCents, discountCents, couponId, shippingCents: ship, taxCents: 0, totalCents,
         bankSlipUrl: bankSlipUrl || null, customerNote: customerNote ? String(customerNote).slice(0, 1000) : null,
         isDigitalOnly: digitalOnly,
         items: { create: lines.map((l) => ({ ...l, totalCents: l.unitPriceCents * l.quantity })) },
         statusHistory: { create: { status: status as any, changedBy: "CUSTOMER" } },
       },
     });
+    if (couponId) await db.coupon.update({ where: { id: couponId }, data: { usedCount: { increment: 1 } } }).catch(() => {});
   } catch (e) {
     console.error("order create failed", e);
     return NextResponse.json({ error: SAVE_FAILED }, { status: 503 });

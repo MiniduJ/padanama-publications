@@ -782,6 +782,8 @@ model Coupon {
   perUserLimit  Int          @default(1)
   expiresAt     DateTime?
   isActive      Boolean      @default(true)
+  description   String? // shown to shoppers
+  isPublic      Boolean      @default(false) // listed as a quick-apply chip in the cart
   createdAt     DateTime     @default(now())
 
   orders Order[]

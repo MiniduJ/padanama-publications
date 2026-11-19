@@ -93,7 +93,7 @@ const ROLE_RESOURCES: Partial<Record<AdminRole, string[]>> = {
   ORDER_MANAGER: ["orders", "messages", "customers"],
   SUPPORT: ["orders", "messages", "testimonials", "customers"],
   ACCOUNTANT: ["expenses", "orders"],
-  MARKETING: ["banners", "testimonials", "social", "content"],
+  MARKETING: ["banners", "testimonials", "social", "content", "coupons"],
 };
 
 export function canAccess(role: AdminRole, resource: string): boolean {

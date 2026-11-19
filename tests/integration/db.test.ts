@@ -99,6 +99,63 @@ describe.skipIf(!run)("database integration", () => {
     expect(await db.orderStatusHistory.count({ where: { orderId: order.id, status: "SHIPPED" } })).toBe(1);
   });
 
+  it("coupons: admin CRUD (rupees in, cents stored), checkout applies them and counts use", async () => {
+    const { GET, POST } = await import("@/app/api/admin/[resource]/route");
+    const { PATCH, DELETE } = await import("@/app/api/admin/[resource]/[id]/route");
+    const { db } = await import("@/server/db");
+    const c = ctx({ resource: "coupons" });
+    const body = { code: " qa 300 ", description: "QA Rs.300 off", discountType: "FIXED_AMOUNT", discountValue: 300, minSpendCents: 100000, isActive: true, isPublic: false };
+    const created = await POST(req("/api/admin/coupons", { method: "POST", body: JSON.stringify(body) }), c);
+    const cp = await created.json();
+    expect(created.status, JSON.stringify(cp)).toBe(200);
+    expect(cp.code).toBe("QA300");
+    expect(cp.discountValue).toBe(300); // shown in rupees
+    expect((await db.coupon.findUnique({ where: { code: "QA300" } }))!.discountValue).toBe(30000); // stored in cents
+    expect((await POST(req("/api/admin/coupons", { method: "POST", body: JSON.stringify(body) }), c)).status).toBe(409); // duplicate code
+    expect((await POST(req("/api/admin/coupons", { method: "POST", body: JSON.stringify({ ...body, code: "QAPCT", discountType: "PERCENTAGE", discountValue: 150 }) }), c)).status).toBe(400);
+
+    const check = await import("@/app/api/coupons/route");
+    expect((await check.GET(req("/api/coupons?code=qa300&subtotal=50000"))).status).toBe(400); // below minimum
+    expect((await (await check.GET(req("/api/coupons?code=qa300&subtotal=200000"))).json()).discountCents).toBe(30000);
+    expect((await (await check.GET(req("/api/coupons"))).json()).coupons.map((x: any) => x.code)).toContain("CIBF2026"); // seeded public codes
+
+    const order = await import("@/app/api/orders/create/route");
+    const o = await (await order.POST(req("/api/orders/create", { method: "POST", body: JSON.stringify({
+      contact: { firstName: "Coupon", lastName: "QA", phone: "0771234500" }, shippingAddress: { street1: "1 Rd", city: "Kandy", district: "Kandy" },
+      deliveryMethod: "COURIER", courier: "DOMEX", paymentMethod: "CASH_ON_DELIVERY", couponCode: "QA300",
+      items: [{ bookId: "pdn-382", format: "PAPERBACK", quantity: 2, priceCents: 1 }],
+    }) }))).json();
+    expect(o.totalCents).toBe(99900 * 2 - 30000 + 30000 + 10000);
+    expect((await db.coupon.findUnique({ where: { code: "QA300" } }))!.usedCount).toBe(1);
+
+    expect((await PATCH(req(`/api/admin/coupons/${cp.id}`, { method: "PATCH", body: JSON.stringify({ ...body, code: "QA300", isActive: false }) }), ctx({ resource: "coupons", id: cp.id }))).status).toBe(200);
+    expect((await check.GET(req("/api/coupons?code=QA300&subtotal=200000"))).status).toBe(400); // inactive
+    const list = await (await GET(req("/api/admin/coupons?q=QA300"), c)).json();
+    expect(list.rows[0].usedCount).toBe(1);
+    expect((await DELETE(req(`/api/admin/coupons/${cp.id}`, { method: "DELETE" }), ctx({ resource: "coupons", id: cp.id }))).status).toBe(200);
+    expect(await db.coupon.count({ where: { code: "QA300" } })).toBe(0);
+  });
+
+  it("admin edits order contact details and customer records; deleting a customer keeps their orders", async () => {
+    const { db } = await import("@/server/db");
+    const { PATCH, DELETE } = await import("@/app/api/admin/[resource]/[id]/route");
+    const order = await db.order.findFirstOrThrow({ where: { customerName: "QA Tester" } });
+    const r = await PATCH(req(`/api/admin/orders/${order.id}`, { method: "PATCH", body: JSON.stringify({ customerName: "QA Tester Fixed", guestPhone: "0779999999", shippingCity: "Galle" }) }), ctx({ resource: "orders", id: order.id }));
+    expect(r.status).toBe(200);
+    expect((await db.order.findUniqueOrThrow({ where: { id: order.id } })).shippingCity).toBe("Galle");
+    await db.order.update({ where: { id: order.id }, data: { customerName: "QA Tester" } }); // later tests look it up by name
+
+    const u = await db.user.create({ data: { name: "Temp Customer", email: `tc${Date.now()}@test.lk`, role: "CUSTOMER" } as any });
+    const o2 = await db.order.create({ data: { orderNumber: `QA-${Date.now()}`, userId: u.id, subtotalCents: 1, totalCents: 1 } });
+    const cc = ctx({ resource: "customers", id: u.id });
+    const newEmail = `Renamed${Date.now()}@TEST.LK`;
+    expect((await PATCH(req(`/api/admin/customers/${u.id}`, { method: "PATCH", body: JSON.stringify({ name: "Renamed", email: newEmail, phoneNumber: `07${String(Date.now()).slice(-8)}`, isActive: true }) }), cc)).status).toBe(200);
+    expect((await db.user.findUniqueOrThrow({ where: { id: u.id } })).email).toBe(newEmail.toLowerCase());
+    expect((await DELETE(req(`/api/admin/customers/${u.id}`, { method: "DELETE" }), cc)).status).toBe(200);
+    expect((await db.user.findUniqueOrThrow({ where: { id: u.id } })).isDeleted).toBe(true);
+    expect(await db.order.count({ where: { id: o2.id } })).toBe(1);
+  });
+
   it("contact form lands in admin inbox; content CRUD + stats work", async () => {
     const contact = await import("@/app/api/contact/route");
     expect((await contact.POST(req("/api/contact", { method: "POST", body: JSON.stringify({ name: "Parent", phone: "0712345678", message: "Grade 5 books?" }) }))).status).toBe(200);

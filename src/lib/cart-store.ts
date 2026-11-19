@@ -1,5 +1,4 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { formatLkr } from "./money";
 
 export interface CartItem {
   id: string; // `${bookId}_${format}`
@@ -24,6 +23,7 @@ export interface AppliedCoupon {
   type: "PERCENT" | "FIXED";
   value: number; // e.g. 10 for 10% or 50000 for Rs. 500
   description: string;
+  minSubtotalCents?: number;
 }
 
 export interface CartState {
@@ -39,27 +39,7 @@ const DEFAULT_STATE: CartState = {
   coupon: null,
 };
 
-// Available promotional coupons for Padanama Publications
-export const VALID_COUPONS: Record<string, { type: "PERCENT" | "FIXED"; value: number; minSubtotalCents: number; description: string }> = {
-  WELCOME10: {
-    type: "PERCENT",
-    value: 10,
-    minSubtotalCents: 100000, // Rs. 1,000
-    description: "Welcome Discount: 10% off on your first order",
-  },
-  PADANAMA500: {
-    type: "FIXED",
-    value: 50000, // Rs. 500
-    minSubtotalCents: 250000, // Rs. 2,500
-    description: "Padanama Readers Club: Rs. 500 off orders over Rs. 2,500",
-  },
-  CIBF2026: {
-    type: "PERCENT",
-    value: 20,
-    minSubtotalCents: 150000, // Rs. 1,500
-    description: "Colombo International Book Fair: 20% Special Discount",
-  },
-};
+// Coupons live in the database (Admin → Coupons) and are checked by /api/coupons.
 
 function getStoredState(): CartState {
   if (typeof window === "undefined") {
@@ -173,39 +153,13 @@ export const cartActions = {
     emitChange();
   },
 
-  applyCoupon(rawCode: string): { success: boolean; message: string } {
-    const code = rawCode.trim().toUpperCase();
-    const couponDef = VALID_COUPONS[code];
-    if (!couponDef) {
-      return { success: false, message: "වලංගු නොවන කූපන් කේතයකි (Invalid coupon code)" };
-    }
-
+  async applyCoupon(rawCode: string): Promise<{ success: boolean; message: string }> {
     const current = getStoredState();
     const subtotalCents = current.items.reduce((sum, item) => sum + item.priceCents * item.quantity, 0);
-
-    if (subtotalCents < couponDef.minSubtotalCents) {
-      return {
-        success: false,
-        message: `මෙම කූපනය සඳහා අවම ඇණවුම් අගය ${formatLkr(couponDef.minSubtotalCents, "si")} විය යුතුය.`,
-      };
-    }
-
-    let discountCents = 0;
-    if (couponDef.type === "PERCENT") {
-      discountCents = Math.round((subtotalCents * couponDef.value) / 100);
-    } else {
-      discountCents = couponDef.value;
-    }
-
-    const applied: AppliedCoupon = {
-      code,
-      discountCents,
-      type: couponDef.type,
-      value: couponDef.value,
-      description: couponDef.description,
-    };
-
-    cachedState = { ...current, coupon: applied };
+    const r = await fetch(`/api/coupons?code=${encodeURIComponent(rawCode.trim())}&subtotal=${subtotalCents}`).then((x) => x.json()).catch(() => null);
+    if (!r?.ok) return { success: false, message: r?.error || "වලංගු නොවන කූපන් කේතයකි (Invalid coupon code)" };
+    const applied: AppliedCoupon = { ...r.coupon, discountCents: r.discountCents };
+    cachedState = { ...getStoredState(), coupon: applied };
     saveStoredState(cachedState);
     emitChange();
     return { success: true, message: `කූපනය සාර්ථකව ඇතුළත් විය (${applied.description})` };
@@ -221,8 +175,7 @@ export const cartActions = {
 
 function recalculateCoupon(coupon: AppliedCoupon | null, items: CartItem[]): AppliedCoupon | null {
   if (!coupon) return null;
-  const def = VALID_COUPONS[coupon.code];
-  if (!def) return null;
+  const def = { type: coupon.type, value: coupon.value, minSubtotalCents: coupon.minSubtotalCents ?? 0 };
 
   const subtotalCents = items.reduce((sum, item) => sum + item.priceCents * item.quantity, 0);
   if (subtotalCents < def.minSubtotalCents) {

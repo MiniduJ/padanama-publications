@@ -14,6 +14,8 @@ export interface Field {
   required?: boolean;
   list?: boolean; // show as table column
   help?: string;
+  suggestions?: string[]; // typed values offered as a pick-list (free text still allowed)
+  lockOnEdit?: boolean; // editable when creating, read-only afterwards (e.g. a setting key)
 }
 
 export interface ResourceDef {
@@ -34,6 +36,8 @@ export const ORDER_STATUSES = [
 export const COURIERS = ["KOOMBIYO", "DOMEX"];
 export const STAFF_ROLES = ["SUPER_ADMIN", "ADMIN", "EDITOR", "LIBRARIAN", "ORDER_MANAGER", "SUPPORT", "ACCOUNTANT", "MARKETING"];
 export const EXPENSE_CATEGORIES = ["PRINTING", "PAPER", "ROYALTY", "COURIER", "SALARY", "MARKETING", "RENT", "UTILITIES", "BOOK_FAIR", "OTHER"];
+
+export const CONTENT_KEYS = ["contact.phone", "contact.phone2", "contact.whatsapp", "contact.email", "contact.address", "bank.accounts"];
 
 export const RESOURCES: Record<string, ResourceDef> = {
   books: {
@@ -83,11 +87,13 @@ export const RESOURCES: Record<string, ResourceDef> = {
     fields: [
       { name: "orderNumber", label: "Order #", type: "readonly", list: true },
       { name: "createdAt", label: "Placed", type: "readonly", list: true },
-      { name: "customerName", label: "Customer", type: "readonly", list: true },
-      { name: "guestPhone", label: "Phone", type: "readonly", list: true },
-      { name: "shippingLine", label: "Address", type: "readonly" },
-      { name: "shippingCity", label: "City", type: "readonly" },
-      { name: "shippingDistrict", label: "District", type: "readonly", list: true },
+      { name: "customerName", label: "Customer", type: "text", list: true },
+      { name: "guestPhone", label: "Phone", type: "text", list: true },
+      { name: "guestEmail", label: "Email", type: "text" },
+      { name: "shippingLine", label: "Address", type: "text" },
+      { name: "shippingCity", label: "City", type: "text" },
+      { name: "shippingDistrict", label: "District", type: "text", list: true },
+      { name: "customerNote", label: "Customer note", type: "readonly" },
       { name: "itemsSummary", label: "Items", type: "readonly" },
       { name: "totalCents", label: "Total", type: "readonly", list: true },
       { name: "paymentMethod", label: "Payment", type: "readonly", list: true },
@@ -145,6 +151,21 @@ export const RESOURCES: Record<string, ResourceDef> = {
       { name: "amountCents", label: "Amount (Rs.)", type: "money", required: true, list: true },
     ],
   },
+  coupons: {
+    key: "coupons", label: "Coupons", singular: "Coupon", canCreate: true, canDelete: true,
+    fields: [
+      { name: "code", label: "Code", type: "text", required: true, list: true, help: "Shoppers type this at checkout. Saved in CAPITALS, no spaces." },
+      { name: "description", label: "Description", type: "text", list: true, help: "Shown to shoppers, e.g. Book Fair: 20% off" },
+      { name: "discountType", label: "Discount type", type: "select", options: ["PERCENTAGE", "FIXED_AMOUNT"], required: true, list: true },
+      { name: "discountValue", label: "Discount (% or Rs.)", type: "number", required: true, list: true, help: "Percentage: 10 = 10% off. Fixed amount: 500 = Rs. 500 off." },
+      { name: "minSpendCents", label: "Minimum order (Rs.)", type: "money" },
+      { name: "maxUsageCount", label: "Usage limit", type: "number", help: "Leave blank for unlimited" },
+      { name: "usedCount", label: "Times used", type: "readonly", list: true },
+      { name: "expiresAt", label: "Expires on", type: "date", list: true, help: "Leave blank for no expiry" },
+      { name: "isPublic", label: "Show in cart", type: "bool", list: true, help: "Listed as a one-tap coupon on the cart page" },
+      { name: "isActive", label: "Active", type: "bool", list: true },
+    ],
+  },
   staff: {
     key: "staff", label: "Staff", singular: "Staff member", canCreate: true, canDelete: true,
     fields: [
@@ -157,11 +178,11 @@ export const RESOURCES: Record<string, ResourceDef> = {
     ],
   },
   customers: {
-    key: "customers", label: "Customers", singular: "Customer",
+    key: "customers", label: "Customers", singular: "Customer", canDelete: true,
     fields: [
-      { name: "name", label: "Name", type: "readonly", list: true },
-      { name: "phoneNumber", label: "Mobile", type: "readonly", list: true },
-      { name: "email", label: "Email", type: "readonly", list: true },
+      { name: "name", label: "Name", type: "text", required: true, list: true },
+      { name: "phoneNumber", label: "Mobile", type: "text", list: true },
+      { name: "email", label: "Email", type: "text", list: true },
       { name: "orderCount", label: "Orders", type: "readonly", list: true },
       { name: "createdAt", label: "Registered", type: "readonly", list: true },
       { name: "isActive", label: "Active", type: "bool", list: true },
@@ -170,7 +191,7 @@ export const RESOURCES: Record<string, ResourceDef> = {
   content: {
     key: "content", label: "Page Content", singular: "Content block", canCreate: true, canDelete: true,
     fields: [
-      { name: "key", label: "Key", type: "text", required: true, list: true, help: "Storefront keys: contact.phone, contact.phone2, contact.whatsapp, contact.email, contact.address, bank.accounts (one account per line, e.g. Bank of Ceylon – 1234567 – Padanama Publications – Kollupitiya)" },
+      { name: "key", label: "Key", type: "text", required: true, list: true, lockOnEdit: true, suggestions: CONTENT_KEYS, help: "Storefront keys: contact.phone, contact.phone2, contact.whatsapp, contact.email, contact.address, bank.accounts (one account per line, e.g. Bank of Ceylon – 1234567 – Padanama Publications – Kollupitiya)" },
       { name: "value", label: "Value", type: "textarea", required: true, list: true },
       { name: "description", label: "Note", type: "text" },
     ],

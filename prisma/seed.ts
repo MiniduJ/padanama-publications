@@ -504,6 +504,15 @@ async function main() {
   if (!(await prisma.socialPost.count())) {
     await prisma.socialPost.createMany({ data: DEFAULT_SOCIAL.map((p, i) => ({ kind: p.kind, url: p.url, thumbnailUrl: p.thumbnailUrl ?? null, caption: p.caption ?? null, sortOrder: i })) });
   }
+  // Coupons that used to be hard-coded → editable in Admin → Coupons (only into an empty table)
+  if (!(await prisma.coupon.count())) {
+    await prisma.coupon.createMany({ data: [
+      { code: "WELCOME10", discountType: "PERCENTAGE", discountValue: 10, minSpendCents: 100000, description: "Welcome Discount: 10% off on your first order", isPublic: true },
+      { code: "PADANAMA500", discountType: "FIXED_AMOUNT", discountValue: 50000, minSpendCents: 250000, description: "Padanama Readers Club: Rs. 500 off orders over Rs. 2,500", isPublic: true },
+      { code: "CIBF2026", discountType: "PERCENTAGE", discountValue: 20, minSpendCents: 150000, description: "Colombo International Book Fair: 20% Special Discount", isPublic: true },
+    ] });
+  }
+
   // Move earlier-seeded site images off the legacy host (rows the admin changed don't match and stay as they are).
   const LEGACY = "https://www.padanamapublication.lk/image/", SITE = "https://ufmcnjfvzxumcvmddpal.supabase.co/storage/v1/object/public/media/site/";
   const moved =

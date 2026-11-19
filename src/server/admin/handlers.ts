@@ -58,7 +58,24 @@ const SIMPLE: Record<string, { model: string; search: string[]; orderBy: any; wh
   social: { model: "socialPost", search: ["url", "caption"], orderBy: { sortOrder: "asc" } },
   expenses: { model: "expense", search: ["description", "category"], orderBy: { date: "desc" } },
   messages: { model: "contactMessage", search: ["name", "phone", "subject", "message"], orderBy: { createdAt: "desc" } },
+  coupons: { model: "coupon", search: ["code", "description"], orderBy: { createdAt: "desc" } },
 };
+
+// Coupons: fixed amounts are stored in cents but edited in rupees.
+const couponRow = (c: any) => ({ ...c, discountValue: c.discountType === "FIXED_AMOUNT" ? c.discountValue / 100 : c.discountValue });
+function couponWrite(d: Record<string, any>) {
+  if (d.code !== undefined) {
+    d.code = String(d.code).toUpperCase().replace(/\s+/g, "");
+    if (!/^[A-Z0-9_-]{3,30}$/.test(d.code)) throw new HttpError(400, "Code: 3-30 letters, numbers, - or _");
+  }
+  if (d.discountValue != null && d.discountType) {
+    if (d.discountType === "PERCENTAGE" && (d.discountValue < 1 || d.discountValue > 100)) throw new HttpError(400, "Percentage must be 1-100");
+    if (d.discountValue < 0) throw new HttpError(400, "Discount cannot be negative");
+    if (d.discountType === "FIXED_AMOUNT") d.discountValue = Math.round(d.discountValue * 100);
+  }
+  if (d.minSpendCents === null) d.minSpendCents = 0;
+  return d;
+}
 
 function searchWhere(fields: string[], q?: string) {
   return q ? { OR: fields.map((f) => ({ [f]: { contains: q, mode: "insensitive" } })) } : {};
@@ -165,10 +182,20 @@ export async function listResource(key: string, q: { q?: string; page?: number; 
   const where = { ...(m.where || {}), ...filters, ...searchWhere(m.search, q.q) };
   const delegate = (db as any)[m.model];
   const [rows, total] = await Promise.all([delegate.findMany({ where, orderBy: m.orderBy, skip, take }), delegate.count({ where })]);
-  return { rows, total, pageSize: take };
+  return { rows: key === "coupons" ? rows.map(couponRow) : rows, total, pageSize: take };
 }
 
 export async function saveResource(key: string, id: string | null, body: Record<string, any>, s: AdminSession) {
+  try {
+    return await saveResourceInner(key, id, body, s);
+  } catch (e: any) {
+    if (e?.code === "P2002") throw new HttpError(409, `That ${(e.meta?.target || ["value"]).join(", ")} is already used by another record`);
+    if (e?.code === "P2025") throw new HttpError(404, "Record not found (it may have been deleted)");
+    throw e;
+  }
+}
+
+async function saveResourceInner(key: string, id: string | null, body: Record<string, any>, s: AdminSession) {
   const def = RESOURCES[key];
   if (!def) throw new HttpError(404, "Unknown resource");
   if (!id && !def.canCreate) throw new HttpError(405, "Create not allowed");
@@ -202,7 +229,9 @@ export async function saveResource(key: string, id: string | null, body: Record<
     const sel = { id: true, name: true, email: true, phoneNumber: true, role: true, isActive: true };
     result = id ? await db.user.update({ where: { id }, data: write, select: sel }) : await db.user.create({ data: write as any, select: sel });
   } else if (key === "customers") {
-    result = await db.user.update({ where: { id: id!, role: "CUSTOMER" }, data: { isActive: data.isActive }, select: { id: true, name: true, isActive: true } });
+    if (!id) throw new HttpError(405, "Customers sign up on the website");
+    if (data.email) data.email = data.email.toLowerCase();
+    result = await db.user.update({ where: { id, role: "CUSTOMER" }, data, select: { id: true, name: true, email: true, phoneNumber: true, isActive: true } });
   } else if (key === "content") {
     const k = id || data.key;
     result = await db.setting.upsert({ where: { key: k }, create: { key: k, value: data.value, description: data.description, updatedBy: s.email }, update: { value: data.value, description: data.description, updatedBy: s.email } });
@@ -210,7 +239,9 @@ export async function saveResource(key: string, id: string | null, body: Record<
   } else {
     const m = SIMPLE[key];
     const delegate = (db as any)[m.model];
-    result = id ? await delegate.update({ where: { id }, data }) : await delegate.create({ data });
+    const write = key === "coupons" ? couponWrite(data) : data;
+    result = id ? await delegate.update({ where: { id }, data: write }) : await delegate.create({ data: write });
+    if (key === "coupons") result = couponRow(result);
   }
   await audit(s, id ? "UPDATE" : "CREATE", key, result.id, data);
   return result;
@@ -224,6 +255,8 @@ export async function deleteResource(key: string, id: string, s: AdminSession) {
   else if (key === "staff") {
     if (id === s.uid) throw new HttpError(400, "You cannot remove your own account");
     await db.user.update({ where: { id }, data: { isActive: false, isDeleted: true, deletedAt: new Date() } });
+  } else if (key === "customers") {
+    await db.user.update({ where: { id, role: "CUSTOMER" }, data: { isActive: false, isDeleted: true, deletedAt: new Date() } }); // orders keep their history
   } else if (key === "content") await db.setting.delete({ where: { key: id } });
   else await (db as any)[SIMPLE[key].model].delete({ where: { id } });
   await audit(s, "DELETE", key, id);
