@@ -113,7 +113,7 @@ function Input({ f, value, onChange, options }: { f: Field; value: any; onChange
   }
 }
 
-export function ResourceManager({ resource, initialFilters = {} }: { resource: string; initialFilters?: Record<string, string> }) {
+export function ResourceManager({ resource, initialFilters = {}, title, defaults = {} }: { resource: string; initialFilters?: Record<string, string>; title?: string; defaults?: Record<string, unknown> }) {
   const def = RESOURCES[resource];
   const [rows, setRows] = useState<Row[]>([]);
   const [total, setTotal] = useState(0);
@@ -180,13 +180,13 @@ export function ResourceManager({ resource, initialFilters = {} }: { resource: s
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-black text-brandNavy">{def.label}</h1>
+          <h1 className="text-2xl font-black text-brandNavy">{title || def.label}</h1>
           <p className="text-xs text-gray-500">{total} record{total === 1 ? "" : "s"}</p>
         </div>
         <div className="flex gap-2">
           <button onClick={load} className="p-2.5 rounded-xl border bg-white hover:bg-gray-50" aria-label="Refresh"><RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /></button>
           {def.canCreate && (
-            <button onClick={() => setEditing(Object.fromEntries(def.fields.map((f) => [f.name, f.type === "bool" ? true : f.type === "images" ? [] : ""])))} className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-brandNavy text-white text-sm font-extrabold hover:bg-brandNavy/90">
+            <button onClick={() => setEditing({ ...Object.fromEntries(def.fields.map((f) => [f.name, f.type === "bool" ? true : f.type === "images" ? [] : ""])), ...defaults })} className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-brandNavy text-white text-sm font-extrabold hover:bg-brandNavy/90">
               <Plus className="w-4 h-4" /> Add {def.singular.toLowerCase()}
             </button>
           )}
@@ -197,7 +197,7 @@ export function ResourceManager({ resource, initialFilters = {} }: { resource: s
         <label className="relative flex-1">
           <span className="sr-only">Search</span>
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} placeholder={`Search ${def.label.toLowerCase()}…`} className="w-full pl-9 pr-3 py-2.5 rounded-xl border bg-white text-sm" />
+          <input value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} placeholder={`Search ${(title || def.label).toLowerCase()}…`} className="w-full pl-9 pr-3 py-2.5 rounded-xl border bg-white text-sm" />
         </label>
         {def.filters?.map((fl) => (
           <select key={fl.name} aria-label={`Filter by ${fl.name}`} value={filters[fl.name] || ""} onChange={(e) => { setFilters({ ...filters, [fl.name]: e.target.value }); setPage(1); }} className="px-3 py-2.5 rounded-xl border bg-white text-sm">

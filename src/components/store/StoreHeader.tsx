@@ -4,11 +4,15 @@ import React, { useState, useEffect } from "react";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { useLocale } from "next-intl";
 import { Logo } from "@/components/ui/Logo";
-import { Search, ShoppingBag, User, Phone, Menu, X, Info, Mail, Sparkles } from "lucide-react";
+import { Search, ShoppingBag, User, Phone, Menu, X, Info, Mail, Sparkles, ChevronDown } from "lucide-react";
 import { CartBadge } from "./CartBadge";
 
 // Nav + top bar stay the same in every language (by design); only page content is translated.
 const NAV_LABELS: Record<string, string> = { home: "Home", books: "All Books", shop: "Book Shop", digitalLibrary: "Digital Library", samples: "Free Samples", about: "About Us", contact: "Contact", bookFair: "Book Fair" };
+const SHOP_LINKS = [
+  { href: "/books", label: "Books", hint: "Workbooks, notes, past papers" },
+  { href: "/books?type=items", label: "School Materials", hint: "Stationery, charts, learning aids" },
+];
 const TOP_LABELS: Record<string, string> = { freeDeliveryNotice: "රු. 3,500 ට වැඩි ඇණවුම් සඳහා දිවයින පුරා නොමිලේ බෙදාහැරීම", searchPlaceholder: "Search books, authors, ISBN, or type in Singlish..." };
 
 export function StoreHeader() {
@@ -161,12 +165,23 @@ export function StoreHeader() {
             <span>{nav("home")}</span>
           </Link>
 
-          <Link
-            href="/books"
-            className="hover:text-brandRed transition-colors"
-          >
-            <span>{nav("shop")}</span>
-          </Link>
+          {/* Book Shop dropdown: opens on hover or keyboard focus */}
+          <div className="relative group">
+            <Link href="/books" aria-haspopup="true" className="hover:text-brandRed transition-colors inline-flex items-center gap-1 py-2">
+              <span>{nav("shop")}</span>
+              <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180 group-focus-within:rotate-180" />
+            </Link>
+            <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition-opacity absolute left-0 top-full z-50 pt-1">
+              <div className="w-60 rounded-2xl bg-white border border-maroon-100 shadow-xl p-2">
+                {SHOP_LINKS.map((l) => (
+                  <Link key={l.href} href={l.href} className="flex flex-col rounded-xl px-3 py-2.5 hover:bg-cream focus:bg-cream outline-none">
+                    <span className="text-sm font-extrabold text-brandNavy">{l.label}</span>
+                    <span className="text-xs font-medium text-ink-muted">{l.hint}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
 
           <Link
             href="/library"
@@ -262,14 +277,17 @@ export function StoreHeader() {
             >
               <span>{nav("home")}</span>
             </Link>
-            <Link
-              href="/books"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-2.5 border-b border-maroon-100 flex items-center justify-between"
-            >
-              <span>{nav("shop")} (Book Shop)</span>
-              <span className="text-xs text-brandRed font-normal">320+ Books</span>
-            </Link>
+            <div className="py-2.5 border-b border-maroon-100">
+              <span>{nav("shop")}</span>
+              <div className="mt-1 pl-3 flex flex-col">
+                {SHOP_LINKS.map((l) => (
+                  <Link key={l.href} href={l.href} onClick={() => setMobileMenuOpen(false)} className="py-2 flex items-center justify-between">
+                    <span>{l.label}</span>
+                    <span className="text-xs text-brandRed font-normal">{l.hint}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
             <Link
               href="/library"
               onClick={() => setMobileMenuOpen(false)}

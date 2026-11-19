@@ -29,15 +29,17 @@ interface LibraryPageProps {
 export default async function DigitalLibraryPage({ params, searchParams }: LibraryPageProps) {
   const { locale } = await params;
   const { category } = await searchParams;
-  const result = await getBooks({ category, limit: 20 });
+  const result = await getBooks({ category, type: "BOOK", limit: 20 });
   const books = result.books;
 
   const categories = [
     { id: "", label: "සියලු පොත් (All)" },
-    { id: "scholarship-grade-5", label: "5 ශ්‍රේණිය ශිෂ්‍යත්වය" },
-    { id: "gce-ol-past-papers", label: "සාමාන්‍ය පෙළ (O/L)" },
-    { id: "gce-al-past-papers", label: "උසස් පෙළ (A/L)" },
-    { id: "sinhala-literature", label: "සාහිත්‍ය හා නවකතා" },
+    { id: "primary", label: "ප්‍රාථමික (Primary)" },
+    { id: "grade-6-7", label: "6-7 ශ්‍රේණි" },
+    { id: "grade-8-9", label: "8-9 ශ්‍රේණි" },
+    { id: "gce-ol", label: "සාමාන්‍ය පෙළ (O/L)" },
+    { id: "gce-al-science", label: "උසස් පෙළ (A/L)" },
+    { id: "gov-exam-past-papers", label: "පසුගිය ප්‍රශ්න පත්‍ර" },
   ];
 
   return (
@@ -109,6 +111,9 @@ export default async function DigitalLibraryPage({ params, searchParams }: Libra
             >
               {/* Top Banner / Cover */}
               <div className="relative aspect-[1/1.2] bg-gradient-to-tr from-maroon-50 via-cream to-white flex items-center justify-center p-4 border-b border-gray-100">
+                {book.coverUrl ? (
+                  <img src={book.coverUrl} alt={book.titleSi} loading="lazy" className="h-full w-auto max-w-full object-contain rounded-lg shadow-md group-hover:scale-105 transition-transform" />
+                ) : (
                 <div className="w-28 h-36 bg-maroon-800 text-cream rounded-lg shadow-md p-3 flex flex-col justify-between border border-gold-500/40 group-hover:scale-105 transition-transform">
                   <span className="text-[9px] font-bold uppercase tracking-wider text-gold-400">
                     පදනම
@@ -118,6 +123,7 @@ export default async function DigitalLibraryPage({ params, searchParams }: Libra
                   </span>
                   <span className="text-[9px] text-cream/70 line-clamp-1">{authorName}</span>
                 </div>
+                )}
 
                 <div className="absolute top-3 left-3">
                   <Badge variant="gold">පිටු {maxPages}ක් නොමිලේ</Badge>

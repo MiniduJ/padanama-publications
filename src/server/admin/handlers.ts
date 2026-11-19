@@ -130,6 +130,7 @@ export async function listResource(key: string, q: { q?: string; page?: number; 
 
   if (key === "books") {
     const where: any = { isDeleted: false, ...filters, ...searchWhere(["titleSi", "titleEn", "slug"], q.q) };
+    if (where.productType === "SCHOOL_MATERIALS") where.productType = { in: ["STATIONERY", "LEARNING_AID"] };
     const [rows, total] = await Promise.all([db.book.findMany({ where, include: bookInclude, orderBy: { updatedAt: "desc" }, skip, take }), db.book.count({ where })]);
     return { rows: rows.map(bookRow), total, pageSize: take };
   }

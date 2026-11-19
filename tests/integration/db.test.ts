@@ -37,6 +37,16 @@ describe.skipIf(!run)("database integration", () => {
     expect(saved.samplePageUrls).toHaveLength(2);
   });
 
+  it("admin splits the catalogue into books and school materials", async () => {
+    const { GET } = await import("@/app/api/admin/[resource]/route");
+    const list = async (f: string) => (await GET(req(`/api/admin/books?f.productType=${f}`), ctx({ resource: "books" }))).json();
+    const [books, materials, all] = await Promise.all([list("BOOK"), list("SCHOOL_MATERIALS"), list("")]);
+    expect(books.rows.every((r: any) => r.productType === "BOOK")).toBe(true);
+    expect(materials.rows.every((r: any) => r.productType !== "BOOK")).toBe(true);
+    expect(materials.total).toBeGreaterThan(0);
+    expect(books.total + materials.total).toBe(all.total);
+  });
+
   it("lists items with photos first, across page boundaries, without gaps or repeats", async () => {
     const { getBooks } = await import("@/server/catalog/books");
     const { db } = await import("@/server/db");

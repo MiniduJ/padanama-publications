@@ -26,10 +26,12 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
   const currentCategory = resolvedParams.category || "all";
   const currentSort = resolvedParams.sort || "newest";
   const currentQuery = resolvedParams.query || "";
-  const currentType = ["BOOK", "items"].includes(resolvedParams.type || "") ? resolvedParams.type! : "";
+  // Two pages: /books lists books, /books?type=items lists school materials (stationery + learning aids).
+  const isItems = resolvedParams.type === "items";
+  const currentType = isItems ? "items" : "BOOK";
   // Keeps the other filters when one changes.
   const qs = (over: Record<string, string | number>) => {
-    const p = new URLSearchParams(Object.entries({ category: currentCategory, sort: currentSort, type: currentType, query: currentQuery, ...over }).filter(([, v]) => v !== "" && v !== "all").map(([k, v]) => [k, String(v)]));
+    const p = new URLSearchParams(Object.entries({ category: currentCategory, sort: currentSort, type: isItems ? "items" : "", query: currentQuery, ...over }).filter(([, v]) => v !== "" && v !== "all" && v !== "BOOK").map(([k, v]) => [k, String(v)]));
     const s = p.toString();
     return s ? `/books?${s}` : "/books";
   };
@@ -43,13 +45,14 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
     format: resolvedParams.format,
     sort: currentSort,
     query: currentQuery,
-    type: currentType || undefined,
+    type: currentType,
     page,
     limit: 18,
   });
-  const counts = await getCategoryCounts(currentType || undefined);
+  const counts = await getCategoryCounts(currentType);
 
   const L = (si: string, en: string, ta: string) => (locale === "en" ? en : locale === "ta" ? ta : si);
+  const pageTitle = isItems ? L("පාසල් අධ්‍යාපන උපකරණ", "School Materials", "பாடசாலைப் பொருட்கள்") : L("පොත්", "Books", "நூல்கள்");
   const categories = [
     { slug: "all", name: cat("all") },
     { slug: "preschool-grade-1-2", name: cat("preschoolGrade12") },
@@ -79,7 +82,7 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
       <nav className="flex items-center gap-2 text-xs text-ink-muted">
         <Link href="/" className="hover:text-brandRed transition-colors">{nav("home")}</Link>
         <span>/</span>
-        <span className="text-brandNavy font-bold">{nav("books")}</span>
+        <span className="text-brandNavy font-bold">{pageTitle}</span>
         {currentCategory !== "all" && (
           <>
             <span>/</span>
@@ -93,13 +96,15 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brandYellow text-brandNavy text-xs font-black shadow">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>{locale === "ta" ? "அதிகாரப்பூர்வ நூல் பட்டியல்" : locale === "en" ? "Official Book Catalog" : "නිල පදනම ප්‍රකාශන ග්‍රන්ථ නාමාවලිය"}</span>
+            <span>{isItems ? L("පාසල් අවශ්‍යතා", "School Essentials", "பாடசாலைத் தேவைகள்") : locale === "ta" ? "அதிகாரப்பூர்வ நூல் பட்டியல்" : locale === "en" ? "Official Book Catalog" : "නිල පදනම ප්‍රකාශන ග්‍රන්ථ නාමාවලිය"}</span>
           </div>
           <h1 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-tight">
-            {nav("books")}
+            {pageTitle}
           </h1>
           <p className="text-xs sm:text-sm text-cream/85 max-w-xl">
-            {locale === "ta"
+            {isItems
+              ? L(`පාසල් ලිපි ද්‍රව්‍ය, පත්‍රිකා සහ ඉගෙනුම් උපකරණ ${pagination.total}ක්.`, `${pagination.total} school stationery items, wall charts and learning aids.`, `${pagination.total} பாடசாலை எழுதுபொருட்கள் மற்றும் கற்றல் உபகரணங்கள்.`)
+              : locale === "ta"
               ? `தரம் 1 முதல் உயர்தரம் வரையிலான ${pagination.total} வினாத்தாள்கள் மற்றும் பயிற்சி நூல்கள்.`
               : locale === "en"
               ? `Explore our official collection of ${pagination.total} textbooks, workbooks, and past papers.`
@@ -126,9 +131,8 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
       {/* Product type: books vs school items / stationery / learning aids */}
       <div role="tablist" aria-label="Product type" className="flex gap-2 overflow-x-auto pb-1">
         {[
-          ["", L("සියල්ල", "Everything", "அனைத்தும்")],
           ["BOOK", L("පොත්", "Books", "நூல்கள்")],
-          ["items", L("පාසල් උපකරණ සහ ලිපි ද්‍රව්‍ය", "School items & stationery", "பாடசாலைப் பொருட்கள்")],
+          ["items", L("පාසල් අධ්‍යාපන උපකරණ", "School Materials", "பாடசாலைப் பொருட்கள்")],
         ].map(([v, label]) => (
           <Link key={v} role="tab" aria-selected={currentType === v} href={qs({ type: v, category: "all", page: "" })}
             className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap border ${currentType === v ? "bg-brandNavy text-white border-brandNavy" : "bg-white text-brandNavy border-maroon-100 hover:border-brandRed"}`}>
@@ -210,7 +214,7 @@ export default async function BooksPage({ params, searchParams }: BooksPageProps
             {/* Left: Results Count & Active Category */}
             <div className="flex items-center gap-2 text-xs flex-wrap">
               <span className="text-ink-muted">{locale === "ta" ? "காட்டப்படும் நூல்கள்:" : locale === "en" ? "Showing:" : "ප්‍රතිඵල:"}</span>
-              <span className="font-extrabold text-brandNavy">{pagination.total} {locale === "ta" ? "நூல்கள்" : locale === "en" ? "Books" : "පොත්"}</span>
+              <span className="font-extrabold text-brandNavy">{pagination.total} {isItems ? L("භාණ්ඩ", "Items", "பொருட்கள்") : L("පොත්", "Books", "நூல்கள்")}</span>
               {currentCategory !== "all" && (
                 <span className="px-2.5 py-0.5 rounded-full bg-brandYellow/30 text-brandNavy font-bold text-[11px]">
                   {currentCategoryObj.name}

@@ -38,7 +38,7 @@ export const EXPENSE_CATEGORIES = ["PRINTING", "PAPER", "ROYALTY", "COURIER", "S
 export const RESOURCES: Record<string, ResourceDef> = {
   books: {
     key: "books", label: "Catalogue", singular: "Item", canCreate: true, canDelete: true,
-    filters: [{ name: "productType", options: ["BOOK", "STATIONERY", "LEARNING_AID"] }],
+    filters: [{ name: "productType", options: ["BOOK", "SCHOOL_MATERIALS", "STATIONERY", "LEARNING_AID"] }], // SCHOOL_MATERIALS = stationery + learning aids
     fields: [
       { name: "productType", label: "Item type", type: "select", options: ["BOOK", "STATIONERY", "LEARNING_AID"], required: true, list: true, help: "Stationery & learning aids have no e-book or free sample" },
       { name: "coverUrl", label: "Cover", type: "image", list: true },
