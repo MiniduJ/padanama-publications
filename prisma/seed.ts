@@ -330,7 +330,8 @@ async function main() {
     },
   });
 
-  // 6. Shipping Zones & 25 Districts
+  // 6. Shipping Zones & 25 Districts (only into an empty table: the seed runs on every deploy)
+  if (!(await prisma.shippingZone.count())) {
   const zone1 = await prisma.shippingZone.create({
     data: {
       name: "Zone 1 — Colombo Metro",
@@ -390,6 +391,7 @@ async function main() {
       },
     },
   });
+  }
 
   // 7. System Settings
   await prisma.setting.upsert({
