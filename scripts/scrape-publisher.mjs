@@ -114,4 +114,31 @@ async function main() {
   console.log(`saved ${books.length} books → ${OUT}`);
 }
 
-main();
+/** Listing pages show their own thumbnail per product; use it where the detail page had no usable cover. */
+async function fillCovers() {
+  const books = JSON.parse(fs.readFileSync(OUT, "utf8"));
+  const byId = new Map(books.map((b) => [b.id, b]));
+  const thumbs = new Map();
+  for (let page = 0; page < 200; page++) {
+    const html = await get(`${BASE}products.php?page=${page}&id=`);
+    const before = thumbs.size;
+    for (const m of html.matchAll(/product-details\.php\?id=(\d+)"[^>]*>\s*<img[^>]+src="([^"]+)"/g)) {
+      if (!m[2].endsWith("/") && !m[2].includes("book_default")) thumbs.set(m[1], abs(m[2]));
+    }
+    if (thumbs.size === before) break;
+    await sleep(250);
+  }
+  fs.mkdirSync(IMG_DIR, { recursive: true });
+  let filled = 0;
+  for (const [id, url] of thumbs) {
+    const b = byId.get(id);
+    if (!b || b.cover) continue;
+    const local = await download(url);
+    if (local.startsWith("/images/")) { b.cover = url; filled++; } // download succeeded → image exists
+  }
+  fs.writeFileSync(OUT, JSON.stringify(books, null, 1));
+  console.log(`listing thumbnails: ${thumbs.size}, covers filled: ${filled}, still missing: ${books.filter((b) => !b.cover).length}`);
+}
+
+if (process.argv.includes("--fill-covers")) fillCovers();
+else main();

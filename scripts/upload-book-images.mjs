@@ -1,47 +1,39 @@
-// Moves book images (downloaded by scrape-publisher.mjs into public/images/books) to Supabase Storage
-// and points Book.coverUrl / Book.galleryUrls at the storage copies. Safe to re-run.
-// Needs: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, DATABASE_URL; public bucket "media".
-// Usage: node --env-file=.env scripts/upload-book-images.mjs
+// Uploads every catalogue image (from the local scrape cache public/images/books) to Supabase Storage
+// bucket "media" (public, created if missing) and rewrites src/data/publisher-catalog.json to the storage URLs.
+// The next deploy's seed syncs those URLs into the database. Safe to re-run (upsert).
+// Needs NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.   Usage: node --env-file=.env scripts/upload-book-images.mjs
 import fs from "node:fs";
 import path from "node:path";
-import { PrismaClient } from "@prisma/client";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (!url || !key) throw new Error("Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY");
-const DIR = "public/images/books";
+const DIR = "public/images/books", JSON_PATH = "src/data/publisher-catalog.json";
+const PUBLIC = `${url}/storage/v1/object/public/media/books/`;
 const TYPES = { ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp", ".gif": "image/gif" };
-const db = new PrismaClient();
-const done = new Map();
+const auth = key.startsWith("sb_") ? { apikey: key } : { Authorization: `Bearer ${key}`, apikey: key }; // new sb_secret_ keys are not JWTs
 
-async function toStorage(src) {
-  if (!src || src.includes("/storage/v1/object/public/")) return src;
-  const name = path.basename(new URL(src, "https://x").pathname);
-  if (done.has(name)) return done.get(name);
-  const local = path.join(DIR, name);
-  const body = fs.existsSync(local) ? fs.readFileSync(local) : Buffer.from(await (await fetch(src)).arrayBuffer());
-  const r = await fetch(`${url}/storage/v1/object/media/books/${name}`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": TYPES[path.extname(name).toLowerCase()] || "application/octet-stream", "x-upsert": "true" },
-    body,
-  });
-  if (!r.ok) throw new Error(`${name}: ${r.status} ${await r.text()}`);
-  const out = `${url}/storage/v1/object/public/media/books/${name}`;
-  done.set(name, out);
-  return out;
-}
+// Bucket (an "already exists" error is fine)
+await fetch(`${url}/storage/v1/bucket`, { method: "POST", headers: { ...auth, "Content-Type": "application/json" }, body: JSON.stringify({ id: "media", name: "media", public: true }) });
 
-const books = await db.book.findMany({ select: { id: true, coverUrl: true, galleryUrls: true } });
-let n = 0;
-for (const b of books) {
-  try {
-    const coverUrl = await toStorage(b.coverUrl);
-    const galleryUrls = await Promise.all(b.galleryUrls.map(toStorage));
-    await db.book.update({ where: { id: b.id }, data: { coverUrl, galleryUrls } });
-    if (++n % 50 === 0) console.log(`${n}/${books.length}`);
-  } catch (e) {
-    console.warn(`skip ${b.id}: ${e.message}`);
-  }
+const books = JSON.parse(fs.readFileSync(JSON_PATH, "utf8"));
+const base = (u) => path.basename(new URL(u).pathname);
+const uploaded = new Set();
+const todo = [...new Set(books.flatMap((b) => [b.cover, ...b.gallery]).filter(Boolean).map(base))].filter((n) => fs.existsSync(path.join(DIR, n)));
+let failed = 0;
+for (let i = 0; i < todo.length; i += 8) {
+  await Promise.all(todo.slice(i, i + 8).map(async (n) => {
+    const r = await fetch(`${url}/storage/v1/object/media/books/${encodeURIComponent(n)}`, {
+      method: "POST",
+      headers: { ...auth, "Content-Type": TYPES[path.extname(n).toLowerCase()] || "application/octet-stream", "x-upsert": "true", "Cache-Control": "max-age=31536000" },
+      body: fs.readFileSync(path.join(DIR, n)),
+    }).catch(() => null);
+    if (r?.ok) uploaded.add(n);
+    else { failed++; console.warn(`fail ${n}: ${r?.status} ${await r?.text().catch(() => "")}`); }
+  }));
+  if (i % 400 === 0) console.log(`${uploaded.size}/${todo.length}`);
 }
-console.log(`done: ${n} books, ${done.size} images`);
-await db.$disconnect();
+const swap = (u) => (u && uploaded.has(base(u)) ? PUBLIC + base(u) : u);
+for (const b of books) { b.cover = swap(b.cover); b.gallery = b.gallery.map(swap); }
+fs.writeFileSync(JSON_PATH, JSON.stringify(books));
+console.log(`uploaded ${uploaded.size}, failed ${failed}; catalogue now points at ${PUBLIC}`);

@@ -476,9 +476,16 @@ async function main() {
       },
     });
   }
-  // Clean legacy empty image paths (".../image/books/") so pages show the placeholder instead of a 403.
-  await prisma.$executeRaw`UPDATE "Book" SET "coverUrl" = NULL WHERE "coverUrl" LIKE '%/'`;
-  await prisma.$executeRaw`UPDATE "Book" SET "galleryUrls" = array(SELECT g FROM unnest("galleryUrls") g WHERE g NOT LIKE '%/') WHERE EXISTS (SELECT 1 FROM unnest("galleryUrls") g WHERE g LIKE '%/')`;
+  // Sync catalogue images in one query (legacy-site → Supabase Storage URLs, dead links → null).
+  // Only touches rows whose images still come from the catalogue, so admin-uploaded images are kept.
+  const imgs = JSON.stringify(REAL_PUBLISHER_BOOKS.map((x) => ({ id: x.id, cover: x.coverUrl, gallery: x.gallery })));
+  const synced = await prisma.$executeRaw`
+    UPDATE "Book" b SET "coverUrl" = x.cover, "galleryUrls" = x.gallery
+    FROM jsonb_to_recordset(${imgs}::jsonb) AS x(id text, cover text, gallery text[])
+    WHERE b.id = x.id
+      AND (b."coverUrl" IS NULL OR b."coverUrl" LIKE '%padanamapublication.lk%' OR b."coverUrl" LIKE '%/storage/v1/object/public/media/books/%')
+      AND (b."coverUrl" IS DISTINCT FROM x.cover OR b."galleryUrls" IS DISTINCT FROM x.gallery)`;
+  console.log(`🖼️  Catalogue images synced: ${synced}`);
 
   // Always reconcile product types (cheap; also fixes databases seeded before types existed).
   for (const t of ["STATIONERY", "LEARNING_AID"] as const) {

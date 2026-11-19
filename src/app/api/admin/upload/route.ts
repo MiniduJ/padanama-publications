@@ -18,7 +18,7 @@ export const POST = adminRoute(() => null, async (req) => {
   const path = `${new Date().toISOString().slice(0, 7)}/${randomUUID()}.${ext}`;
   const up = await fetch(`${url}/storage/v1/object/media/${path}`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": file.type, "x-upsert": "false" },
+    headers: { ...(key.startsWith("sb_") ? {} : { Authorization: `Bearer ${key}` }), apikey: key, "Content-Type": file.type, "x-upsert": "false" },
     body: Buffer.from(await file.arrayBuffer()),
   });
   if (!up.ok) throw new HttpError(502, `Storage error: ${await up.text()}`);
