@@ -504,6 +504,12 @@ async function main() {
   if (!(await prisma.socialPost.count())) {
     await prisma.socialPost.createMany({ data: DEFAULT_SOCIAL.map((p, i) => ({ kind: p.kind, url: p.url, thumbnailUrl: p.thumbnailUrl ?? null, caption: p.caption ?? null, sortOrder: i })) });
   }
+  // Move earlier-seeded site images off the legacy host (rows the admin changed don't match and stay as they are).
+  const LEGACY = "https://www.padanamapublication.lk/image/", SITE = "https://ufmcnjfvzxumcvmddpal.supabase.co/storage/v1/object/public/media/site/";
+  const moved =
+    (await prisma.$executeRaw`UPDATE "Banner" SET "imageUrl" = replace("imageUrl", ${LEGACY}, ${SITE}) WHERE "imageUrl" LIKE ${LEGACY + "%"}`) +
+    (await prisma.$executeRaw`UPDATE "SocialPost" SET "thumbnailUrl" = replace("thumbnailUrl", ${LEGACY}, ${SITE}) WHERE "thumbnailUrl" LIKE ${LEGACY + "%"}`);
+  if (moved) console.log(`🖼️  Site images moved to storage: ${moved}`);
   if (!(await prisma.testimonial.count())) {
     await prisma.testimonial.createMany({ data: DEFAULT_REVIEWS.map((r, i) => ({ name: r.name, location: r.location, rating: r.rating, comment: r.title ? `${r.title}
 

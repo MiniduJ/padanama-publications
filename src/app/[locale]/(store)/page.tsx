@@ -11,7 +11,7 @@ import { UserReviewsSection } from "@/components/store/UserReviewsSection";
 import { SocialMediaSection } from "@/components/store/SocialMediaSection";
 import { BookOpen, ShieldCheck, Truck, CreditCard, Sparkles, Phone, ArrowRight, GraduationCap } from "lucide-react";
 
-const IMG = "https://www.padanamapublication.lk/image";
+const IMG = "https://ufmcnjfvzxumcvmddpal.supabase.co/storage/v1/object/public/media/site";
 const FEATURE_META = [
   { image: `${IMG}/others/shortnotes.jpg`, link: "/books?category=gce-ol" },
   { image: `${IMG}/others/termpapers.jpg`, link: "/books" },

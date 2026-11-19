@@ -37,6 +37,22 @@ describe.skipIf(!run)("database integration", () => {
     expect(saved.samplePageUrls).toHaveLength(2);
   });
 
+  it("lists items with photos first, across page boundaries, without gaps or repeats", async () => {
+    const { getBooks } = await import("@/server/catalog/books");
+    const { db } = await import("@/server/db");
+    const withPhoto = await db.book.count({ where: { isDeleted: false, coverUrl: { not: null } } });
+    const limit = 12, boundary = Math.floor(withPhoto / limit) + 1; // page that holds the last photo items and the first placeholders
+    const seen: any[] = [];
+    for (const page of [1, boundary, boundary + 1]) {
+      const { books, pagination } = await getBooks({ page, limit });
+      expect(books).toHaveLength(limit);
+      expect(pagination.total).toBeGreaterThan(withPhoto);
+      seen.push(...books.map((b: any, i: number) => ({ id: b.id, photo: !!b.coverUrl, pos: (page - 1) * limit + i })));
+    }
+    for (const s of seen) expect(s.photo).toBe(s.pos < withPhoto);
+    expect(new Set(seen.map((s) => s.id)).size).toBe(seen.length);
+  });
+
   it("reader preview serves admin pages and counts reads", async () => {
     const { GET } = await import("@/app/api/reader/[slug]/preview/route");
     const d = await (await GET(req("/api/reader/382/preview"), ctx({ slug: "382" }))).json();

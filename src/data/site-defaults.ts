@@ -1,6 +1,6 @@
 // Built-in site content. Used as fallback before admin content exists, and loaded into the DB by prisma/seed.ts.
 // Keep imports relative (seed runs without the @ alias).
-const IMG = "https://www.padanamapublication.lk/image";
+const IMG = "https://ufmcnjfvzxumcvmddpal.supabase.co/storage/v1/object/public/media/site";
 export const FACEBOOK_URL = "https://www.facebook.com/padanama07/";
 export const YOUTUBE_URL = "https://www.youtube.com/@padanamapublication";
 

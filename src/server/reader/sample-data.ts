@@ -193,7 +193,7 @@ export function getReaderBookContent(
     titleSi: matchedBook ? matchedBook.titleSi : (slug === "ol-mathematics-short-notes" ? "සාමාන්‍ය පෙළ ගණිතය කෙටි සටහන් සහ සූත්‍ර සංග්‍රහය" : "5 ශ්‍රේණිය ශිෂ්‍යත්ව පෙරහුරු ප්‍රශ්න පත්‍ර"),
     titleEn: matchedBook ? matchedBook.titleEn : (slug === "ol-mathematics-short-notes" ? "O/L Mathematics Short Notes" : "Grade 5 Scholarship Model Papers"),
     authorName: "පදනම අධ්‍යාපනික මණ්ඩලය",
-    coverImage: matchedBook?.coverUrl || "https://padanamapublication.lk/image/books/1627556979.jpg",
+    coverImage: matchedBook?.coverUrl || "https://ufmcnjfvzxumcvmddpal.supabase.co/storage/v1/object/public/media/books/1627556979.jpg",
     totalPages,
     sampleMaxPages,
     chapters: sampleData.chapters,

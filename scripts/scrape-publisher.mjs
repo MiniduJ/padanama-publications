@@ -34,7 +34,7 @@ const slugify = (s) => s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/
 function parseDetail(id, html) {
   const title = decode(html.match(/<h3 class="product-title">([\s\S]*?)<\/h3>/)?.[1]);
   if (!title) return null;
-  const imgs = [...html.matchAll(/class="single-slide">\s*<center><img src="([^"]+)"/g)].map((m) => m[1]).filter((u) => !u.includes("book_default") && !u.endsWith("/"));
+  const imgs = [...html.matchAll(/class="single-slide">\s*<center><img src="([^"]+)"/g)].map((m) => m[1]).filter((u) => !u.includes("book_default") && /.(jpe?g|png|webp|gif)$/i.test(u)); // images only (the legacy site also served .php files from its image folder)
   const gallery = [...new Set(imgs.map(abs))];
   const stock = field(html, "Availability");
   const desc = html.match(/id="tab-1"[\s\S]*?<article class="review-article">([\s\S]*?)<\/article>/)?.[1] || "";

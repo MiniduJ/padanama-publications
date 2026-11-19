@@ -146,7 +146,7 @@ export default function BookFairPage() {
               title: "ශිෂ්‍යත්ව සහ O/L ආදර්ශ ප්‍රශ්න පත්‍ර කට්ටල නිකුතුව",
               category: "නව මුද්‍රණ",
               desc: "2026 විභාග සඳහා අලුතෙන්ම සම්පාදනය කළ පෙරහුරු හා ආදර්ශ ප්‍රශ්න පත්‍ර පොත් පෙළ එළිදැක්වීම.",
-              image: "https://www.padanamapublication.lk/image/bg-images/mainslide1.jpg",
+              image: "https://ufmcnjfvzxumcvmddpal.supabase.co/storage/v1/object/public/media/site/bg-images/mainslide1.jpg",
               tag: "නව නිකුත් කිරීම්",
             },
             {
@@ -167,7 +167,7 @@ export default function BookFairPage() {
               title: "5 ශ්‍රේණිය ශිෂ්‍යත්ව විශේෂ පුහුණු පොත් පෙළ ප්‍රදර්ශනය",
               category: "ප්‍රාථමික අංශය",
               desc: "කුඩා දරු දැරියන් සඳහා විභාග පෙරහුරු සහ IQ ප්‍රශ්න විවරණ ග්‍රන්ථ ප්‍රදර්ශනය කෙරෙන අයුරු.",
-              image: "https://www.padanamapublication.lk/image/bg-images/mainslide3.jpg",
+              image: "https://ufmcnjfvzxumcvmddpal.supabase.co/storage/v1/object/public/media/site/bg-images/mainslide3.jpg",
               tag: "ශිෂ්‍යත්ව අංශය",
             },
             {

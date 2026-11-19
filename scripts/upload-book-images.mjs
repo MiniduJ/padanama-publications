@@ -19,7 +19,7 @@ await fetch(`${url}/storage/v1/bucket`, { method: "POST", headers: { ...auth, "C
 const books = JSON.parse(fs.readFileSync(JSON_PATH, "utf8"));
 const base = (u) => path.basename(new URL(u).pathname);
 const uploaded = new Set();
-const todo = [...new Set(books.flatMap((b) => [b.cover, ...b.gallery]).filter(Boolean).map(base))].filter((n) => fs.existsSync(path.join(DIR, n)));
+const todo = [...new Set(books.flatMap((b) => [b.cover, ...b.gallery]).filter(Boolean).map(base))].filter((n) => TYPES[path.extname(n).toLowerCase()] && fs.existsSync(path.join(DIR, n))); // images only
 let failed = 0;
 for (let i = 0; i < todo.length; i += 8) {
   await Promise.all(todo.slice(i, i + 8).map(async (n) => {

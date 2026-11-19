@@ -76,21 +76,22 @@ export async function getBooks(params: BookFilterParams = {}) {
     if (sort === "rating") orderBy.push({ averageRating: "desc" });
     if (sort === "title") orderBy.push({ titleSi: "asc" });
 
-    const [books, totalCount] = await Promise.all([
-      db.book.findMany({
-        where,
-        include: {
-          authors: { include: { author: true } },
-          categories: { include: { category: true } },
-          editions: { where: { isDeleted: false }, orderBy: { isDigital: "asc" } },
-          sampleConfig: true,
-        },
-        orderBy,
-        skip,
-        take: limit,
-      }),
-      db.book.count({ where }),
+    // Items with a photo come first (in the chosen order), then the rest, so listings never open on a wall of placeholders.
+    const withPhoto = { ...where, AND: [{ coverUrl: { not: null } }, { coverUrl: { not: "" } }] };
+    const noPhoto = { ...where, AND: [{ OR: [{ coverUrl: null }, { coverUrl: "" }] }] };
+    const include = {
+      authors: { include: { author: true } },
+      categories: { include: { category: true } },
+      editions: { where: { isDeleted: false }, orderBy: { isDigital: "asc" as const } },
+      sampleConfig: true,
+    };
+    const [photoCount, totalCount] = await Promise.all([db.book.count({ where: withPhoto }), db.book.count({ where })]);
+    const fromPhoto = Math.max(0, Math.min(limit, photoCount - skip));
+    const [a, b] = await Promise.all([
+      fromPhoto ? db.book.findMany({ where: withPhoto, include, orderBy, skip, take: fromPhoto }) : [],
+      limit - fromPhoto ? db.book.findMany({ where: noPhoto, include, orderBy, skip: Math.max(0, skip - photoCount), take: limit - fromPhoto }) : [],
     ]);
+    const books = [...a, ...b];
 
     if (books && books.length > 0) {
       return {
@@ -245,6 +246,8 @@ export function getFallbackBooks(params: BookFilterParams = {}) {
   } else if (sort === "title") {
     filtered.sort((a, b) => a.titleSi.localeCompare(b.titleSi));
   }
+
+  filtered.sort((a, b) => Number(!a.coverUrl) - Number(!b.coverUrl)); // stable: photos first, order kept within each group
 
   const total = filtered.length;
   const startIndex = (page - 1) * limit;
